@@ -258,7 +258,7 @@ extension ReorderQuiz {
         prompt: "配列 [5, 2, 4, 1, 3] から選択ソートを1パス実行した直後の配列を作ってね。",
         pool: ["1","2","3","4","5"],
         answer: ["1","2","4","5","3"],
-        explanation: "最小値 1 を探して先頭の 5 と入れ替えるので [1, 2, 4, 5, 3] になる。"
+        explanation: "未ソート部分 [5,2,4,1,3] の最小値は 1（index 3）。これを先頭の 5 と入れ替えるので [1, 2, 4, 5, 3] になる。"
     )
 
     static let bfsTraversal: ReorderQuiz = .init(
