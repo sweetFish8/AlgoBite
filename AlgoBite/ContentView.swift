@@ -330,16 +330,51 @@ enum AppScreen: Hashable {
 
 // MARK: - Palette / Helpers (pop & friendly)
 
-enum Pop {
-    // 背景グラデーション
-    static let bgNeutralTop    = Color(red: 1.00, green: 0.97, blue: 0.93)   // #FFF7ED
-    static let bgNeutralBottom = Color(red: 1.00, green: 0.89, blue: 0.89)   // #FFE4E6
-    static let bgSuccessTop    = Color(red: 0.86, green: 0.99, blue: 0.91)   // #DCFCE7
-    static let bgSuccessBottom = Color(red: 0.73, green: 0.97, blue: 0.82)   // #BBF7D0
-    static let bgFailTop       = Color(red: 1.00, green: 0.84, blue: 0.84)   // #FECACA
-    static let bgFailBottom    = Color(red: 0.99, green: 0.84, blue: 0.67)   // #FED7AA
+/// light/dark を切替える Color。UIColor の dynamic provider 経由。
+extension Color {
+    static func dyn(light: Color, dark: Color) -> Color {
+        Color(UIColor { trait in
+            trait.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+        })
+    }
+}
 
-    // メインカラー
+enum Pop {
+    // 背景グラデーション (dark はディープウォーム)
+    static let bgNeutralTop = Color.dyn(
+        light: Color(red: 1.00, green: 0.97, blue: 0.93),
+        dark:  Color(red: 0.18, green: 0.13, blue: 0.16))
+    static let bgNeutralBottom = Color.dyn(
+        light: Color(red: 1.00, green: 0.89, blue: 0.89),
+        dark:  Color(red: 0.13, green: 0.09, blue: 0.13))
+    static let bgSuccessTop = Color.dyn(
+        light: Color(red: 0.86, green: 0.99, blue: 0.91),
+        dark:  Color(red: 0.07, green: 0.21, blue: 0.13))
+    static let bgSuccessBottom = Color.dyn(
+        light: Color(red: 0.73, green: 0.97, blue: 0.82),
+        dark:  Color(red: 0.05, green: 0.15, blue: 0.10))
+    static let bgFailTop = Color.dyn(
+        light: Color(red: 1.00, green: 0.84, blue: 0.84),
+        dark:  Color(red: 0.28, green: 0.10, blue: 0.13))
+    static let bgFailBottom = Color.dyn(
+        light: Color(red: 0.99, green: 0.84, blue: 0.67),
+        dark:  Color(red: 0.22, green: 0.10, blue: 0.08))
+
+    // カード面 (旧 .white と各パステル fill の置換)
+    static let surface = Color.dyn(
+        light: .white,
+        dark:  Color(red: 0.16, green: 0.14, blue: 0.18))
+    static let surfaceCream = Color.dyn(
+        light: Color(red: 1.00, green: 0.97, blue: 0.93),
+        dark:  Color(red: 0.22, green: 0.17, blue: 0.20))
+    static let surfaceMint = Color.dyn(
+        light: Color(red: 0.86, green: 0.99, blue: 0.91),
+        dark:  Color(red: 0.10, green: 0.22, blue: 0.15))
+    static let surfaceLavender = Color.dyn(
+        light: Color(red: 0.98, green: 0.96, blue: 1.00),
+        dark:  Color(red: 0.18, green: 0.16, blue: 0.26))
+
+    // メインカラー (高彩度なので両モード共通)
     static let primary       = Color(red: 0.35, green: 0.80, blue: 0.01)  // Duolingo Green #58CC02
     static let primaryShadow = Color(red: 0.27, green: 0.64, blue: 0.01)  // #46A302
     static let accent        = Color(red: 0.96, green: 0.62, blue: 0.04)  // #F59E0B
@@ -348,8 +383,20 @@ enum Pop {
     static let dangerShadow  = Color(red: 0.72, green: 0.11, blue: 0.11)  // #B91C1C
 
     // テキスト
-    static let ink     = Color(red: 0.17, green: 0.18, blue: 0.20)   // #2B2D31
-    static let inkSub  = Color(red: 0.42, green: 0.42, blue: 0.46)   // #6B6E76
+    static let ink = Color.dyn(
+        light: Color(red: 0.17, green: 0.18, blue: 0.20),
+        dark:  Color(red: 0.97, green: 0.95, blue: 0.92))
+    static let inkSub = Color.dyn(
+        light: Color(red: 0.42, green: 0.42, blue: 0.46),
+        dark:  Color(red: 0.74, green: 0.72, blue: 0.70))
+
+    // 温色系テキスト (#7C2D12 / #9A3412 / #92400E などをまとめて吸収)
+    static let inkWarm = Color.dyn(
+        light: Color(red: 0.49, green: 0.18, blue: 0.07),
+        dark:  Color(red: 1.00, green: 0.87, blue: 0.70))
+    static let inkWarmSub = Color.dyn(
+        light: Color(red: 0.60, green: 0.20, blue: 0.07),
+        dark:  Color(red: 0.95, green: 0.80, blue: 0.60))
 }
 
 /// Duolingo風の3D影付きボタン (下に offsetY 分のシャドウ層)
@@ -474,8 +521,6 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
-        // 温色パステルのお菓子テーマは light 固定。ダークモード時の眩しさ・コントラスト劣化を回避。
-        .preferredColorScheme(.light)
     }
 
     // MARK: 背景 (画面全体)
@@ -524,14 +569,14 @@ struct ContentView: View {
             CookieIcon(size: 36)
             Text("AlgoBite")
                 .font(.system(size: 26, weight: .black, design: .rounded))
-                .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))  // #7C2D12
+                .foregroundStyle(Pop.inkWarm)  // #7C2D12
             Spacer()
             HStack(spacing: 6) {
                 DonutIcon(size: 22)
                 Text(vm.todayDateString)
                     .font(.caption.weight(.heavy))
             }
-            .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))   // #9A3412
+            .foregroundStyle(Pop.inkWarmSub)   // #9A3412
             .padding(.leading, 6).padding(.trailing, 12)
             .padding(.vertical, 5)
             .background(Color(red: 1.00, green: 0.84, blue: 0.67),         // #FED7AA
@@ -542,7 +587,7 @@ struct ContentView: View {
     }
 
     private var todayPreviewCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.99, green: 0.79, blue: 0.79)) {       // #FECACA
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
@@ -558,7 +603,7 @@ struct ContentView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("今日のおやつ")
                             .font(.caption.weight(.heavy))
-                            .foregroundStyle(Color(red: 0.63, green: 0.39, blue: 0.05))  // #A16207
+                            .foregroundStyle(Pop.inkWarmSub)  // #A16207
                         // 完了済なら今日が Day N、未完了なら今日 = Day N+1 (連続を伸ばす一日)
                         Text("Day \(vm.isCompletedToday ? max(vm.streak, 1) : vm.streak + 1)")
                             .font(.caption2.weight(.semibold))
@@ -620,7 +665,7 @@ struct ContentView: View {
     }
 
     private var reorderPracticeCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {     // #DDD6FE
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
@@ -661,7 +706,7 @@ struct ContentView: View {
 
     // ⑥ 復習モードの導線
     private var reviewCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.99, green: 0.79, blue: 0.18)) {       // #FBBF24
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
@@ -701,7 +746,7 @@ struct ContentView: View {
     }
 
     private var streakSection: some View {
-        PopCard(fill: Color(red: 1.00, green: 0.97, blue: 0.93),                // #FFF7ED
+        PopCard(fill: Pop.surfaceCream,                                          // #FFF7ED
                 border: Color(red: 0.99, green: 0.73, blue: 0.45)) {            // #FDBA74
             VStack(alignment: .leading, spacing: 14) {
                 // 見出し
@@ -710,16 +755,16 @@ struct ContentView: View {
                         .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 8 }
                     Text("\(vm.streak)")
                         .font(.system(size: 44, weight: .black, design: .rounded))
-                        .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))   // #7C2D12
+                        .foregroundStyle(Pop.inkWarm)   // #7C2D12
                     Text("日連続！")
                         .font(.title3.weight(.heavy))
-                        .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
+                        .foregroundStyle(Pop.inkWarmSub)
                     Spacer()
                     HStack(spacing: 4) {
                         CakeIcon(size: 16)
                         Text("ストリーク")
                             .font(.caption2.weight(.heavy))
-                            .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
+                            .foregroundStyle(Pop.inkWarmSub)
                     }
                     .padding(.horizontal, 8).padding(.vertical, 4)
                     .background(Color(red: 1.00, green: 0.91, blue: 0.78),
@@ -750,7 +795,7 @@ struct ContentView: View {
                             }
                             Text(["月","火","水","木","金","土","日"][i])
                                 .font(.system(size: 9, weight: .heavy))
-                                .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
+                                .foregroundStyle(Pop.inkWarmSub)
                         }
                     }
                 }
@@ -761,12 +806,12 @@ struct ContentView: View {
                         CupcakeIcon(size: 18)
                         Text("また明日もおやつ食べようね")
                             .font(.caption.weight(.heavy))
-                            .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                            .foregroundStyle(Pop.inkWarm)
                     } else {
                         DonutIcon(size: 18)
                         Text("今日から1日目！はじめよう")
                             .font(.caption.weight(.heavy))
-                            .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                            .foregroundStyle(Pop.inkWarm)
                     }
                     Spacer()
                 }
@@ -829,14 +874,14 @@ struct ContentView: View {
                 Text("🍪")
                 Text("AlgoBite")
                     .font(.system(size: 20, weight: .black, design: .rounded))
-                    .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                    .foregroundStyle(Pop.inkWarm)
             }
             Spacer()
             HStack(spacing: 4) {
                 Text("🔥").font(.title3)
                 Text("\(vm.streak)")
                     .font(.system(size: 24, weight: .black, design: .rounded))
-                    .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
+                    .foregroundStyle(Pop.inkWarmSub)
             }
             .padding(.horizontal, 12).padding(.vertical, 6)
             .background(Color.white.opacity(0.7), in: Capsule())
@@ -846,7 +891,7 @@ struct ContentView: View {
 
     // MARK: Problem card
     private var problemCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.78, green: 0.82, blue: 0.99)) {      // #C7D2FE
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
@@ -964,7 +1009,7 @@ struct ContentView: View {
 
     // MARK: Answers panel
     private var answersPanel: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {      // #DDD6FE
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
@@ -1051,7 +1096,7 @@ struct ContentView: View {
 
     // MARK: Completion card (お祝い)
     private var completionCard: some View {
-        PopCard(fill: Color(red: 0.86, green: 0.99, blue: 0.91),                // #DCFCE7
+        PopCard(fill: Pop.surfaceMint,                                           // #DCFCE7
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {            // #22C55E
             VStack(spacing: 20) {
                 HStack(spacing: 6) {
@@ -1071,7 +1116,7 @@ struct ContentView: View {
                             Text("日連続！")
                                 .font(.headline.weight(.heavy))
                         }
-                        .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                        .foregroundStyle(Pop.inkWarm)
                         Text("また明日も来てね！")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Pop.inkSub)
@@ -1118,7 +1163,7 @@ struct ExplanationView: View {
     @State private var playToken: Int = 0
 
     var body: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.99, green: 0.90, blue: 0.52)) {        // #FDE68A
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
@@ -1126,7 +1171,7 @@ struct ExplanationView: View {
                         Text("✨").font(.title3)
                         Text("解説アニメーション")
                             .font(.subheadline.weight(.black))
-                            .foregroundStyle(Color(red: 0.57, green: 0.25, blue: 0.05))
+                            .foregroundStyle(Pop.inkWarmSub)
                     }
                     Spacer()
                     Button { play() } label: {
@@ -1170,7 +1215,7 @@ struct ExplanationView: View {
                         Text("💡").font(.title3)
                         Text("ポイント")
                             .font(.subheadline.weight(.black))
-                            .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                            .foregroundStyle(Pop.inkWarm)
                     }
                     Text(problem.explanation.isEmpty ? problem.prompt : problem.explanation)
                         .font(.footnote.weight(.medium))
@@ -1200,7 +1245,7 @@ struct ExplanationView: View {
                     .foregroundStyle(.white)
                 (Text("\(slot.label) → ")
                     .font(.caption.weight(.heavy))
-                    .foregroundStyle(Color(red: 0.57, green: 0.25, blue: 0.05))
+                    .foregroundStyle(Pop.inkWarmSub)
                 + Text(slot.answer)
                     .font(.system(.caption, design: .monospaced).weight(.black))
                     .foregroundStyle(Color(red: 0.13, green: 0.55, blue: 0.13)))
@@ -1802,7 +1847,7 @@ struct ReorderQuizView: View {
     }
 
     private var promptCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
@@ -1819,7 +1864,7 @@ struct ReorderQuizView: View {
     }
 
     private var answerArea: some View {
-        PopCard(fill: Color(red: 0.98, green: 0.96, blue: 1.00),
+        PopCard(fill: Pop.surfaceLavender,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -1882,7 +1927,7 @@ struct ReorderQuizView: View {
     }
 
     private var poolArea: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.99, green: 0.90, blue: 0.52)) {
             VStack(alignment: .leading, spacing: 10) {
                 Text("候補")
@@ -1907,7 +1952,7 @@ struct ReorderQuizView: View {
                                     .overlay(RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color(red: 0.99, green: 0.79, blue: 0.18),
                                                 lineWidth: 2))
-                                    .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                                    .foregroundStyle(Pop.inkWarm)
                             }
                             .buttonStyle(.plain)
                             .disabled(model.isGrading)
@@ -1929,7 +1974,7 @@ struct ReorderQuizView: View {
                         Text("リセット")
                             .font(.subheadline.weight(.heavy))
                     }
-                    .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                    .foregroundStyle(Pop.inkWarm)
                 }
                 .disabled(model.picks.isEmpty || model.isGrading)
                 .opacity((model.picks.isEmpty || model.isGrading) ? 0.5 : 1)
@@ -1955,7 +2000,7 @@ struct ReorderQuizView: View {
     }
 
     private var completionCard: some View {
-        PopCard(fill: Color(red: 0.73, green: 0.97, blue: 0.82),
+        PopCard(fill: Pop.surfaceMint,
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 8) {
