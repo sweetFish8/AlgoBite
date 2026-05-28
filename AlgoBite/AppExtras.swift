@@ -2,6 +2,14 @@ import SwiftUI
 import UIKit
 import UserNotifications
 
+// MARK: - Shared UserDefaults (App Group)
+
+/// メインアプリと Widget で共有する UserDefaults。
+/// App Group が有効ならそちら、無ければ .standard にフォールバック。
+let appDefaults: UserDefaults = {
+    UserDefaults(suiteName: "group.app.Goto.Sakana.AlgoBite") ?? .standard
+}()
+
 // MARK: - Sweet Illustrations (ポップなお菓子イラスト)
 // 絵文字ではなく SwiftUI Shape で描いた可愛いお菓子アイコン群。
 
@@ -403,7 +411,7 @@ final class StatsStore: ObservableObject {
     static let shared = StatsStore()
 
     init() {
-        let d = UserDefaults.standard
+        let d = appDefaults
         totalSolved   = d.integer(forKey: kTotal)
         solvedDates   = Set((d.array(forKey: kDates) as? [String]) ?? [])
         topicCounts   = (d.dictionary(forKey: kTopics) as? [String: Int]) ?? [:]
@@ -449,7 +457,7 @@ final class StatsStore: ObservableObject {
     }
 
     private func persist() {
-        let d = UserDefaults.standard
+        let d = appDefaults
         d.set(totalSolved, forKey: kTotal)
         d.set(Array(solvedDates), forKey: kDates)
         d.set(topicCounts, forKey: kTopics)
@@ -488,7 +496,7 @@ final class BadgeStore: ObservableObject {
     static let shared = BadgeStore()
 
     init() {
-        let d = UserDefaults.standard
+        let d = appDefaults
         unlocked = Set((d.array(forKey: key) as? [String]) ?? [])
     }
 
@@ -509,7 +517,7 @@ final class BadgeStore: ObservableObject {
         if stats.topicCounts.values.contains(where: { $0 >= 5 }) { add("topic_5") }
 
         if !newOnes.isEmpty {
-            UserDefaults.standard.set(Array(unlocked), forKey: key)
+            appDefaults.set(Array(unlocked), forKey: key)
             if let first = newOnes.first, let badge = BadgeCatalog.by(first) {
                 justUnlocked = badge
                 Haptics.success()
@@ -564,7 +572,7 @@ enum AppNotifications {
     static let enabledKey = "algobite.notifications.enabled"
 
     static func requestAuthorizationIfNeeded() {
-        let d = UserDefaults.standard
+        let d = appDefaults
         guard !d.bool(forKey: askedKey) else {
             // 既に確認済 → 有効ならスケジュール
             if d.bool(forKey: enabledKey) { scheduleDaily() }
