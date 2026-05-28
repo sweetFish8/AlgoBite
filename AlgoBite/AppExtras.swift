@@ -1577,7 +1577,7 @@ extension ReorderQuiz {
         prompt: "配列 [3, 1, 4, 2] で pivot=2 (末尾) の Lomuto partition を1回実行した直後。",
         pool: ["1","2","3","4"],
         answer: ["1","2","4","3"],
-        explanation: "pivot 未満を左に集めて最後に pivot を境界へ。1 < 2 → 左に、3 と 4 は右に残る。"
+        explanation: "Lomuto: 境界 i=-1 から走査し、pivot 未満を見つけたら i を進めて swap。j=1 で 1<2 → i=0, swap a[0]↔a[1] で [1,3,4,2]。最後に a[i+1=1] と pivot a[末尾] を swap して [1,2,4,3]。(Hoare partition だと別配置になる点に注意)"
     )
 
     static let minHeapInsert: ReorderQuiz = .init(
@@ -1774,10 +1774,10 @@ extension ReorderQuiz {
         id: "union-find-merge",
         title: "Union-Find の代表元",
         topic: "グラフ / Union Find",
-        prompt: "5 要素 (0..4) に union(0,1), union(2,3), union(1,3) を順に適用した後、各要素の代表元 (root) を 0,1,2,3,4 の順に並べて (path compression あり)。",
+        prompt: "5 要素 (0..4) に union(0,1), union(2,3), union(1,3) を順に適用した後、各要素の代表元 (root) を 0,1,2,3,4 の順に並べて。\n注: union(a,b) では a の root を b の root の親にする (= 左側の root が親になる) ルール、path compression あり。",
         pool: ["0","0","0","0","4"],
         answer: ["0","0","0","0","4"],
-        explanation: "全部 0 のグループに統合されて root=0、4 だけ独立で root=4。"
+        explanation: "union(0,1): root(1)=1 の親を root(0)=0 にする → {0,1} 全部 root 0。union(2,3): {2,3} 全部 root 2。union(1,3): root(3)=2 の親を root(1)=0 にする → 全要素 (4 以外) が root 0 に統合。4 は単独なので root 4。"
     )
 
     static let mergeSortSplitMerge: ReorderQuiz = .init(
