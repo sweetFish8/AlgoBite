@@ -552,7 +552,8 @@ struct ContentView: View {
                         Text("今日のおやつ")
                             .font(.caption.weight(.heavy))
                             .foregroundStyle(Color(red: 0.63, green: 0.39, blue: 0.05))  // #A16207
-                        Text("Day \(vm.streak + 1)")
+                        // 完了済なら今日が Day N、未完了なら今日 = Day N+1 (連続を伸ばす一日)
+                        Text("Day \(vm.isCompletedToday ? max(vm.streak, 1) : vm.streak + 1)")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(Pop.inkSub)
                     }
@@ -1601,7 +1602,7 @@ extension ReorderQuiz {
         prompt: "配列 [5, 2, 4, 1, 3] にバブルソートを1パス実行した直後の並びになるように、要素を順番にタップしてね。",
         pool: ["1", "2", "3", "4", "5"],
         answer: ["2", "4", "1", "3", "5"],
-        explanation: "隣同士を比較・交換しながら左から右へ進むので、最大値 5 が右端まで押し出される。それ以外は1つずつ左へずれる。"
+        explanation: "隣同士を比較しながら左から右へ進むと、最大値 5 が右端まで押し出される。他の要素は元の相対順序を保ったまま、5 が通り過ぎた分だけ左へ1つずれる。"
     )
 }
 
@@ -1664,12 +1665,14 @@ final class ReorderQuizViewModel: ObservableObject {
     func pick(_ value: String) {
         guard !isCompleted, !isGrading else { return }
         picks.append(value)
+        Haptics.selection()
     }
 
     func removeAt(_ index: Int) {
         guard !isCompleted, !isGrading else { return }
         guard picks.indices.contains(index) else { return }
         picks.remove(at: index)
+        Haptics.light()
     }
 
     func reset() {
@@ -1678,6 +1681,7 @@ final class ReorderQuizViewModel: ObservableObject {
         gradedMask = []
         shakeTrigger = [:]
         resultMood = .neutral
+        Haptics.light()
     }
 
     func submit() {
@@ -1690,10 +1694,19 @@ final class ReorderQuizViewModel: ObservableObject {
         if mask.allSatisfy({ $0 }) {
             isCompleted = true
             resultMood = .success
+            Haptics.success()
+            // ③ 累計統計に反映し、④ バッジを再評価
+            let stats = StatsStore.shared
+            stats.recordReorderClear()
+            BadgeStore.shared.evaluate(
+                stats: stats,
+                streak: UserDefaults.standard.integer(forKey: "algobite.streak")
+            )
             return
         }
 
         resultMood = .fail
+        Haptics.error()
         for (idx, ok) in mask.enumerated() where !ok {
             shakeTrigger[idx, default: 0] += 1
         }
