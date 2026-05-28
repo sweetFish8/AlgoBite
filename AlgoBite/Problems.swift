@@ -310,7 +310,7 @@ private let p51_100: [PuzzleProblem] = [
 
     // 64. Rotate Array
     PuzzleProblem(
-        id: "rotate-array", title: "Rotate Array", difficulty: "Easy", topic: "Array / Two Pointers",
+        id: "rotate-array", title: "Rotate Array", difficulty: "Medium", topic: "Array / Two Pointers",
         prompt: "配列を右に k 要素回転させてください（in-place）。",
         example: "例: nums=[1,2,3,4,5,6,7], k=3  →  [5,6,7,1,2,3,4]",
         template: [
@@ -1340,7 +1340,7 @@ private let p1_50: [PuzzleProblem] = [
 
     // 7. BFS
     PuzzleProblem(
-        id: "bfs", title: "BFS", difficulty: "Medium", topic: "Graph / BFS",
+        id: "bfs", title: "BFS", difficulty: "Easy", topic: "Graph / BFS",
         prompt: "グラフを幅優先探索し、訪問済みノードの集合を返してください。",
         example: "例: graph={0:[1,2],1:[3]},  start=0  →  {0,1,2,3}",
         template: [
@@ -1365,7 +1365,7 @@ private let p1_50: [PuzzleProblem] = [
 
     // 8. DFS (Iterative)
     PuzzleProblem(
-        id: "dfs-iterative", title: "DFS (Iterative)", difficulty: "Medium", topic: "Graph / DFS",
+        id: "dfs-iterative", title: "DFS (Iterative)", difficulty: "Easy", topic: "Graph / DFS",
         prompt: "スタックを使った反復 DFS でグラフを探索し、訪問済みノード集合を返してください。",
         example: "例: graph={0:[1,2],1:[3]},  start=0  →  {0,1,2,3}",
         template: [
@@ -1905,7 +1905,7 @@ private let p1_50: [PuzzleProblem] = [
 
     // 31. Inorder Traversal (Iterative)
     PuzzleProblem(
-        id: "inorder-iter", title: "Inorder Traversal", difficulty: "Medium", topic: "Tree",
+        id: "inorder-iter", title: "Inorder Traversal", difficulty: "Easy", topic: "Tree",
         prompt: "スタックを使った反復中順走査を実装してください。",
         example: "例: BST [4,2,6,1,3]  →  [1,2,3,4,6]",
         template: [
@@ -2244,7 +2244,7 @@ private let p1_50: [PuzzleProblem] = [
 
     // 46. Trie Insert
     PuzzleProblem(
-        id: "trie-insert", title: "Trie Insert", difficulty: "Medium", topic: "Trie",
+        id: "trie-insert", title: "Trie Insert", difficulty: "Easy", topic: "Trie",
         prompt: "Trie（プレフィックスツリー）への挿入を実装してください。",
         example: "例: insert('apple') → 'apple' が検索可能になる",
         template: [
