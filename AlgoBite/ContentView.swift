@@ -648,6 +648,44 @@ struct ContentView: View {
         }
     }
 
+    // ⑥ 復習モードの導線
+    private var reviewCard: some View {
+        PopCard(fill: .white,
+                border: Color(red: 0.99, green: 0.79, blue: 0.18)) {       // #FBBF24
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 1.00, green: 0.95, blue: 0.78))   // #FEF3C7
+                            .frame(width: 48, height: 48)
+                        Text("📖").font(.system(size: 26))
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("復習モード")
+                            .font(.subheadline.weight(.black))
+                            .foregroundStyle(Pop.ink)
+                        Text("過去問にもう一度挑戦")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Pop.inkSub)
+                    }
+                    Spacer()
+                    popBadge("全 \(vm.problems.count) 問",
+                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),
+                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))
+                }
+                PopButton(fill: Pop.accent,
+                          shadow: Pop.accentShadow,
+                          action: { path.append(.review) }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "books.vertical.fill")
+                        Text("過去問を見る！")
+                            .font(.subheadline.weight(.heavy))
+                    }
+                }
+            }
+        }
+    }
+
     private var streakSection: some View {
         PopCard(fill: Color(red: 1.00, green: 0.97, blue: 0.93),                // #FFF7ED
                 border: Color(red: 0.99, green: 0.73, blue: 0.45)) {            // #FDBA74
