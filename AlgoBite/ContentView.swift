@@ -518,25 +518,25 @@ struct ContentView: View {
     }
 
     private var homeHeader: some View {
-        HStack(spacing: 6) {
-            Text("🍪").font(.system(size: 30))
+        HStack(spacing: 8) {
+            CookieIcon(size: 36)
             Text("AlgoBite")
                 .font(.system(size: 26, weight: .black, design: .rounded))
                 .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))  // #7C2D12
-            Text("✨").font(.system(size: 18))
             Spacer()
-            HStack(spacing: 4) {
-                Text("🍩").font(.system(size: 14))
+            HStack(spacing: 6) {
+                DonutIcon(size: 22)
                 Text(vm.todayDateString)
                     .font(.caption.weight(.heavy))
             }
             .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))   // #9A3412
-            .padding(.horizontal, 12).padding(.vertical, 7)
+            .padding(.leading, 6).padding(.trailing, 12)
+            .padding(.vertical, 5)
             .background(Color(red: 1.00, green: 0.84, blue: 0.67),         // #FED7AA
                         in: Capsule())
             .overlay(Capsule().stroke(Color(red: 0.99, green: 0.73, blue: 0.45), lineWidth: 1.5))
         }
-        .padding(.vertical, 14)
+        .padding(.vertical, 12)
     }
 
     private var todayPreviewCard: some View {
@@ -547,11 +547,11 @@ struct ContentView: View {
                     ZStack {
                         Circle()
                             .fill(Color(red: 1.00, green: 0.92, blue: 0.85))   // donut peach
-                            .frame(width: 56, height: 56)
+                            .frame(width: 60, height: 60)
                         Circle()
                             .stroke(Color(red: 0.99, green: 0.73, blue: 0.45), lineWidth: 2)
-                            .frame(width: 56, height: 56)
-                        Text("🍩").font(.system(size: 32))
+                            .frame(width: 60, height: 60)
+                        DonutIcon(size: 44)
                     }
                     VStack(alignment: .leading, spacing: 2) {
                         Text("今日のおやつ")
@@ -625,11 +625,11 @@ struct ContentView: View {
                     ZStack {
                         Circle()
                             .fill(Color(red: 0.96, green: 0.93, blue: 1.00))   // #F3F0FF
-                            .frame(width: 52, height: 52)
+                            .frame(width: 56, height: 56)
                         Circle()
                             .stroke(Color(red: 0.78, green: 0.72, blue: 0.98), lineWidth: 2)
-                            .frame(width: 52, height: 52)
-                        Text("🧁").font(.system(size: 28))
+                            .frame(width: 56, height: 56)
+                        CupcakeIcon(size: 44)
                     }
                     VStack(alignment: .leading, spacing: 2) {
                         Text("並べ替え練習")
@@ -666,11 +666,11 @@ struct ContentView: View {
                     ZStack {
                         Circle()
                             .fill(Color(red: 0.97, green: 0.85, blue: 0.70))   // milky chocolate cream
-                            .frame(width: 52, height: 52)
+                            .frame(width: 56, height: 56)
                         Circle()
                             .stroke(Color(red: 0.71, green: 0.46, blue: 0.20), lineWidth: 2)
-                            .frame(width: 52, height: 52)
-                        Text("🍫").font(.system(size: 28))
+                            .frame(width: 56, height: 56)
+                        ChocolateIcon(size: 44)
                     }
                     VStack(alignment: .leading, spacing: 2) {
                         Text("復習モード")
@@ -702,9 +702,10 @@ struct ContentView: View {
         PopCard(fill: Color(red: 1.00, green: 0.97, blue: 0.93),                // #FFF7ED
                 border: Color(red: 0.99, green: 0.73, blue: 0.45)) {            // #FDBA74
             VStack(alignment: .leading, spacing: 14) {
-                // ✨ 甘い見出し ✨
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("🔥").font(.system(size: 34))
+                // 見出し
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    FlameIcon(size: 36)
+                        .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 8 }
                     Text("\(vm.streak)")
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))   // #7C2D12
@@ -712,8 +713,8 @@ struct ContentView: View {
                         .font(.title3.weight(.heavy))
                         .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
                     Spacer()
-                    HStack(spacing: 3) {
-                        Text("🍰").font(.system(size: 14))
+                    HStack(spacing: 4) {
+                        CakeIcon(size: 16)
                         Text("ストリーク")
                             .font(.caption2.weight(.heavy))
                             .foregroundStyle(Color(red: 0.60, green: 0.20, blue: 0.07))
@@ -723,7 +724,7 @@ struct ContentView: View {
                                 in: Capsule())
                 }
 
-                // 🍪 食べた日 = クッキー、まだ = 空き皿
+                // クッキーの日めくり
                 HStack(spacing: 8) {
                     ForEach(0..<7) { i in
                         let filled = i < min(vm.streak, 7)
@@ -731,9 +732,9 @@ struct ContentView: View {
                             ZStack {
                                 Circle()
                                     .fill(filled
-                                          ? Color(red: 1.00, green: 0.84, blue: 0.55)  // cookie tan
+                                          ? Color(red: 1.00, green: 0.93, blue: 0.78)
                                           : Color.white)
-                                    .frame(width: 30, height: 30)
+                                    .frame(width: 32, height: 32)
                                     .overlay(
                                         Circle()
                                             .stroke(filled
@@ -742,7 +743,7 @@ struct ContentView: View {
                                                     lineWidth: 1.4)
                                     )
                                 if filled {
-                                    Text("🍪").font(.system(size: 16))
+                                    CookieIcon(size: 24)
                                 }
                             }
                             Text(["月","火","水","木","金","土","日"][i])
@@ -752,16 +753,20 @@ struct ContentView: View {
                     }
                 }
 
-                if vm.streak > 0 {
-                    Text("また明日もおやつ食べようね 🧁")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                } else {
-                    Text("🍩 今日から1日目！はじめよう")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
-                        .frame(maxWidth: .infinity, alignment: .center)
+                HStack(spacing: 6) {
+                    Spacer()
+                    if vm.streak > 0 {
+                        CupcakeIcon(size: 18)
+                        Text("また明日もおやつ食べようね")
+                            .font(.caption.weight(.heavy))
+                            .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                    } else {
+                        DonutIcon(size: 18)
+                        Text("今日から1日目！はじめよう")
+                            .font(.caption.weight(.heavy))
+                            .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                    }
+                    Spacer()
                 }
             }
         }
