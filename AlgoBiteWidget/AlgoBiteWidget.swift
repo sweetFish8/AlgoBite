@@ -2,7 +2,7 @@
 //  AlgoBiteWidget.swift
 //  AlgoBiteWidget
 //
-//  Small/Medium ウィジェット — 今日のおやつ + ストリーク
+//  Small/Medium ウィジェット — 今日のひと口 + ストリーク
 //
 
 import WidgetKit
@@ -144,8 +144,8 @@ struct AlgoBiteWidgetView: View {
                             .foregroundStyle(ink)
                     }
                     Text(entry.isCompletedToday
-                         ? "今日のおやつクリア！"
-                         : "今日のおやつできてるよ")
+                         ? "今日のひと口、ごちそうさま！"
+                         : "今日のひと口できてるよ")
                         .font(.subheadline.weight(.heavy))
                         .foregroundStyle(ink)
                         .lineLimit(2)
@@ -204,7 +204,7 @@ struct AlgoBiteWidget: Widget {
             }
         }
         .configurationDisplayName("AlgoBite")
-        .description("今日のおやつとストリークを表示します🍪")
+        .description("今日のひと口とストリークを表示します🍪")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

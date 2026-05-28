@@ -303,7 +303,65 @@ struct CakeIcon: View {
     }
 }
 
-/// 炎アイコン (ストリーク用)
+/// ストリーク用：3 段に積まれたクッキータワー
+struct CookieStackIcon: View {
+    var size: CGFloat = 36
+    var body: some View {
+        ZStack {
+            // 影
+            Ellipse()
+                .fill(Color.black.opacity(0.18))
+                .frame(width: size * 0.75, height: size * 0.10)
+                .offset(y: size * 0.46)
+            // 下段クッキー
+            tier(yOffset: 0.22, scale: 1.00, tint: 0)
+            // 中段
+            tier(yOffset: -0.04, scale: 0.85, tint: 1)
+            // 上段
+            tier(yOffset: -0.30, scale: 0.66, tint: 2)
+            // てっぺんに星
+            Path { p in
+                let r = size * 0.10
+                let cy = -size * 0.46
+                for i in 0..<5 {
+                    let a = Double(i) * .pi * 2 / 5 - .pi / 2
+                    let pt = CGPoint(x: r * cos(a), y: cy + r * sin(a))
+                    if i == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+                    let a2 = a + .pi / 5
+                    p.addLine(to: CGPoint(x: r * 0.45 * cos(a2),
+                                          y: cy + r * 0.45 * sin(a2)))
+                }
+                p.closeSubpath()
+            }
+            .fill(Color(red: 0.99, green: 0.78, blue: 0.18))
+            .frame(width: size, height: size)
+        }
+        .frame(width: size, height: size)
+    }
+    private func tier(yOffset: CGFloat, scale: CGFloat, tint: Int) -> some View {
+        let palette: [Color] = [
+            Color(red: 0.90, green: 0.70, blue: 0.40),  // 一番下：濃い焼き色
+            Color(red: 0.94, green: 0.76, blue: 0.46),
+            Color(red: 0.97, green: 0.82, blue: 0.55),  // 一番上：ふんわり
+        ]
+        return ZStack {
+            Ellipse()
+                .fill(palette[tint])
+                .frame(width: size * scale * 0.85, height: size * scale * 0.30)
+            // チョコチップ点
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(Color(red: 0.30, green: 0.16, blue: 0.06))
+                    .frame(width: size * scale * 0.07, height: size * scale * 0.07)
+                    .offset(x: size * scale * (-0.20 + 0.20 * CGFloat(i)),
+                            y: 0)
+            }
+        }
+        .offset(y: size * yOffset)
+    }
+}
+
+/// 炎アイコン (旧 streak 用、他で参照されているので残す)
 struct FlameIcon: View {
     var size: CGFloat = 36
     var body: some View {
@@ -366,6 +424,387 @@ struct FlameIcon: View {
             ], startPoint: .top, endPoint: .bottom))
         }
         .frame(width: size, height: size)
+    }
+}
+
+// MARK: - Achievements Screen — 実績まとめ画面
+
+/// ヘッダー右上から開く実績画面。これまでの統計とバッジコレクションを 1 画面に集約。
+struct AchievementsView: View {
+    @ObservedObject var stats: StatsStore
+    @ObservedObject var badges: BadgeStore
+
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [Pop.bgNeutralTop, Pop.bgNeutralBottom],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: 16) {
+                    // ヘッダー：アイコン + サマリーテキスト
+                    HStack(spacing: 12) {
+                        CakeIcon(size: 56)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("これまでの記録")
+                                .font(.headline.weight(.black))
+                                .foregroundStyle(Pop.ink)
+                            Text("ちょっとずつでも、積み重ねが甘い")
+                                .font(.caption.weight(.heavy))
+                                .foregroundStyle(Pop.inkSub)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 4)
+                    StatsCard(stats: stats, badges: badges)
+                    BadgesCard(badges: badges)
+                }
+                .padding(16)
+            }
+        }
+        .navigationTitle("実績")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Topic Illustration — 問題ごとの抽象アルゴ図
+
+/// トピック文字列を見て、ざっくり「何をする問題か」を伝える抽象イラストを返す。
+/// プロブレム数は多いがトピックは限られるので、kind を判定して 1 つに集約。
+struct TopicIllustration: View {
+    let topic: String
+    var size: CGFloat = 72
+
+    enum Kind {
+        case twoPointers, binarySearch, sort, hashMap, stack, queue, linkedList
+        case tree, graph, dp, backtracking, string, slidingWindow, bit, generic
+    }
+
+    var kind: Kind {
+        let t = topic.lowercased()
+        if t.contains("two pointer") || t.contains("two pointers") { return .twoPointers }
+        if t.contains("binary search") { return .binarySearch }
+        if t.contains("sort") || t.contains("sorting")             { return .sort }
+        if t.contains("hash")                                      { return .hashMap }
+        if t.contains("stack")                                     { return .stack }
+        if t.contains("queue")                                     { return .queue }
+        if t.contains("linked list")                               { return .linkedList }
+        if t.contains("tree") || t.contains("bst") || t.contains("trie") { return .tree }
+        if t.contains("graph") || t.contains("bfs") || t.contains("dfs") { return .graph }
+        if t.contains("dp") || t.contains("dynamic")               { return .dp }
+        if t.contains("backtrack")                                 { return .backtracking }
+        if t.contains("sliding")                                   { return .slidingWindow }
+        if t.contains("bit")                                       { return .bit }
+        if t.contains("string")                                    { return .string }
+        return .generic
+    }
+
+    var body: some View {
+        ZStack {
+            // 統一の角丸背景 (ほんのり淡い色)
+            RoundedRectangle(cornerRadius: size * 0.16)
+                .fill(Color(red: 1.00, green: 0.97, blue: 0.93).opacity(0.95))
+            RoundedRectangle(cornerRadius: size * 0.16)
+                .strokeBorder(Color(red: 0.99, green: 0.79, blue: 0.45).opacity(0.6),
+                              lineWidth: size * 0.02)
+            illustration
+                .padding(size * 0.12)
+        }
+        .frame(width: size, height: size)
+    }
+
+    @ViewBuilder
+    private var illustration: some View {
+        switch kind {
+        case .twoPointers:   twoPointersArt
+        case .binarySearch:  binarySearchArt
+        case .sort:          sortArt
+        case .hashMap:       hashArt
+        case .stack:         stackArt
+        case .queue:         queueArt
+        case .linkedList:    linkedListArt
+        case .tree:          treeArt
+        case .graph:         graphArt
+        case .dp:            dpArt
+        case .backtracking:  backtrackingArt
+        case .slidingWindow: slidingArt
+        case .bit:           bitArt
+        case .string:        stringArt
+        case .generic:       genericArt
+        }
+    }
+
+    private var accent: Color { Color(red: 0.55, green: 0.20, blue: 0.92) }
+    private var accent2: Color { Color(red: 0.96, green: 0.62, blue: 0.04) }
+    private var ink: Color { Color(red: 0.34, green: 0.18, blue: 0.50) }
+
+    // 共通の "5 つの並び" シルエット (sort/search/string などで使い回し)
+    private func row(width w: CGFloat, fill: @escaping (Int) -> Color) -> some View {
+        HStack(spacing: w * 0.05) {
+            ForEach(0..<5, id: \.self) { i in
+                RoundedRectangle(cornerRadius: w * 0.03)
+                    .fill(fill(i))
+                    .frame(width: w * 0.13, height: w * 0.30)
+            }
+        }
+    }
+
+    // ▶ Two Pointers — 両端から内側へ向かう矢印
+    private var twoPointersArt: some View {
+        VStack(spacing: size * 0.08) {
+            row(width: size) { _ in ink.opacity(0.25) }
+            HStack {
+                Image(systemName: "arrow.right")
+                    .font(.system(size: size * 0.18, weight: .black))
+                    .foregroundStyle(accent)
+                Spacer()
+                Image(systemName: "arrow.left")
+                    .font(.system(size: size * 0.18, weight: .black))
+                    .foregroundStyle(accent2)
+            }
+        }
+    }
+
+    // ▶ Binary Search — 中央のハイライト＋外側がフェード
+    private var binarySearchArt: some View {
+        VStack(spacing: size * 0.06) {
+            row(width: size) { i in
+                i == 2 ? accent : ink.opacity(0.20 + abs(2 - Double(i)) * 0.05)
+            }
+            HStack {
+                Image(systemName: "arrow.right")
+                    .font(.system(size: size * 0.16, weight: .black))
+                    .foregroundStyle(ink.opacity(0.5))
+                Spacer()
+                Image(systemName: "scope")
+                    .font(.system(size: size * 0.22))
+                    .foregroundStyle(accent)
+                Spacer()
+                Image(systemName: "arrow.left")
+                    .font(.system(size: size * 0.16, weight: .black))
+                    .foregroundStyle(ink.opacity(0.5))
+            }
+        }
+    }
+
+    // ▶ Sort — 棒グラフを昇順に
+    private var sortArt: some View {
+        HStack(alignment: .bottom, spacing: size * 0.04) {
+            ForEach(0..<6, id: \.self) { i in
+                RoundedRectangle(cornerRadius: size * 0.03)
+                    .fill(LinearGradient(colors: [accent2, accent],
+                                         startPoint: .top, endPoint: .bottom))
+                    .frame(width: size * 0.09,
+                           height: size * (0.16 + CGFloat(i) * 0.10))
+            }
+        }
+    }
+
+    // ▶ Hash — # + buckets
+    private var hashArt: some View {
+        VStack(spacing: size * 0.06) {
+            Image(systemName: "number")
+                .font(.system(size: size * 0.30, weight: .black))
+                .foregroundStyle(accent)
+            HStack(spacing: size * 0.06) {
+                ForEach(0..<3, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: size * 0.04)
+                        .fill(ink.opacity(0.20 + Double(i) * 0.18))
+                        .frame(width: size * 0.18, height: size * 0.18)
+                }
+            }
+        }
+    }
+
+    // ▶ Stack — 縦積み
+    private var stackArt: some View {
+        VStack(spacing: size * 0.03) {
+            ForEach(0..<4, id: \.self) { i in
+                RoundedRectangle(cornerRadius: size * 0.03)
+                    .fill(i == 0 ? accent : ink.opacity(0.30))
+                    .frame(width: size * 0.50, height: size * 0.10)
+            }
+        }
+    }
+
+    // ▶ Queue — 横並び + 入出口矢印
+    private var queueArt: some View {
+        HStack(spacing: size * 0.03) {
+            Image(systemName: "arrow.right")
+                .font(.system(size: size * 0.14, weight: .heavy))
+                .foregroundStyle(accent2)
+            ForEach(0..<4, id: \.self) { i in
+                RoundedRectangle(cornerRadius: size * 0.03)
+                    .fill(i == 0 ? accent : ink.opacity(0.30))
+                    .frame(width: size * 0.10, height: size * 0.30)
+            }
+            Image(systemName: "arrow.right")
+                .font(.system(size: size * 0.14, weight: .heavy))
+                .foregroundStyle(accent)
+        }
+    }
+
+    // ▶ Linked List — 円⇒円
+    private var linkedListArt: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(i == 0 ? accent : ink.opacity(0.45))
+                    .frame(width: size * 0.18, height: size * 0.18)
+                if i < 2 {
+                    Rectangle()
+                        .fill(ink.opacity(0.45))
+                        .frame(width: size * 0.10, height: size * 0.03)
+                }
+            }
+        }
+    }
+
+    // ▶ Tree — 三角3層
+    private var treeArt: some View {
+        ZStack {
+            // ノード
+            Circle().fill(accent).frame(width: size * 0.16, height: size * 0.16)
+                .offset(y: -size * 0.28)
+            Circle().fill(ink.opacity(0.45)).frame(width: size * 0.13, height: size * 0.13)
+                .offset(x: -size * 0.22, y: 0)
+            Circle().fill(ink.opacity(0.45)).frame(width: size * 0.13, height: size * 0.13)
+                .offset(x: size * 0.22, y: 0)
+            Circle().fill(ink.opacity(0.30)).frame(width: size * 0.10, height: size * 0.10)
+                .offset(x: -size * 0.30, y: size * 0.26)
+            Circle().fill(ink.opacity(0.30)).frame(width: size * 0.10, height: size * 0.10)
+                .offset(x: -size * 0.12, y: size * 0.26)
+            // 線 (parent → child)
+            Path { p in
+                p.move(to: CGPoint(x: size * 0.36, y: size * 0.08))
+                p.addLine(to: CGPoint(x: size * 0.14, y: size * 0.36))
+                p.move(to: CGPoint(x: size * 0.36, y: size * 0.08))
+                p.addLine(to: CGPoint(x: size * 0.58, y: size * 0.36))
+                p.move(to: CGPoint(x: size * 0.14, y: size * 0.36))
+                p.addLine(to: CGPoint(x: size * 0.06, y: size * 0.62))
+                p.move(to: CGPoint(x: size * 0.14, y: size * 0.36))
+                p.addLine(to: CGPoint(x: size * 0.24, y: size * 0.62))
+            }
+            .stroke(ink.opacity(0.50), lineWidth: size * 0.02)
+        }
+        .frame(width: size * 0.70, height: size * 0.70)
+    }
+
+    // ▶ Graph — ノードと辺
+    private var graphArt: some View {
+        ZStack {
+            // 辺 (三角形)
+            Path { p in
+                p.move(to: CGPoint(x: size * 0.10, y: size * 0.65))
+                p.addLine(to: CGPoint(x: size * 0.40, y: size * 0.12))
+                p.addLine(to: CGPoint(x: size * 0.70, y: size * 0.50))
+                p.addLine(to: CGPoint(x: size * 0.10, y: size * 0.65))
+                p.addLine(to: CGPoint(x: size * 0.70, y: size * 0.50))
+            }
+            .stroke(ink.opacity(0.50), lineWidth: size * 0.02)
+            // ノード
+            Circle().fill(accent).frame(width: size * 0.16).offset(x: -size * 0.20, y: size * 0.15)
+            Circle().fill(accent2).frame(width: size * 0.16).offset(x: -size * 0.05, y: -size * 0.30)
+            Circle().fill(ink.opacity(0.55)).frame(width: size * 0.16).offset(x: size * 0.20, y: 0)
+        }
+        .frame(width: size * 0.70, height: size * 0.70)
+    }
+
+    // ▶ DP — グリッド
+    private var dpArt: some View {
+        VStack(spacing: size * 0.03) {
+            ForEach(0..<4, id: \.self) { row in
+                HStack(spacing: size * 0.03) {
+                    ForEach(0..<4, id: \.self) { col in
+                        RoundedRectangle(cornerRadius: size * 0.02)
+                            .fill(row >= col
+                                  ? LinearGradient(colors: [accent.opacity(0.85), accent2.opacity(0.85)],
+                                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                                  : LinearGradient(colors: [ink.opacity(0.15), ink.opacity(0.15)],
+                                                   startPoint: .top, endPoint: .bottom))
+                            .frame(width: size * 0.11, height: size * 0.11)
+                    }
+                }
+            }
+        }
+    }
+
+    // ▶ Backtracking — 分岐の矢印
+    private var backtrackingArt: some View {
+        ZStack {
+            Path { p in
+                // 中央から右上 / 右下に分岐
+                let cx: CGFloat = size * 0.20
+                p.move(to: CGPoint(x: cx, y: size * 0.36))
+                p.addLine(to: CGPoint(x: size * 0.62, y: size * 0.16))
+                p.move(to: CGPoint(x: cx, y: size * 0.36))
+                p.addLine(to: CGPoint(x: size * 0.62, y: size * 0.56))
+                // 再帰の戻り (破線風)
+                p.move(to: CGPoint(x: size * 0.62, y: size * 0.16))
+                p.addLine(to: CGPoint(x: cx + size * 0.04, y: size * 0.34))
+            }
+            .stroke(ink.opacity(0.60), style: StrokeStyle(lineWidth: size * 0.025, dash: [size * 0.04, size * 0.03]))
+            Circle().fill(accent).frame(width: size * 0.18).offset(x: -size * 0.16, y: -size * 0.04)
+            Circle().fill(accent2).frame(width: size * 0.14).offset(x: size * 0.16, y: -size * 0.20)
+            Circle().fill(ink.opacity(0.55)).frame(width: size * 0.14).offset(x: size * 0.16, y: size * 0.18)
+        }
+        .frame(width: size * 0.70, height: size * 0.70)
+    }
+
+    // ▶ Sliding Window — 中央 3 つだけハイライト
+    private var slidingArt: some View {
+        VStack(spacing: size * 0.06) {
+            HStack(spacing: size * 0.03) {
+                ForEach(0..<6, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: size * 0.02)
+                        .fill((1...3).contains(i) ? accent : ink.opacity(0.25))
+                        .frame(width: size * 0.10, height: size * 0.30)
+                }
+            }
+            RoundedRectangle(cornerRadius: size * 0.04)
+                .strokeBorder(accent, lineWidth: size * 0.03)
+                .frame(width: size * 0.46, height: size * 0.12)
+                .offset(x: -size * 0.05, y: -size * 0.36)
+        }
+    }
+
+    // ▶ Bit — 0/1
+    private var bitArt: some View {
+        HStack(spacing: size * 0.04) {
+            ForEach(["1","0","1","1","0","1"], id: \.self) { c in
+                Text(c)
+                    .font(.system(size: size * 0.20, weight: .black, design: .monospaced))
+                    .foregroundStyle(c == "1" ? accent : ink.opacity(0.4))
+            }
+        }
+    }
+
+    // ▶ String — 文字並び
+    private var stringArt: some View {
+        HStack(spacing: size * 0.025) {
+            ForEach(["a","b","c","d","e"], id: \.self) { c in
+                RoundedRectangle(cornerRadius: size * 0.03)
+                    .fill(ink.opacity(0.18))
+                    .overlay(
+                        Text(c)
+                            .font(.system(size: size * 0.16, weight: .heavy, design: .monospaced))
+                            .foregroundStyle(accent)
+                    )
+                    .frame(width: size * 0.14, height: size * 0.32)
+            }
+        }
+    }
+
+    // ▶ Generic — 抽象ドット波
+    private var genericArt: some View {
+        ZStack {
+            Image(systemName: "function")
+                .font(.system(size: size * 0.36, weight: .black))
+                .foregroundStyle(accent)
+            Image(systemName: "sparkles")
+                .font(.system(size: size * 0.18))
+                .foregroundStyle(accent2)
+                .offset(x: size * 0.22, y: -size * 0.22)
+        }
     }
 }
 
@@ -592,7 +1031,7 @@ enum AppNotifications {
         c.removePendingNotificationRequests(withIdentifiers: [dailyId])
 
         let content = UNMutableNotificationContent()
-        content.title = "今日のおやつできてるよ🍪"
+        content.title = "今日のひと口、できてるよ 🍪"
         content.body  = "AlgoBiteで1問解いてリフレッシュ！"
         content.sound = .default
 

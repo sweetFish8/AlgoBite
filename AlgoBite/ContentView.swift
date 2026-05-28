@@ -326,6 +326,7 @@ enum AppScreen: Hashable {
     case reorderList
     case review
     case practice(PuzzleProblem)
+    case achievements
 }
 
 // MARK: - Palette / Helpers (pop & friendly)
@@ -507,6 +508,8 @@ struct ContentView: View {
                             }
                         case .practice(let p):
                             PracticeView(session: PracticeSession(problem: p))
+                        case .achievements:
+                            AchievementsView(stats: vm.stats, badges: vm.badges)
                         }
                     }
             }
@@ -548,13 +551,12 @@ struct ContentView: View {
                 homeHeader.padding(.horizontal, 18)
                 ScrollView {
                     VStack(spacing: 18) {
-                        streakSection      // ① 最上段 — 連続記録を一番目立たせる
+                        streakSection      // 最上段 — 連続記録を一番目立たせる
                         todayPreviewCard
                         startButton
                         reorderPracticeCard
                         reviewCard
-                        StatsCard(stats: vm.stats, badges: vm.badges)
-                        BadgesCard(badges: vm.badges)
+                        homeFooter
                     }
                     .padding(.horizontal, 18)
                     .padding(.top, 6)
@@ -569,19 +571,37 @@ struct ContentView: View {
             CookieIcon(size: 36)
             Text("AlgoBite")
                 .font(.system(size: 26, weight: .black, design: .rounded))
-                .foregroundStyle(Pop.inkWarm)  // #7C2D12
-            Spacer()
+                .foregroundStyle(Pop.inkWarm)
+            Spacer(minLength: 4)
+            // 日付ピル (左寄せ)
             HStack(spacing: 6) {
-                DonutIcon(size: 22)
+                DonutIcon(size: 20)
                 Text(vm.todayDateString)
                     .font(.caption.weight(.heavy))
             }
-            .foregroundStyle(Pop.inkWarmSub)   // #9A3412
-            .padding(.leading, 6).padding(.trailing, 12)
+            .foregroundStyle(Pop.inkWarmSub)
+            .padding(.leading, 6).padding(.trailing, 10)
             .padding(.vertical, 5)
-            .background(Color(red: 1.00, green: 0.84, blue: 0.67),         // #FED7AA
+            .background(Color(red: 1.00, green: 0.84, blue: 0.67),
                         in: Capsule())
             .overlay(Capsule().stroke(Color(red: 0.99, green: 0.73, blue: 0.45), lineWidth: 1.5))
+            // 実績ショートカット (右上)
+            Button {
+                Haptics.light()
+                path.append(.achievements)
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(Color(red: 1.00, green: 0.95, blue: 0.78))   // #FEF3C7
+                        .frame(width: 40, height: 40)
+                    Circle()
+                        .stroke(Color(red: 0.99, green: 0.79, blue: 0.18), lineWidth: 1.6)
+                        .frame(width: 40, height: 40)
+                    CakeIcon(size: 28)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("実績")
         }
         .padding(.vertical, 12)
     }
@@ -601,7 +621,7 @@ struct ContentView: View {
                         DonutIcon(size: 44)
                     }
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("今日のおやつ")
+                        Text("今日のひと口")
                             .font(.caption.weight(.heavy))
                             .foregroundStyle(Pop.inkWarmSub)  // #A16207
                         // 完了済なら今日が Day N、未完了なら今日 = Day N+1 (連続を伸ばす一日)
@@ -640,14 +660,21 @@ struct ContentView: View {
                     popBadge("★ \(d)", bg: db, fg: df)
                 }
 
-                Text(vm.todayProblem.title)
-                    .font(.title2.weight(.black))
-                    .foregroundStyle(Pop.ink)
-
-                Text(vm.todayProblem.prompt)
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(Pop.inkSub)
-                    .lineLimit(3)
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(vm.todayProblem.title)
+                            .font(.title2.weight(.black))
+                            .foregroundStyle(Pop.ink)
+                        Text(vm.todayProblem.prompt)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Pop.inkSub)
+                            .lineLimit(3)
+                    }
+                    Spacer(minLength: 4)
+                    // 右側：問題の "何をするか" を抽象化した図
+                    TopicIllustration(topic: vm.todayProblem.topic, size: 76)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
@@ -745,14 +772,66 @@ struct ContentView: View {
         }
     }
 
+    // ホーム最下部：実績ショートカット + クレジット
+    private var homeFooter: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 10) {
+                footerLink(title: "実績", icon: AnyView(CakeIcon(size: 26))) {
+                    path.append(.achievements)
+                }
+                footerLink(title: "並べ替え", icon: AnyView(CupcakeIcon(size: 26))) {
+                    path.append(.reorderList)
+                }
+                footerLink(title: "復習", icon: AnyView(ChocolateIcon(size: 26))) {
+                    path.append(.review)
+                }
+            }
+            VStack(spacing: 2) {
+                HStack(spacing: 4) {
+                    Text("Made with")
+                        .font(.system(size: 10, weight: .heavy))
+                    CookieIcon(size: 12)
+                    Text("by ayu")
+                        .font(.system(size: 10, weight: .heavy))
+                }
+                .foregroundStyle(Pop.inkSub)
+                Text("AlgoBite v1.0  ·  毎日ひと口、アルゴリズム")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(Pop.inkSub.opacity(0.7))
+            }
+            .padding(.top, 4)
+        }
+        .padding(.top, 10)
+    }
+
+    private func footerLink(title: String, icon: AnyView,
+                            action: @escaping () -> Void) -> some View {
+        Button(action: { Haptics.light(); action() }) {
+            VStack(spacing: 6) {
+                icon
+                Text(title)
+                    .font(.system(size: 11, weight: .heavy))
+                    .foregroundStyle(Pop.inkWarmSub)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(Pop.surface,
+                        in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14)
+                .stroke(Color(red: 0.99, green: 0.79, blue: 0.45).opacity(0.5),
+                        lineWidth: 1.2))
+        }
+        .buttonStyle(.plain)
+    }
+
     private var streakSection: some View {
         PopCard(fill: Pop.surfaceCream,                                          // #FFF7ED
                 border: Color(red: 0.99, green: 0.73, blue: 0.45)) {            // #FDBA74
             VStack(alignment: .leading, spacing: 14) {
                 // 見出し
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    FlameIcon(size: 36)
-                        .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 8 }
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    CookieStackIcon(size: 38)
+                        .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 10 }
                     Text("\(vm.streak)")
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(Pop.inkWarm)   // #7C2D12
