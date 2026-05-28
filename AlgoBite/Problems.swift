@@ -1203,7 +1203,7 @@ private let p1_50: [PuzzleProblem] = [
 
     // 1. Binary Search
     PuzzleProblem(
-        id: "binary-search", title: "Binary Search", difficulty: "Easy", topic: "Array / Search",
+        id: "binary-search", title: "Binary Search", difficulty: "Easy", topic: "Binary Search",
         prompt: "昇順ソート済み配列 nums から target の index を返してください。見つからない場合は -1。",
         example: "例: nums = [-1,0,3,5,9,12],  target = 9  →  4",
         template: [
@@ -2354,5 +2354,96 @@ private let p1_50: [PuzzleProblem] = [
             "app": PuzzleSlot(id: "app", label: "結果に追加", answer: "path[:]",  choices: ["path[:]", "path", "[path]"]),
             "rng": PuzzleSlot(id: "rng", label: "ループ開始", answer: "start",   choices: ["start", "0", "start + 1"])
         ]
+    ),
+    PuzzleProblem(
+        id: "queue-two-stacks", title: "Implement Queue using Stacks", difficulty: "Easy", topic: "Queue / Design",
+        prompt: "2 つのスタックでキューを実装してください。FIFO を保つ。",
+        example: "例: push(1), push(2), pop()  →  1",
+        template: [
+            "class MyQueue:",
+            "    def __init__(self):",
+            "        self.in_st, self.out_st = [], []",
+            "    def push(self, x):",
+            "        self.in_st.{{push}}(x)",
+            "    def pop(self):",
+            "        if not self.out_st:",
+            "            while self.in_st:",
+            "                self.out_st.append(self.in_st.{{mv}}())",
+            "        return self.out_st.pop()",
+            "    def empty(self):",
+            "        return not self.in_st and {{em}}"
+        ],
+        slots: [
+            "push": PuzzleSlot(id: "push", label: "入庫スタックへ", answer: "append",
+                               choices: ["append", "push", "add"]),
+            "mv":   PuzzleSlot(id: "mv", label: "in→out 転送", answer: "pop",
+                               choices: ["pop", "popleft", "shift"]),
+            "em":   PuzzleSlot(id: "em", label: "出庫スタック空チェック", answer: "not self.out_st",
+                               choices: ["not self.out_st", "self.out_st", "self.in_st"])
+        ],
+        explanation: "2 スタックで償却 O(1) push/pop。push は入庫スタックにそのまま積み、pop 時に出庫が空ならまとめて移送し LIFO を 2 回反転して FIFO を作る。"
+    ),
+    PuzzleProblem(
+        id: "queue-bfs-shortest", title: "BFS Shortest Path", difficulty: "Medium", topic: "Queue / BFS",
+        prompt: "始点から終点までの最短経路長を BFS で求めてください。",
+        example: "例: grid 上で start→end の最短ステップ数",
+        template: [
+            "from collections import deque",
+            "def shortest(adj, s, t):",
+            "    q = {{init}}([(s, 0)])",
+            "    seen = {s}",
+            "    while q:",
+            "        node, d = q.{{deq}}()",
+            "        if node == t: return d",
+            "        for nb in adj[node]:",
+            "            if nb not in seen:",
+            "                seen.{{add}}(nb)",
+            "                q.{{enq}}((nb, d + 1))",
+            "    return -1"
+        ],
+        slots: [
+            "init": PuzzleSlot(id: "init", label: "キュー型", answer: "deque",
+                               choices: ["deque", "list", "Queue"]),
+            "deq":  PuzzleSlot(id: "deq", label: "先頭取り出し", answer: "popleft",
+                               choices: ["popleft", "pop", "remove"]),
+            "add":  PuzzleSlot(id: "add", label: "訪問済に追加", answer: "add",
+                               choices: ["add", "append", "insert"]),
+            "enq":  PuzzleSlot(id: "enq", label: "末尾追加", answer: "append",
+                               choices: ["append", "appendleft", "push"])
+        ],
+        explanation: "deque で O(1) の両端操作。BFS は popleft で FIFO 順に取り出すことで距離の浅い順に確定し、最短経路を保証する。"
+    ),
+    PuzzleProblem(
+        id: "queue-circular", title: "Design Circular Queue", difficulty: "Medium", topic: "Queue / Design",
+        prompt: "固定容量 k の循環キューを実装してください。",
+        example: "例: cap=3, enQ(1), enQ(2), enQ(3), deQ, enQ(4)  →  [2,3,4]",
+        template: [
+            "class MyCircularQueue:",
+            "    def __init__(self, k):",
+            "        self.q = [0] * k",
+            "        self.head = 0",
+            "        self.size = 0",
+            "        self.cap = {{cap}}",
+            "    def enQueue(self, x):",
+            "        if self.size == self.cap: return False",
+            "        tail = (self.head + self.size) % {{mod}}",
+            "        self.q[tail] = x",
+            "        self.size += 1",
+            "        return True",
+            "    def deQueue(self):",
+            "        if self.size == 0: return False",
+            "        self.head = (self.head + 1) % {{mod2}}",
+            "        self.size -= 1",
+            "        return True"
+        ],
+        slots: [
+            "cap":  PuzzleSlot(id: "cap", label: "容量", answer: "k",
+                               choices: ["k", "0", "len(self.q)"]),
+            "mod":  PuzzleSlot(id: "mod", label: "tail の mod", answer: "self.cap",
+                               choices: ["self.cap", "self.size", "self.head"]),
+            "mod2": PuzzleSlot(id: "mod2", label: "head の mod", answer: "self.cap",
+                               choices: ["self.cap", "self.size", "self.head"])
+        ],
+        explanation: "配列上で head と size を管理し、index は cap で剰余を取って循環させる。連続メモリのキューを overhead なく実装できる。"
     )
 ]
