@@ -687,7 +687,7 @@ struct StatsCard: View {
     @ObservedObject var badges: BadgeStore
 
     var body: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.78, green: 0.82, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
@@ -700,7 +700,7 @@ struct StatsCard: View {
                         .font(.caption2.weight(.heavy))
                         .padding(.horizontal, 8).padding(.vertical, 4)
                         .background(Color(red: 0.99, green: 0.90, blue: 0.52), in: Capsule())
-                        .foregroundStyle(Color(red: 0.57, green: 0.25, blue: 0.05))
+                        .foregroundStyle(Pop.inkWarmSub)
                 }
                 HStack(spacing: 10) {
                     statCell(icon: AnyView(CookieIcon(size: 26)),
@@ -784,21 +784,21 @@ struct BadgesCard: View {
     @State private var showDetails = false
 
     var body: some View {
-        PopCard(fill: Color(red: 1.00, green: 0.97, blue: 0.93),
+        PopCard(fill: Pop.surfaceCream,
                 border: Color(red: 0.99, green: 0.79, blue: 0.18)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 6) {
                     Text("🏆").font(.title3)
                     Text("バッジコレクション")
                         .font(.subheadline.weight(.black))
-                        .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                        .foregroundStyle(Pop.inkWarm)
                     Spacer()
                     Button { showDetails = true } label: {
                         Text("詳細")
                             .font(.caption2.weight(.heavy))
                             .padding(.horizontal, 10).padding(.vertical, 5)
                             .background(Color(red: 0.99, green: 0.90, blue: 0.52), in: Capsule())
-                            .foregroundStyle(Color(red: 0.57, green: 0.25, blue: 0.05))
+                            .foregroundStyle(Pop.inkWarmSub)
                     }
                     .buttonStyle(.plain)
                 }
@@ -911,7 +911,7 @@ struct BadgeUnlockOverlay: View {
             VStack(spacing: 14) {
                 Text("🎉 バッジ解放！")
                     .font(.caption.weight(.heavy))
-                    .foregroundStyle(Color(red: 0.49, green: 0.18, blue: 0.07))
+                    .foregroundStyle(Pop.inkWarm)
                 Text(badge.emoji).font(.system(size: 72))
                 Text(badge.title)
                     .font(.title2.weight(.black))
@@ -1199,7 +1199,7 @@ struct PracticeView: View {
     }
 
     private var promptCard: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.78, green: 0.82, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("📖 復習問題")
@@ -1291,7 +1291,7 @@ struct PracticeView: View {
     }
 
     private var answersPanel: some View {
-        PopCard(fill: .white,
+        PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 12) {
                 if let slot = session.problem.slots[session.activeSlotID ?? ""] {
@@ -1349,7 +1349,7 @@ struct PracticeView: View {
     }
 
     private var completionCard: some View {
-        PopCard(fill: Color(red: 0.86, green: 0.99, blue: 0.91),
+        PopCard(fill: Pop.surfaceMint,
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
             VStack(spacing: 14) {
                 HStack(spacing: 6) {
