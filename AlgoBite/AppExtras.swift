@@ -324,8 +324,8 @@ struct StatsCard: View {
                 border: Color(red: 0.78, green: 0.82, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
-                    Text("📈").font(.title3)
-                    Text("これまでの記録")
+                    Text("🍰").font(.title3)
+                    Text("これまでのおやつ")
                         .font(.subheadline.weight(.black))
                         .foregroundStyle(Color(red: 0.19, green: 0.18, blue: 0.50))
                     Spacer()
@@ -337,12 +337,12 @@ struct StatsCard: View {
                 }
                 HStack(spacing: 10) {
                     statCell(emoji: "🍪", value: "\(stats.totalSolved)", label: "パズル")
-                    statCell(emoji: "📋", value: "\(stats.reorderClears)", label: "並べ替え")
+                    statCell(emoji: "🧁", value: "\(stats.reorderClears)", label: "並べ替え")
                     if let t = stats.topTopic {
-                        statCell(emoji: "🎓", value: "\(t.count)",
+                        statCell(emoji: "🍫", value: "\(t.count)",
                                  label: String(t.topic.prefix(5)))
                     } else {
-                        statCell(emoji: "🎓", value: "-", label: "得意")
+                        statCell(emoji: "🍫", value: "-", label: "得意")
                     }
                 }
                 heatmap
