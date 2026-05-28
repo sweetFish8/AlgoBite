@@ -25,7 +25,10 @@ struct PuzzleSlot {
     let choices: [String]
 }
 
-struct PuzzleProblem: Identifiable {
+struct PuzzleProblem: Identifiable, Hashable {
+    static func == (l: PuzzleProblem, r: PuzzleProblem) -> Bool { l.id == r.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+
     let id: String
     let title: String
     let difficulty: String
@@ -77,8 +80,12 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var isCompletedToday: Bool = false
     @Published private(set) var attemptCount: Int = 0
     @Published private(set) var slotResults: [String: Bool] = [:]
+    @Published var hintLevel: HintLevel = .none
+    @Published var gentleHintText: String?
 
     let problems: [PuzzleProblem] = PuzzleData.all
+    let stats: StatsStore = .shared
+    let badges: BadgeStore = .shared
 
 
     var todayProblem: PuzzleProblem {
@@ -142,6 +149,7 @@ final class GameViewModel: ObservableObject {
     func selectSlot(_ id: String) {
         activeSlotID = id
         slotStates = [:]
+        Haptics.light()
     }
 
     func fillChoice(_ choice: String) {
@@ -149,26 +157,64 @@ final class GameViewModel: ObservableObject {
         answers[id] = choice
         slotStates = [:]
         activeSlotID = nextEmptySlot(after: id)
+        Haptics.selection()
     }
 
     func resetCurrent() {
         answers = [:]
         activeSlotID = nil
         slotStates = [:]
+        hintLevel = .none
+        gentleHintText = nil
         logMessage = "リセットしました"
+        Haptics.light()
     }
 
+    /// 段階的ヒント (⑤)
+    /// none → gentle (テキスト) → fillOne (1スロット埋める) → fillAll (全部埋める)
     func revealHint() {
-        let ids = todayProblem.orderedSlotIDs
-        guard let id = ids.first(where: { answers[$0] != todayProblem.slots[$0]?.answer }) else {
-            logMessage = "すべて正解済みです"
-            return
-        }
-        if let answer = todayProblem.slots[id]?.answer {
-            answers[id] = answer
+        guard !isCompletedToday else { return }
+        switch hintLevel {
+        case .none:
+            hintLevel = .gentle
+            gentleHintText = HintStore.gentleText(for: todayProblem)
+            logMessage = "🔆 ヒント1/3: ふんわりヒント"
+            Haptics.light()
+        case .gentle:
+            // 1 スロット埋める
+            let ids = todayProblem.orderedSlotIDs
+            if let id = ids.first(where: { answers[$0] != todayProblem.slots[$0]?.answer }),
+               let answer = todayProblem.slots[id]?.answer {
+                answers[id] = answer
+                slotStates = [:]
+                activeSlotID = nextEmptySlot(after: id)
+                logMessage = "💡 ヒント2/3: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
+            }
+            hintLevel = .fillOne
+            Haptics.medium()
+        case .fillOne:
+            // 全部埋める
+            let ids = todayProblem.orderedSlotIDs
+            for id in ids {
+                answers[id] = todayProblem.slots[id]?.answer
+            }
             slotStates = [:]
-            activeSlotID = nextEmptySlot(after: id)
-            logMessage = "ヒント: \(todayProblem.slots[id]?.label ?? id) を埋めました"
+            activeSlotID = nil
+            logMessage = "🔓 ヒント3/3: 全部埋めたよ。「こたえる！」を押そう"
+            hintLevel = .fillAll
+            Haptics.medium()
+        case .fillAll:
+            logMessage = "もうヒントはないよ。「こたえる！」を押してね"
+            Haptics.warning()
+        }
+    }
+
+    var hintLabel: String {
+        switch hintLevel {
+        case .none:    return "💡 ヒント (1/3)"
+        case .gentle:  return "💡 もうちょい (2/3)"
+        case .fillOne: return "💡 答えを見る (3/3)"
+        case .fillAll: return "💡 ヒント済"
         }
     }
 
@@ -187,6 +233,7 @@ final class GameViewModel: ObservableObject {
         if !empty.isEmpty {
             for id in empty { slotStates[id] = .wrong }
             logMessage = "未入力スロットが \(empty.count) 個あります"
+            Haptics.warning()
             return
         }
 
@@ -217,9 +264,13 @@ final class GameViewModel: ObservableObject {
             defaults.set(answers, forKey: "algobite.todayAnswers.\(today)")
             defaults.set(results, forKey: "algobite.todayResults.\(today)")
             logMessage = "PASS 🎉 今日のパズルクリア！"
+            Haptics.success()
+            stats.recordPuzzleClear(topic: todayProblem.topic)
+            badges.evaluate(stats: stats, streak: streak)
         } else {
             let labels = wrong.compactMap { todayProblem.slots[$0]?.label }.joined(separator: " / ")
             logMessage = "FAIL: \(labels) を見直してください"
+            Haptics.error()
 
             // 不正解スロットを震わせる → 少し待ってから idle に戻して再挑戦できるようにする
             for id in wrong {
@@ -272,6 +323,9 @@ final class GameViewModel: ObservableObject {
 enum AppScreen: Hashable {
     case problem
     case reorder(ReorderQuiz)
+    case reorderList
+    case review
+    case practice(PuzzleProblem)
 }
 
 // MARK: - Palette / Helpers (pop & friendly)
@@ -387,17 +441,39 @@ struct ContentView: View {
     @State private var path: [AppScreen] = []
 
     var body: some View {
-        NavigationStack(path: $path) {
-            homeScreen
-                .navigationDestination(for: AppScreen.self) { screen in
-                    switch screen {
-                    case .problem:
-                        problemScreen
-                    case .reorder(let q):
-                        ReorderQuizView(model: ReorderQuizViewModel(quiz: q))
+        ZStack {
+            NavigationStack(path: $path) {
+                homeScreen
+                    .navigationDestination(for: AppScreen.self) { screen in
+                        switch screen {
+                        case .problem:
+                            problemScreen
+                        case .reorder(let q):
+                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q))
+                        case .reorderList:
+                            ReorderQuizListView { q in
+                                path.append(.reorder(q))
+                            }
+                        case .review:
+                            ReviewListView(problems: vm.problems) { p in
+                                path.append(.practice(p))
+                            }
+                        case .practice(let p):
+                            PracticeView(session: PracticeSession(problem: p))
+                        }
+                    }
+            }
+            // ④ バッジ解放オーバーレイ
+            if let badge = vm.badges.justUnlocked {
+                BadgeUnlockOverlay(badge: badge) {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        vm.badges.dismissJustUnlocked()
                     }
                 }
+                .zIndex(10)
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
     }
 
     // MARK: 背景 (画面全体)
@@ -428,7 +504,10 @@ struct ContentView: View {
                         todayPreviewCard
                         startButton
                         reorderPracticeCard
+                        reviewCard
                         streakSection
+                        StatsCard(stats: vm.stats, badges: vm.badges)
+                        BadgesCard(badges: vm.badges)
                     }
                     .padding(.horizontal, 18)
                     .padding(.top, 6)
@@ -547,21 +626,59 @@ struct ContentView: View {
                         Text("並べ替え練習")
                             .font(.subheadline.weight(.black))
                             .foregroundStyle(Pop.ink)
-                        Text(ReorderQuiz.bubbleSortPass.title)
+                        Text("全 \(ReorderQuiz.allList.count) 問")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(Pop.inkSub)
                     }
                     Spacer()
-                    popBadge("NEW",
-                             bg: Color(red: 0.99, green: 0.79, blue: 0.18),    // #F59E0B
-                             fg: Color(red: 0.49, green: 0.18, blue: 0.07))    // #7C2D12
+                    popBadge("\(ReorderQuiz.allList.count) 問",
+                             bg: Color(red: 0.99, green: 0.79, blue: 0.18),
+                             fg: Color(red: 0.49, green: 0.18, blue: 0.07))
                 }
-                PopButton(fill: Color(red: 0.55, green: 0.49, blue: 0.92),     // #8B7EE9
+                PopButton(fill: Color(red: 0.55, green: 0.49, blue: 0.92),
                           shadow: Color(red: 0.40, green: 0.34, blue: 0.78),
-                          action: { path.append(.reorder(ReorderQuiz.bubbleSortPass)) }) {
+                          action: { path.append(.reorderList) }) {
                     HStack(spacing: 6) {
-                        Image(systemName: "hand.tap.fill")
-                        Text("挑戦する！")
+                        Image(systemName: "list.bullet.rectangle.fill")
+                        Text("一覧から選ぶ！")
+                            .font(.subheadline.weight(.heavy))
+                    }
+                }
+            }
+        }
+    }
+
+    // ⑥ 復習モードの導線
+    private var reviewCard: some View {
+        PopCard(fill: .white,
+                border: Color(red: 0.99, green: 0.79, blue: 0.18)) {       // #FBBF24
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 1.00, green: 0.95, blue: 0.78))   // #FEF3C7
+                            .frame(width: 48, height: 48)
+                        Text("📖").font(.system(size: 26))
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("復習モード")
+                            .font(.subheadline.weight(.black))
+                            .foregroundStyle(Pop.ink)
+                        Text("過去問にもう一度挑戦")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Pop.inkSub)
+                    }
+                    Spacer()
+                    popBadge("全 \(vm.problems.count) 問",
+                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),
+                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))
+                }
+                PopButton(fill: Pop.accent,
+                          shadow: Pop.accentShadow,
+                          action: { path.append(.review) }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "books.vertical.fill")
+                        Text("過去問を見る！")
                             .font(.subheadline.weight(.heavy))
                     }
                 }
