@@ -660,41 +660,107 @@ struct TopicIllustration: View {
         }
     }
 
-    // ▶ Binary Search — ターゲットに照準
+    // ▶ Binary Search — 範囲を半分に絞り込んでいく "二分" を明示
+    // 上段: 8 セルの sorted 配列 + L/M/R マーカー  →  ↓ halve ↓  → 下段: 4 セルに半減
     private var binarySearchArt: some View {
-        let cellW = size * 0.11
-        return VStack(spacing: size * 0.06) {
-            HStack(spacing: size * 0.022) {
-                ForEach(0..<7, id: \.self) { i in
-                    let distance = abs(3 - i)
-                    let isHit = i == 3
-                    let f: Color = isHit
-                        ? accent
-                        : ink.opacity(max(0.10, 0.45 - Double(distance) * 0.08))
-                    let s: Color = isHit ? accent2 : ink.opacity(0.25)
-                    tile(value: nil,
-                         w: cellW, h: cellW * 1.20,
-                         fill: f, stroke: s, fg: .white)
+        let cellW = size * 0.085
+        let cellH = cellW * 1.20
+        return VStack(spacing: size * 0.04) {
+            // 上段: 8 セル + L (i=0), M (i=3) [現在の中央], R (i=7)
+            VStack(spacing: size * 0.018) {
+                HStack(spacing: size * 0.012) {
+                    ForEach(0..<8, id: \.self) { i in
+                        bsCell(index: i,
+                               midIndex: 3,
+                               width: cellW, height: cellH,
+                               highlightKeptHalf: i >= 4)
+                    }
+                }
+                // L / M / R ラベル行
+                HStack(spacing: size * 0.012) {
+                    ForEach(0..<8, id: \.self) { i in
+                        bsLabel(for: i, at: [0, 3, 7], width: cellW)
+                    }
                 }
             }
-            // 中央の照準: target circle + crosshair
-            ZStack {
-                Circle()
-                    .strokeBorder(accent, lineWidth: size * 0.035)
-                    .frame(width: size * 0.30, height: size * 0.30)
-                Circle()
-                    .strokeBorder(accent.opacity(0.45), lineWidth: size * 0.02)
-                    .frame(width: size * 0.18, height: size * 0.18)
-                Circle()
-                    .fill(accent2)
-                    .frame(width: size * 0.07, height: size * 0.07)
-                // crosshair lines
-                Rectangle().fill(accent).frame(width: size * 0.40, height: size * 0.020)
-                Rectangle().fill(accent).frame(width: size * 0.020, height: size * 0.40)
+            // 真ん中の "÷2" を強調する矢印
+            HStack(spacing: size * 0.03) {
+                Text("÷2")
+                    .font(.system(size: size * 0.11, weight: .black, design: .rounded))
+                    .foregroundStyle(accent)
+                Image(systemName: "arrow.down")
+                    .font(.system(size: size * 0.11, weight: .heavy))
+                    .foregroundStyle(accent)
             }
-            .compositingGroup()
-            .offset(y: -size * 0.40)
+            // 下段: 半減した 4 セル (右半分が残る)
+            VStack(spacing: size * 0.018) {
+                HStack(spacing: size * 0.012) {
+                    ForEach(0..<4, id: \.self) { i in
+                        bsCell(index: i,
+                               midIndex: 1,   // 新しい mid
+                               width: cellW, height: cellH * 0.85,
+                               highlightKeptHalf: false,
+                               isLowerRange: true)
+                    }
+                }
+                HStack(spacing: size * 0.012) {
+                    ForEach(0..<4, id: \.self) { i in
+                        bsLabel(for: i, at: [0, 1, 3], width: cellW)
+                    }
+                }
+            }
         }
+    }
+
+    /// 1 セル: index と midIndex を比較してハイライト
+    private func bsCell(index: Int, midIndex: Int,
+                        width: CGFloat, height: CGFloat,
+                        highlightKeptHalf: Bool,
+                        isLowerRange: Bool = false) -> some View {
+        let isMid = index == midIndex
+        let fill: Color
+        let stroke: Color
+        if isMid {
+            fill = accent
+            stroke = accent2
+        } else if isLowerRange || highlightKeptHalf {
+            fill = accent.opacity(0.30)
+            stroke = accent.opacity(0.55)
+        } else {
+            // 切り捨てる側 (左半分)
+            fill = ink.opacity(0.12)
+            stroke = ink.opacity(0.25)
+        }
+        return RoundedRectangle(cornerRadius: width * 0.20)
+            .fill(fill)
+            .frame(width: width, height: height)
+            .overlay(
+                RoundedRectangle(cornerRadius: width * 0.20)
+                    .strokeBorder(stroke, lineWidth: width * 0.08)
+            )
+            .overlay(
+                isMid ?
+                AnyView(Image(systemName: "star.fill")
+                    .font(.system(size: width * 0.50, weight: .black))
+                    .foregroundStyle(.white))
+                : AnyView(EmptyView())
+            )
+    }
+
+    /// 位置 i が L/M/R のどれかなら対応文字、そうでなければ空
+    private func bsLabel(for index: Int, at positions: [Int], width: CGFloat) -> some View {
+        let labels = ["L", "M", "R"]
+        let idx = positions.firstIndex(of: index)
+        return Group {
+            if let k = idx {
+                Text(labels[k])
+                    .font(.system(size: width * 0.55, weight: .black, design: .rounded))
+                    .foregroundStyle(k == 1 ? accent : ink.opacity(0.65))
+            } else {
+                Text("")
+            }
+        }
+        .frame(width: width)
     }
 
     // ▶ Sort — 高さがバラバラ → 昇順に整列
