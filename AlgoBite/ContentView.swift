@@ -116,7 +116,7 @@ final class GameViewModel: ObservableObject {
     }
 
     init() {
-        let defaults = UserDefaults.standard
+        let defaults = appDefaults
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         let today = f.string(from: Date())
 
@@ -225,7 +225,7 @@ final class GameViewModel: ObservableObject {
 
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         let today = f.string(from: Date())
-        let defaults = UserDefaults.standard
+        let defaults = appDefaults
         defaults.set(attemptCount, forKey: "algobite.todayAttempts.\(today)")
 
         let ids = todayProblem.orderedSlotIDs
@@ -474,6 +474,8 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
+        // 温色パステルのお菓子テーマは light 固定。ダークモード時の眩しさ・コントラスト劣化を回避。
+        .preferredColorScheme(.light)
     }
 
     // MARK: 背景 (画面全体)
@@ -1735,7 +1737,7 @@ final class ReorderQuizViewModel: ObservableObject {
             stats.recordReorderClear()
             BadgeStore.shared.evaluate(
                 stats: stats,
-                streak: UserDefaults.standard.integer(forKey: "algobite.streak")
+                streak: appDefaults.integer(forKey: "algobite.streak")
             )
             return
         }

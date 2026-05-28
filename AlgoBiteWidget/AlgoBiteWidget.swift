@@ -11,9 +11,9 @@ import SwiftUI
 // MARK: - 共有 UserDefaults (App Group)
 
 /// App Group 経由でメインアプリと共有する UserDefaults。
-/// プロビジョニングが無い環境では nil になるため fallback として .standard を返す。
+/// 環境が無い時は fallback として .standard を返す。
 private let sharedDefaults: UserDefaults = {
-    UserDefaults(suiteName: "group.com.example.AlgoBite") ?? .standard
+    UserDefaults(suiteName: "group.app.Goto.Sakana.AlgoBite") ?? .standard
 }()
 
 // MARK: - Entry

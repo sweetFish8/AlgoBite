@@ -25,6 +25,8 @@
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
 		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
 		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
+		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
 		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidgetBundle.swift; sourceTree = "<group>"; };
 		A20000120000000000000001 /* AlgoBiteWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidget.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */,
 				A20000120000000000000001 /* AlgoBiteWidget.swift */,
 				A20000130000000000000001 /* Info.plist */,
+				A40000120000000000000001 /* AlgoBiteWidget.entitlements */,
 			);
 			path = AlgoBiteWidget;
 			sourceTree = "<group>";
@@ -92,6 +95,7 @@
 				A10000150000000000000001 /* TopicAnimations.swift */,
 				A10000160000000000000001 /* AppExtras.swift */,
 				A30000110000000000000001 /* Assets.xcassets */,
+				A40000110000000000000001 /* AlgoBite.entitlements */,
 			);
 			path = AlgoBite;
 			sourceTree = "<group>";
@@ -360,9 +364,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -377,7 +382,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AlgoBite;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Goto.Sakana.AlgoBite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -390,9 +395,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -407,7 +413,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AlgoBite;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Goto.Sakana.AlgoBite;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -419,9 +425,10 @@
 		A20000910000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -433,7 +440,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AlgoBite.AlgoBiteWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Goto.Sakana.AlgoBite.AlgoBiteWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -446,9 +453,10 @@
 		A20000920000000000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -460,7 +468,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.AlgoBite.AlgoBiteWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = app.Goto.Sakana.AlgoBite.AlgoBiteWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
