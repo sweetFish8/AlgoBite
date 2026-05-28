@@ -11,6 +11,7 @@
 		A10000020000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000120000000000000001 /* ContentView.swift */; };
 		A10000030000000000000001 /* Problems.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000130000000000000001 /* Problems.swift */; };
 		A10000040000000000000001 /* TopicAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000150000000000000001 /* TopicAnimations.swift */; };
+		A10000050000000000000001 /* AppExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000160000000000000001 /* AppExtras.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		A10000120000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A10000130000000000000001 /* Problems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Problems.swift; sourceTree = "<group>"; };
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
+		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
 		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -47,6 +49,7 @@
 				A10000120000000000000001 /* ContentView.swift */,
 				A10000130000000000000001 /* Problems.swift */,
 				A10000150000000000000001 /* TopicAnimations.swift */,
+				A10000160000000000000001 /* AppExtras.swift */,
 			);
 			path = AlgoBite;
 			sourceTree = "<group>";
@@ -131,6 +134,7 @@
 				A10000020000000000000001 /* ContentView.swift in Sources */,
 				A10000030000000000000001 /* Problems.swift in Sources */,
 				A10000040000000000000001 /* TopicAnimations.swift in Sources */,
+				A10000050000000000000001 /* AppExtras.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
