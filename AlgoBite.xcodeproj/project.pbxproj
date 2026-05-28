@@ -12,6 +12,7 @@
 		A10000030000000000000001 /* Problems.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000130000000000000001 /* Problems.swift */; };
 		A10000040000000000000001 /* TopicAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000150000000000000001 /* TopicAnimations.swift */; };
 		A10000050000000000000001 /* AppExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000160000000000000001 /* AppExtras.swift */; };
+		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
 		A20000010000000000000001 /* AlgoBiteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */; };
 		A20000020000000000000001 /* AlgoBiteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000120000000000000001 /* AlgoBiteWidget.swift */; };
 		A20000030000000000000001 /* AlgoBiteWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000140000000000000001 /* AlgoBiteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -23,6 +24,7 @@
 		A10000130000000000000001 /* Problems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Problems.swift; sourceTree = "<group>"; };
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
 		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
+		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidgetBundle.swift; sourceTree = "<group>"; };
 		A20000120000000000000001 /* AlgoBiteWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidget.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				A10000130000000000000001 /* Problems.swift */,
 				A10000150000000000000001 /* TopicAnimations.swift */,
 				A10000160000000000000001 /* AppExtras.swift */,
+				A30000110000000000000001 /* Assets.xcassets */,
 			);
 			path = AlgoBite;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A30000010000000000000001 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +359,7 @@
 		A10000910000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -384,6 +389,7 @@
 		A10000920000000000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
