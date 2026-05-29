@@ -484,12 +484,22 @@ struct SlidingWindowAnim: View {
 struct GridSearchAnim: View {
     enum Kind { case bfs, dfs }
     let kind: Kind
-    let grid: [[Int]] = [
-        [1, 1, 0, 0, 0],
-        [1, 0, 0, 1, 1],
-        [0, 0, 1, 1, 0],
-        [0, 1, 1, 0, 0],
-    ]
+    let grid: [[Int]]
+    let subtitle: String
+
+    init(kind: Kind,
+         grid: [[Int]] = [
+            [1, 1, 0, 0, 0],
+            [1, 0, 0, 1, 1],
+            [0, 0, 1, 1, 0],
+            [0, 1, 1, 0, 0],
+         ],
+         subtitle: String = "") {
+        self.kind = kind
+        self.grid = grid
+        self.subtitle = subtitle
+    }
+
     @State private var visited: Set<String> = []
     @State private var frontier: Set<String> = []
     @State private var caption = ""
@@ -498,6 +508,11 @@ struct GridSearchAnim: View {
     var body: some View {
         AnimFrame(title: kind == .bfs ? "BFS の広がり" : "DFS の進行", tint: kind == .bfs ? .blue : .green, onReplay: play) {
             VStack(alignment: .leading, spacing: 6) {
+                if !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 VStack(spacing: 3) {
                     ForEach(grid.indices, id: \.self) { r in
                         HStack(spacing: 3) {
@@ -578,12 +593,17 @@ struct GridSearchAnim: View {
 struct TreeTraversalAnim: View {
     enum Order { case inorder, preorder, postorder, level }
     let order: Order
-    // Fixed sample tree:    4
-    //                      / \
-    //                     2   6
-    //                    / \ / \
-    //                   1  3 5  7
-    private let nodes: [Int?] = [4, 2, 6, 1, 3, 5, 7]
+    /// 7 ノード 3 段の木 (level order の配列表現)。問題ごとに違う数列を渡せる
+    let nodes: [Int]
+    /// 副題 (問題の文脈で表示)
+    let subtitle: String
+
+    init(order: Order, nodes: [Int] = [4, 2, 6, 1, 3, 5, 7], subtitle: String = "") {
+        self.order = order
+        self.nodes = nodes
+        self.subtitle = subtitle
+    }
+
     @State private var visited: [Int] = []
     @State private var current: Int? = nil
     @State private var token = 0
@@ -591,8 +611,13 @@ struct TreeTraversalAnim: View {
     var body: some View {
         AnimFrame(title: title, tint: .green, onReplay: play) {
             VStack(spacing: 8) {
+                if !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 // Render as 3-level pyramid
-                let levels: [[Int]] = [[nodes[0]!], [nodes[1]!, nodes[2]!], [nodes[3]!, nodes[4]!, nodes[5]!, nodes[6]!]]
+                let levels: [[Int]] = [[nodes[0]], [nodes[1], nodes[2]], [nodes[3], nodes[4], nodes[5], nodes[6]]]
                 ForEach(levels.indices, id: \.self) { lvl in
                     HStack(spacing: 12) {
                         ForEach(levels[lvl], id: \.self) { v in
@@ -627,12 +652,14 @@ struct TreeTraversalAnim: View {
     private func play() {
         token += 1; let t = token
         visited = []; current = nil
+        // nodes[0..6] を完全二分木として扱い、走査順を実際に計算する
+        // index: 0=root, 1=L, 2=R, 3=LL, 4=LR, 5=RL, 6=RR
         let seq: [Int]
         switch order {
-        case .inorder: seq = [1, 2, 3, 4, 5, 6, 7]
-        case .preorder: seq = [4, 2, 1, 3, 6, 5, 7]
-        case .postorder: seq = [1, 3, 2, 5, 7, 6, 4]
-        case .level: seq = [4, 2, 6, 1, 3, 5, 7]
+        case .inorder:   seq = [nodes[3], nodes[1], nodes[4], nodes[0], nodes[5], nodes[2], nodes[6]]
+        case .preorder:  seq = [nodes[0], nodes[1], nodes[3], nodes[4], nodes[2], nodes[5], nodes[6]]
+        case .postorder: seq = [nodes[3], nodes[4], nodes[1], nodes[5], nodes[6], nodes[2], nodes[0]]
+        case .level:     seq = nodes
         }
         for (i, v) in seq.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.6) {
@@ -1382,9 +1409,23 @@ struct FloydAnim: View {
 @ViewBuilder
 func topicAnimation(for problem: PuzzleProblem) -> some View {
     switch problem.id {
-    // Binary search variants
-    case "binary-search", "search-rotated", "first-last-pos", "median-two-arrays":
-        BinarySearchAnim()
+    // Binary search variants — それぞれ違う配列と target で動かす
+    case "binary-search":
+        BinarySearchAnim(nums: [1, 3, 5, 7, 9, 11, 13],
+                         target: 11,
+                         caption: "ソート済の中から 11 を探す")
+    case "search-rotated":
+        BinarySearchAnim(nums: [6, 7, 8, 1, 2, 3, 4, 5],
+                         target: 3,
+                         caption: "回転済の配列から 3 を探す (片側がソート済)")
+    case "first-last-pos":
+        BinarySearchAnim(nums: [1, 2, 2, 2, 3, 4, 5],
+                         target: 2,
+                         caption: "最初/最後の 2 を求める (lower / upper bound)")
+    case "median-two-arrays":
+        BinarySearchAnim(nums: [1, 3, 5, 8, 10, 14, 17],
+                         target: 8,
+                         caption: "2つの配列をマージした中央値の位置を二分探索")
     // Two pointers / strings
     case "palindrome-check": TwoPointerAnim(word: "racecar")
     case "reverse-string": TwoPointerAnim(word: "hello")
@@ -1420,21 +1461,79 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "longest-substring": SlidingWindowAnim(s: "abcabcbb", initialWidth: 1)
     case "min-window-substring": SlidingWindowAnim(s: "ADOBECODEBANC", initialWidth: 1)
     case "sliding-window-max": HeapAnim(kind: .slidingMax)
-    // BFS / DFS / Graph
-    case "bfs": GridSearchAnim(kind: .bfs)
-    case "dfs-iterative": GridSearchAnim(kind: .dfs)
-    case "num-islands": GridSearchAnim(kind: .bfs)
-    case "level-order": TreeTraversalAnim(order: .level)
-    case "topo-sort", "course-schedule": GridSearchAnim(kind: .dfs)
-    case "dijkstra": GridSearchAnim(kind: .bfs)
+    // BFS / DFS / Graph — それぞれ違うグリッド
+    case "bfs":
+        GridSearchAnim(kind: .bfs,
+                       grid: [[1,1,1,0,0],[0,1,0,0,1],[0,1,1,1,1],[0,0,0,1,0]],
+                       subtitle: "距離の近いマスから順に訪問")
+    case "dfs-iterative":
+        GridSearchAnim(kind: .dfs,
+                       grid: [[1,1,0,0,0],[1,0,0,1,1],[0,0,1,1,0],[0,1,1,0,0]],
+                       subtitle: "深さ優先で 1 本道を最後まで")
+    case "num-islands":
+        GridSearchAnim(kind: .bfs,
+                       grid: [[1,1,0,0,1],[1,0,0,1,1],[0,0,1,0,0],[1,0,0,1,1]],
+                       subtitle: "島ごとに塗りつぶしてカウント")
+    case "level-order":
+        TreeTraversalAnim(order: .level, nodes: [3,9,20,1,2,15,7],
+                          subtitle: "BFS で同じ深さをまとめて出力")
+    case "topo-sort":
+        GridSearchAnim(kind: .dfs,
+                       grid: [[1,1,1,0,0],[0,0,1,1,1],[0,0,0,1,0],[0,0,0,0,1]],
+                       subtitle: "後行順序の逆 = トポロジカル順")
+    case "course-schedule":
+        GridSearchAnim(kind: .dfs,
+                       grid: [[1,1,0,1,0],[1,1,0,0,1],[0,0,1,1,0],[1,0,1,1,0]],
+                       subtitle: "サイクルがあれば履修不可能")
+    case "dijkstra":
+        GridSearchAnim(kind: .bfs,
+                       grid: [[1,1,1,1,1],[1,0,0,0,1],[1,0,1,0,1],[1,1,1,0,1]],
+                       subtitle: "距離が短いノードから確定")
     case "union-find": UnionFindAnim(kind: .basic)
     case "kruskal": UnionFindAnim(kind: .kruskal)
-    // Tree
-    case "inorder-iter", "validate-bst", "kth-smallest-bst": TreeTraversalAnim(order: .inorder)
-    case "lca-bt", "lca-bst", "flatten-bt", "build-tree-post": TreeTraversalAnim(order: .preorder)
-    case "max-depth-bt", "balanced-bt", "diameter-bt", "path-sum",
-         "invert-bt", "symmetric-tree": TreeTraversalAnim(order: .postorder)
-    case "serialize-bt": TreeTraversalAnim(order: .level)
+    // Tree — それぞれ違う木の形と副題で動かす
+    case "inorder-iter":
+        TreeTraversalAnim(order: .inorder, nodes: [4,2,6,1,3,5,7],
+                          subtitle: "スタックで反復的に inorder")
+    case "validate-bst":
+        TreeTraversalAnim(order: .inorder, nodes: [5,3,8,2,4,7,9],
+                          subtitle: "BST なら inorder = 昇順になる")
+    case "kth-smallest-bst":
+        TreeTraversalAnim(order: .inorder, nodes: [5,3,8,1,4,7,9],
+                          subtitle: "inorder の k 番目 = k 番目に小さい値")
+    case "lca-bt":
+        TreeTraversalAnim(order: .preorder, nodes: [3,5,1,6,2,0,8],
+                          subtitle: "LCA 探索の preorder")
+    case "lca-bst":
+        TreeTraversalAnim(order: .preorder, nodes: [6,2,8,0,4,7,9],
+                          subtitle: "BST の性質で左右を絞り込む")
+    case "flatten-bt":
+        TreeTraversalAnim(order: .preorder, nodes: [1,2,5,3,4,0,6],
+                          subtitle: "preorder の順に右に flatten")
+    case "build-tree-post":
+        TreeTraversalAnim(order: .preorder, nodes: [3,9,20,0,0,15,7],
+                          subtitle: "inorder+postorder から木を復元")
+    case "max-depth-bt":
+        TreeTraversalAnim(order: .postorder, nodes: [3,9,20,0,0,15,7],
+                          subtitle: "葉まで降りて深さ +1 を返す")
+    case "balanced-bt":
+        TreeTraversalAnim(order: .postorder, nodes: [3,9,20,1,2,15,7],
+                          subtitle: "高さ差 ≤ 1 をボトムアップで判定")
+    case "diameter-bt":
+        TreeTraversalAnim(order: .postorder, nodes: [1,2,3,4,5,6,7],
+                          subtitle: "各ノードで 左深さ + 右深さ の最大")
+    case "path-sum":
+        TreeTraversalAnim(order: .postorder, nodes: [5,4,8,11,2,13,1],
+                          subtitle: "葉まで降りて合計が target か")
+    case "invert-bt":
+        TreeTraversalAnim(order: .postorder, nodes: [4,2,7,1,3,6,9],
+                          subtitle: "左右を swap しながら戻る")
+    case "symmetric-tree":
+        TreeTraversalAnim(order: .postorder, nodes: [1,2,2,3,4,4,3],
+                          subtitle: "左右ミラーで対応比較")
+    case "serialize-bt":
+        TreeTraversalAnim(order: .level, nodes: [1,2,3,4,5,6,7],
+                          subtitle: "BFS で順番に出力 (null 含む)")
     // DP
     case "fibonacci-memo": DPTableAnim(kind: .fib)
     case "climbing-stairs": DPTableAnim(kind: .climb)

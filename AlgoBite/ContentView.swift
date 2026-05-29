@@ -1602,8 +1602,18 @@ struct ExplanationView: View {
 // MARK: - Binary Search Animation
 
 struct BinarySearchAnim: View {
-    let nums = [-1, 0, 3, 5, 9, 12, 14, 18, 22]
-    let target = 9
+    let nums: [Int]
+    let target: Int
+    let caption: String
+
+    init(nums: [Int] = [-1, 0, 3, 5, 9, 12, 14, 18, 22],
+         target: Int = 9,
+         caption: String = "ソート済 nums の中から target を探す") {
+        self.nums = nums
+        self.target = target
+        self.caption = caption
+    }
+
     @State private var step = 0
     @State private var found = false
     @State private var token = 0
@@ -1628,6 +1638,9 @@ struct BinarySearchAnim: View {
                     .font(.subheadline.weight(.black))
                     .foregroundStyle(Color(red: 0.05, green: 0.46, blue: 0.55))   // teal
             }
+            Text(caption)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color(red: 0.42, green: 0.42, blue: 0.46))
             Text("target = \(target)")
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(Color(red: 0.42, green: 0.42, blue: 0.46))
