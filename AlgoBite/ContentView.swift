@@ -82,6 +82,8 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var slotResults: [String: Bool] = [:]
     @Published var hintLevel: HintLevel = .none
     @Published var gentleHintText: String?
+    /// 直前に不正解だったスロット (赤波線で表示し続ける)
+    @Published var lastWrongIDs: Set<String> = []
 
     let problems: [PuzzleProblem] = PuzzleData.all
     let stats: StatsStore = .shared
@@ -149,6 +151,7 @@ final class GameViewModel: ObservableObject {
     func selectSlot(_ id: String) {
         activeSlotID = id
         slotStates = [:]
+        clearLastWrong(id)
         Haptics.light()
     }
 
@@ -193,18 +196,20 @@ final class GameViewModel: ObservableObject {
             hintLevel = .fillOne
             Haptics.medium()
         case .fillOne:
-            // 全部埋める
+            // 全部埋める＋自動採点
             let ids = todayProblem.orderedSlotIDs
             for id in ids {
                 answers[id] = todayProblem.slots[id]?.answer
             }
             slotStates = [:]
             activeSlotID = nil
-            logMessage = "🔓 ヒント3/3: 全部埋めたよ。「こたえる！」を押そう"
+            logMessage = "🔓 ヒント3/3: 全部埋めたよ"
             hintLevel = .fillAll
             Haptics.medium()
+            // ヒント全開放したら自動で採点まで進める
+            runCheck()
         case .fillAll:
-            logMessage = "もうヒントはないよ。「こたえる！」を押してね"
+            logMessage = "もうヒントはないよ"
             Haptics.warning()
         }
     }
@@ -277,14 +282,36 @@ final class GameViewModel: ObservableObject {
                 shakeTrigger[id, default: 0] += 1
             }
             let wrongIDs = wrong
+            lastWrongIDs = Set(wrongIDs)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self] in
                 guard let self else { return }
                 for id in wrongIDs {
                     self.slotStates[id] = .idle
                     self.answers[id] = nil
                 }
+                // slotStates は idle に戻すが lastWrongIDs は残し、赤い波線で
+                // 「ここを直してね」を視覚的に保持する
             }
         }
+    }
+
+    /// スロットがタップされたら lastWrong マークを外す (再挑戦の合図)
+    func clearLastWrong(_ id: String) {
+        if lastWrongIDs.contains(id) {
+            lastWrongIDs.remove(id)
+        }
+    }
+
+    /// 今日の問題を諦める (skip)。ストリークには影響させず、UI 状態だけ初期化する
+    func skipToday() {
+        answers = [:]
+        activeSlotID = nil
+        slotStates = [:]
+        hintLevel = .none
+        gentleHintText = nil
+        lastWrongIDs = []
+        logMessage = "今日はパスしたよ"
+        Haptics.light()
     }
 
     func shareText() -> String {
@@ -327,6 +354,7 @@ enum AppScreen: Hashable {
     case review
     case practice(PuzzleProblem)
     case achievements
+    case settings
 }
 
 // MARK: - Palette / Helpers (pop & friendly)
@@ -487,6 +515,7 @@ struct ContentView: View {
     @StateObject private var vm = GameViewModel()
     @State private var showCopied = false
     @State private var path: [AppScreen] = []
+    @State private var showOnboarding: Bool = !appDefaults.bool(forKey: "algobite.onboarded")
 
     var body: some View {
         ZStack {
@@ -497,7 +526,15 @@ struct ContentView: View {
                         case .problem:
                             problemScreen
                         case .reorder(let q):
-                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q))
+                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q),
+                                            onNext: { next in
+                                                // パスを差し替えて新しいクイズへ移動
+                                                if let lastIdx = path.lastIndex(where: {
+                                                    if case .reorder = $0 { return true } else { return false }
+                                                }) {
+                                                    path[lastIdx] = .reorder(next)
+                                                }
+                                            })
                         case .reorderList:
                             ReorderQuizListView { q in
                                 path.append(.reorder(q))
@@ -510,6 +547,8 @@ struct ContentView: View {
                             PracticeView(session: PracticeSession(problem: p))
                         case .achievements:
                             AchievementsView(stats: vm.stats, badges: vm.badges)
+                        case .settings:
+                            SettingsView()
                         }
                     }
             }
@@ -522,8 +561,15 @@ struct ContentView: View {
                 }
                 .zIndex(10)
             }
+            // 初回起動時のオンボーディング
+            if showOnboarding {
+                OnboardingView(isPresented: $showOnboarding)
+                    .zIndex(20)
+                    .transition(.opacity)
+            }
         }
         .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
+        .animation(.easeInOut(duration: 0.30), value: showOnboarding)
     }
 
     // MARK: 背景 (画面全体)
@@ -569,9 +615,11 @@ struct ContentView: View {
     private var homeHeader: some View {
         HStack(spacing: 8) {
             CookieIcon(size: 36)
+                .accessibilityHidden(true)
             Text("AlgoBite")
                 .font(.system(size: 26, weight: .black, design: .rounded))
                 .foregroundStyle(Pop.inkWarm)
+                .accessibilityAddTraits(.isHeader)
             Spacer(minLength: 4)
             // 日付ピル (左寄せ)
             HStack(spacing: 6) {
@@ -785,6 +833,9 @@ struct ContentView: View {
                 footerLink(title: "復習", icon: AnyView(ChocolateIcon(size: 26))) {
                     path.append(.review)
                 }
+                footerLink(title: "設定", icon: AnyView(DonutIcon(size: 26))) {
+                    path.append(.settings)
+                }
             }
             VStack(spacing: 2) {
                 HStack(spacing: 4) {
@@ -850,7 +901,7 @@ struct ContentView: View {
                                 in: Capsule())
                 }
 
-                // クッキーの日めくり
+                // クッキーの日めくり (7 日まで)
                 HStack(spacing: 8) {
                     ForEach(0..<7) { i in
                         let filled = i < min(vm.streak, 7)
@@ -877,6 +928,24 @@ struct ContentView: View {
                                 .foregroundStyle(Pop.inkWarmSub)
                         }
                     }
+                }
+                // 7 日を超えたら「+N 日」を金色プレートで表示 (週単位の達成バナー)
+                if vm.streak > 7 {
+                    HStack(spacing: 6) {
+                        Text("⭐️")
+                        Text("さらに +\(vm.streak - 7) 日達成中！")
+                            .font(.caption.weight(.black))
+                            .foregroundStyle(Pop.inkWarm)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background(LinearGradient(colors: [
+                        Color(red: 1.00, green: 0.93, blue: 0.55),
+                        Color(red: 0.99, green: 0.79, blue: 0.18)
+                    ], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                in: Capsule())
+                    .overlay(Capsule().stroke(Color(red: 0.92, green: 0.65, blue: 0.05),
+                                              lineWidth: 1.4))
+                    .frame(maxWidth: .infinity, alignment: .center)
                 }
 
                 HStack(spacing: 6) {
@@ -1043,20 +1112,25 @@ struct ContentView: View {
             let active = vm.activeSlotID == id
             let state = vm.slotStates[id] ?? .idle
             let shakes = vm.shakeTrigger[id] ?? 0
+            // 「直前間違えたよ」マーク (idle に戻った後も赤波線で残す)
+            let wasWrong = state == .idle && vm.lastWrongIDs.contains(id)
             Button { vm.selectSlot(id) } label: {
                 Text(val)
                     .font(.system(size: 13, weight: .heavy, design: .monospaced))
                     .padding(.horizontal, 8).padding(.vertical, 3)
                     .background(slotBg(active, state), in: RoundedRectangle(cornerRadius: 7))
                     .overlay(RoundedRectangle(cornerRadius: 7)
-                        .stroke(slotBorder(active, state),
-                                style: StrokeStyle(lineWidth: 1.5, dash: state == .idle ? [3, 3] : [])))
+                        .stroke(wasWrong ? Pop.danger : slotBorder(active, state),
+                                style: StrokeStyle(lineWidth: wasWrong ? 2.0 : 1.5,
+                                                   dash: wasWrong ? [4, 2]
+                                                       : (state == .idle ? [3, 3] : []))))
                     .foregroundStyle(slotFg(state))
             }
             .buttonStyle(.plain)
             .disabled(vm.isCompletedToday)
             .modifier(ShakeEffect(animatableData: CGFloat(shakes)))
             .animation(.easeInOut(duration: 0.55), value: shakes)
+            .accessibilityLabel("スロット \(vm.todayProblem.slots[id]?.label ?? id)、現在 \(val == "___" ? "未入力" : val)")
         }
     }
 
@@ -1121,6 +1195,12 @@ struct ContentView: View {
                     smallBtn("↻ リセット",
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) { vm.resetCurrent() }
+                    smallBtn("⤼ スキップ",
+                             fill: Color(red: 0.78, green: 0.72, blue: 0.98),
+                             shadow: Color(red: 0.55, green: 0.49, blue: 0.92)) {
+                        vm.skipToday()
+                        path.removeLast()
+                    }
                 }
 
                 PopButton(fill: Pop.primary, shadow: Pop.primaryShadow,
@@ -1889,6 +1969,8 @@ final class ReorderQuizViewModel: ObservableObject {
 struct ReorderQuizView: View {
     @StateObject var model: ReorderQuizViewModel
     @Environment(\.dismiss) private var dismiss
+    /// クリア後「次の問題へ」が押されたときの遷移先
+    var onNext: ((ReorderQuiz) -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -2068,11 +2150,28 @@ struct ReorderQuizView: View {
                 .disabled(!ready || model.isGrading)
                 .opacity((ready && !model.isGrading) ? 1 : 0.5)
             } else {
+                // クリア後: 次のランダムな並べ替えへ + ホームへの両方
+                PopButton(fill: Pop.accent,
+                          shadow: Pop.accentShadow,
+                          action: {
+                            // 現在のクイズと違うものをランダムに選んで置換
+                            Haptics.light()
+                            let others = ReorderQuiz.allList.filter { $0.id != model.quiz.id }
+                            if let next = others.randomElement() {
+                                onNext?(next)
+                            }
+                          }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "shuffle")
+                        Text("次の問題へ！")
+                            .font(.subheadline.weight(.heavy))
+                    }
+                }
                 PopButton(fill: Pop.primary,
                           shadow: Pop.primaryShadow,
                           action: { dismiss() }) {
-                    Text("ホームへ戻る")
-                        .font(.title3.weight(.black))
+                    Text("ホームへ")
+                        .font(.subheadline.weight(.heavy))
                 }
             }
         }
