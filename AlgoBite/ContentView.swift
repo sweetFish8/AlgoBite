@@ -95,6 +95,31 @@ final class GameViewModel: ObservableObject {
         return problems[day % problems.count]
     }
 
+    /// 穴埋めと並べ替えを混ぜた「今日の一問」プール。
+    /// 順序は 3 穴埋め : 1 並べ替えのインターリーブで、合計 134 問のローテーション。
+    var dailyChallenges: [DailyChallenge] {
+        var out: [DailyChallenge] = []
+        let puzzles = problems
+        let reorders = ReorderQuiz.allList
+        var p = 0, r = 0
+        while p < puzzles.count || r < reorders.count {
+            for _ in 0..<3 where p < puzzles.count {
+                out.append(.puzzle(puzzles[p])); p += 1
+            }
+            if r < reorders.count {
+                out.append(.reorder(reorders[r])); r += 1
+            }
+        }
+        return out
+    }
+
+    /// 今日の一問 (穴埋め or 並べ替え)
+    var todayChallenge: DailyChallenge {
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: Date()) ?? 0
+        let pool = dailyChallenges
+        return pool[day % pool.count]
+    }
+
     var todayDateString: String {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
         return f.string(from: Date())
@@ -302,6 +327,33 @@ final class GameViewModel: ObservableObject {
         }
     }
 
+    /// 今日の一問が並べ替えだった場合、それをクリアしたら呼ぶ。穴埋め runCheck の成功
+    /// 分岐と同じ後処理 (streak / lastSolvedDate / stats / badges) を実行する。
+    func markDailyReorderCleared() {
+        guard !isCompletedToday else { return }
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        let today = f.string(from: Date())
+        let defaults = appDefaults
+
+        isCompletedToday = true
+
+        if let lastStr = defaults.string(forKey: "algobite.lastSolvedDate"),
+           let lastDate = f.date(from: lastStr) {
+            let diff = Calendar.current.dateComponents([.day], from: lastDate, to: Date()).day ?? 0
+            if diff == 1 { streak += 1 }
+            else if diff > 1 { streak = 1 }
+        } else {
+            streak = 1
+        }
+
+        defaults.set(today, forKey: "algobite.lastSolvedDate")
+        defaults.set(streak, forKey: "algobite.streak")
+        logMessage = "PASS 🎉 今日のひと口クリア！"
+        Haptics.success()
+        // 並べ替えのクリア記録は ReorderQuizViewModel.submit で既に行われている
+        badges.evaluate(stats: stats, streak: streak)
+    }
+
     /// 今日の問題を諦める (skip)。ストリークには影響させず、UI 状態だけ初期化する
     func skipToday() {
         answers = [:]
@@ -350,11 +402,49 @@ final class GameViewModel: ObservableObject {
 enum AppScreen: Hashable {
     case problem
     case reorder(ReorderQuiz)
+    case dailyReorder(ReorderQuiz)   // 「今日の一問」が並べ替えだった場合の専用ルート (クリアでストリーク更新)
     case reorderList
     case review
     case practice(PuzzleProblem)
     case achievements
     case settings
+}
+
+/// 今日の一問の型 (穴埋め or 並べ替え)
+enum DailyChallenge: Hashable {
+    case puzzle(PuzzleProblem)
+    case reorder(ReorderQuiz)
+
+    var title: String {
+        switch self {
+        case .puzzle(let p):  return p.title
+        case .reorder(let r): return r.title
+        }
+    }
+    var topic: String {
+        switch self {
+        case .puzzle(let p):  return p.topic
+        case .reorder(let r): return r.topic
+        }
+    }
+    var prompt: String {
+        switch self {
+        case .puzzle(let p):  return p.prompt
+        case .reorder(let r): return r.prompt
+        }
+    }
+    var difficulty: String {
+        switch self {
+        case .puzzle(let p):  return p.difficulty
+        case .reorder: return "Medium"   // 並べ替えは難易度なしなので暫定
+        }
+    }
+    var kindLabel: String {   // バッジ表示用
+        switch self {
+        case .puzzle:  return "穴埋め"
+        case .reorder: return "並べ替え"
+        }
+    }
 }
 
 // MARK: - Palette / Helpers (pop & friendly)
@@ -535,6 +625,10 @@ struct ContentView: View {
                                                     path[lastIdx] = .reorder(next)
                                                 }
                                             })
+                        case .dailyReorder(let q):
+                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q, isDaily: true),
+                                            onNext: nil,
+                                            onDailyCleared: { vm.markDailyReorderCleared() })
                         case .reorderList:
                             ReorderQuizListView { q in
                                 path.append(.reorder(q))
@@ -600,7 +694,6 @@ struct ContentView: View {
                         streakSection      // 最上段 — 連続記録を一番目立たせる
                         todayPreviewCard
                         startButton
-                        reorderPracticeCard
                         reviewCard
                         homeFooter
                     }
@@ -655,13 +748,14 @@ struct ContentView: View {
     }
 
     private var todayPreviewCard: some View {
-        PopCard(fill: Pop.surface,
-                border: Color(red: 0.99, green: 0.79, blue: 0.79)) {       // #FECACA
+        let ch = vm.todayChallenge
+        return PopCard(fill: Pop.surface,
+                       border: Color(red: 0.99, green: 0.79, blue: 0.79)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
                     ZStack {
                         Circle()
-                            .fill(Color(red: 1.00, green: 0.92, blue: 0.85))   // donut peach
+                            .fill(Color(red: 1.00, green: 0.92, blue: 0.85))
                             .frame(width: 60, height: 60)
                         Circle()
                             .stroke(Color(red: 0.99, green: 0.73, blue: 0.45), lineWidth: 2)
@@ -671,8 +765,7 @@ struct ContentView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("今日のひと口")
                             .font(.caption.weight(.heavy))
-                            .foregroundStyle(Pop.inkWarmSub)  // #A16207
-                        // 完了済なら今日が Day N、未完了なら今日 = Day N+1 (連続を伸ばす一日)
+                            .foregroundStyle(Pop.inkWarmSub)
                         Text("Day \(vm.isCompletedToday ? max(vm.streak, 1) : vm.streak + 1)")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(Pop.inkSub)
@@ -684,17 +777,24 @@ struct ContentView: View {
                             .padding(.horizontal, 10).padding(.vertical, 5)
                             .background(Color(red: 0.73, green: 0.97, blue: 0.82),
                                         in: Capsule())
-                            .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18)) // #14532D
+                            .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
                     }
                 }
 
                 HStack(spacing: 6) {
-                    let topic = vm.todayProblem.topic.components(separatedBy: " / ").first
-                                  ?? vm.todayProblem.topic
+                    // クイズの形式バッジ (穴埋め / 並べ替え)
+                    popBadge(ch.kindLabel == "穴埋め" ? "✏️ 穴埋め" : "🔀 並べ替え",
+                             bg: ch.kindLabel == "穴埋め"
+                                 ? Color(red: 0.87, green: 0.84, blue: 0.99)
+                                 : Color(red: 0.99, green: 0.90, blue: 0.52),
+                             fg: ch.kindLabel == "穴埋め"
+                                 ? Color(red: 0.30, green: 0.18, blue: 0.50)
+                                 : Color(red: 0.57, green: 0.25, blue: 0.05))
+                    let topic = ch.topic.components(separatedBy: " / ").first ?? ch.topic
                     popBadge("📌 \(topic)",
-                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),     // #FDE68A
-                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))     // #92400E
-                    let d = vm.todayProblem.difficulty
+                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),
+                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))
+                    let d = ch.difficulty
                     let (db, df): (Color, Color) = {
                         switch d {
                         case "Easy":   return (Color(red: 0.73, green: 0.97, blue: 0.82),
@@ -710,17 +810,16 @@ struct ContentView: View {
 
                 HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(vm.todayProblem.title)
+                        Text(ch.title)
                             .font(.title2.weight(.black))
                             .foregroundStyle(Pop.ink)
-                        Text(vm.todayProblem.prompt)
+                        Text(ch.prompt)
                             .font(.footnote.weight(.medium))
                             .foregroundStyle(Pop.inkSub)
                             .lineLimit(3)
                     }
                     Spacer(minLength: 4)
-                    // 右側：問題の "何をするか" を抽象化した図
-                    TopicIllustration(topic: vm.todayProblem.topic, size: 76)
+                    TopicIllustration(topic: ch.topic, size: 76)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -730,7 +829,13 @@ struct ContentView: View {
     private var startButton: some View {
         PopButton(fill: Pop.primary,
                   shadow: Pop.primaryShadow,
-                  action: { path.append(.problem) }) {
+                  action: {
+                    Haptics.medium()
+                    switch vm.todayChallenge {
+                    case .puzzle:        path.append(.problem)
+                    case .reorder(let q): path.append(.dailyReorder(q))
+                    }
+                  }) {
             HStack(spacing: 8) {
                 Image(systemName: "play.fill")
                 Text(vm.isCompletedToday ? "結果と解説を見る！" : "はじめる！")
@@ -1888,7 +1993,13 @@ final class ReorderQuizViewModel: ObservableObject {
     @Published var attemptCount = 0
     @Published var resultMood: ResultMood = .neutral
 
-    init(quiz: ReorderQuiz) { self.quiz = quiz }
+    /// 今日の一問として開いた場合は true。ストリーク更新の callback がトリガーされる
+    let isDaily: Bool
+
+    init(quiz: ReorderQuiz, isDaily: Bool = false) {
+        self.quiz = quiz
+        self.isDaily = isDaily
+    }
 
     /// 候補のうち、現在 picks に積まれていない残り（同じ値の重複にも対応）
     var remainingPool: [String] {
@@ -1969,8 +2080,11 @@ final class ReorderQuizViewModel: ObservableObject {
 struct ReorderQuizView: View {
     @StateObject var model: ReorderQuizViewModel
     @Environment(\.dismiss) private var dismiss
-    /// クリア後「次の問題へ」が押されたときの遷移先
+    /// クリア後「次の問題へ」が押されたときの遷移先 (練習モード)
     var onNext: ((ReorderQuiz) -> Void)? = nil
+    /// 今日の一問として開いた場合に、クリア時に呼ぶ callback (ストリーク更新)
+    var onDailyCleared: (() -> Void)? = nil
+    @State private var didCallDailyCallback = false
 
     var body: some View {
         ZStack {
@@ -1990,6 +2104,12 @@ struct ReorderQuizView: View {
         }
         .navigationTitle(model.quiz.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: model.isCompleted) { _, completed in
+            if completed && model.isDaily && !didCallDailyCallback {
+                didCallDailyCallback = true
+                onDailyCleared?()
+            }
+        }
     }
 
     @ViewBuilder
@@ -2150,21 +2270,22 @@ struct ReorderQuizView: View {
                 .disabled(!ready || model.isGrading)
                 .opacity((ready && !model.isGrading) ? 1 : 0.5)
             } else {
-                // クリア後: 次のランダムな並べ替えへ + ホームへの両方
-                PopButton(fill: Pop.accent,
-                          shadow: Pop.accentShadow,
-                          action: {
-                            // 現在のクイズと違うものをランダムに選んで置換
-                            Haptics.light()
-                            let others = ReorderQuiz.allList.filter { $0.id != model.quiz.id }
-                            if let next = others.randomElement() {
-                                onNext?(next)
-                            }
-                          }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "shuffle")
-                        Text("次の問題へ！")
-                            .font(.subheadline.weight(.heavy))
+                // クリア後: 練習モードなら次へ shuffle、daily ならホームのみ
+                if !model.isDaily {
+                    PopButton(fill: Pop.accent,
+                              shadow: Pop.accentShadow,
+                              action: {
+                                Haptics.light()
+                                let others = ReorderQuiz.allList.filter { $0.id != model.quiz.id }
+                                if let next = others.randomElement() {
+                                    onNext?(next)
+                                }
+                              }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "shuffle")
+                            Text("次の問題へ！")
+                                .font(.subheadline.weight(.heavy))
+                        }
                     }
                 }
                 PopButton(fill: Pop.primary,
