@@ -1476,7 +1476,88 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "sieve": SieveAnim()
     // Floyd's cycle (Array variant)
     case "find-duplicate": FloydAnim()
+    // 追加マッピング — 漏れていた問題を埋める
+    case "longest-palindrome":      TwoPointerAnim(word: "babad")
+    case "roman-to-int":            BitAnim(kind: .singleNumber)         // 文字→数値の処理を雰囲気で
+    case "product-except-self":     DPTableAnim(kind: .pascals)          // prefix product を triangle ぽく
+    case "kmp-lps":                 DPTableAnim(kind: .lcs)
+    case "jump-game":               SortingAnim(kind: .rotate)           // 配列を辿る感
+    case "jump-game-ii":            SortingAnim(kind: .rotate)
+    case "buy-sell-stock":          DPTableAnim(kind: .maxSubarray)
+    case "spiral-matrix":           GridSearchAnim(kind: .dfs)
+    case "two-sum":                 BitAnim(kind: .singleNumber)         // ペア探索の雰囲気
+    case "lru-cache":               LinkedListAnim(kind: .reverse)       // 双方向リンクリスト的
+    // Queue 追加 3 問
+    case "queue-two-stacks":        StackAnim(input: ["1","2","3"], kind: .parens)
+    case "queue-bfs-shortest":      GridSearchAnim(kind: .bfs)
+    case "queue-circular":          LinkedListAnim(kind: .cycle)
+    // 上にどれもマッチしなければ、topic 文字列で fallback (TopicIllustration と同じ判定)
     default:
-        EmptyView()
+        topicAnimationFallback(topic: problem.topic)
+    }
+}
+
+/// topic キーワードに応じた汎用アニメ。id 単位のマッピングに漏れた問題のため。
+/// 英語 (PuzzleProblem.topic) と日本語 (ReorderQuiz.topic) 両方のキーワードに対応。
+@ViewBuilder
+func topicAnimationFallback(topic: String) -> some View {
+    let t = topic.lowercased()
+    if t.contains("two pointer") || t.contains("2 ポインタ") {
+        TwoPointerAnim(word: "hello")
+    } else if t.contains("binary search") || t.contains("二分探索") {
+        BinarySearchAnim()
+    } else if t.contains("merge sort") || t.contains("マージソート") {
+        SortingAnim(kind: .merge)
+    } else if t.contains("quick") || t.contains("クイックソート") {
+        SortingAnim(kind: .quick)
+    } else if t.contains("insertion") || t.contains("挿入ソート") {
+        SortingAnim(kind: .insertion)
+    } else if t.contains("bubble") || t.contains("バブルソート") {
+        SortingAnim(kind: .bubble)
+    } else if t.contains("selection") || t.contains("選択ソート") {
+        SortingAnim(kind: .selection)
+    } else if t.contains("counting") || t.contains("counting sort") {
+        SortingAnim(kind: .counting)
+    } else if t.contains("sort") || t.contains("ソート") {
+        SortingAnim(kind: .bubble)
+    } else if t.contains("hash") || t.contains("ハッシュ") {
+        DPTableAnim(kind: .fib)
+    } else if t.contains("stack") || t.contains("スタック") {
+        StackAnim(input: ["1","2","3"], kind: .parens)
+    } else if t.contains("queue") || t.contains("キュー") || t.contains("デック") {
+        GridSearchAnim(kind: .bfs)
+    } else if t.contains("linked list") || t.contains("リンクリスト") || t.contains("連結リスト") {
+        LinkedListAnim(kind: .reverse)
+    } else if t.contains("trie") {
+        TrieAnim(kind: .insert)
+    } else if t.contains("tree") || t.contains("bst") || t.contains("木") {
+        TreeTraversalAnim(order: .inorder)
+    } else if t.contains("dijkstra") || t.contains("ダイクストラ") {
+        GridSearchAnim(kind: .bfs)
+    } else if t.contains("graph") || t.contains("bfs") || t.contains("dfs") || t.contains("グラフ") {
+        GridSearchAnim(kind: .bfs)
+    } else if t.contains("dp") || t.contains("dynamic") || t.contains("メモ化") || t.contains("lis") {
+        DPTableAnim(kind: .fib)
+    } else if t.contains("backtrack") || t.contains("バックトラック") || t.contains("順列") {
+        BacktrackingAnim(kind: .combinations)
+    } else if t.contains("sliding") || t.contains("スライディング") {
+        SlidingWindowAnim(s: "abcabc", initialWidth: 1)
+    } else if t.contains("bit") || t.contains("ビット") {
+        BitAnim(kind: .singleNumber)
+    } else if t.contains("greedy") || t.contains("貪欲") {
+        SortingAnim(kind: .selection)
+    } else if t.contains("heap") || t.contains("ヒープ") {
+        HeapAnim(kind: .kthLargest)
+    } else if t.contains("union find") || t.contains("union") {
+        UnionFindAnim(kind: .basic)
+    } else if t.contains("hanoi") || t.contains("ハノイ") || t.contains("再帰") {
+        BacktrackingAnim(kind: .combinations)
+    } else if t.contains("string") || t.contains("文字列") || t.contains("kmp") {
+        TwoPointerAnim(word: "abcab")
+    } else if t.contains("math") || t.contains("数学") {
+        GCDAnim()
+    } else {
+        // 最後の砦：何かしら動くものを出す
+        SortingAnim(kind: .bubble)
     }
 }

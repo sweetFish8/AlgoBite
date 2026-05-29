@@ -2301,7 +2301,7 @@ struct ReorderQuizView: View {
     private var completionCard: some View {
         PopCard(fill: Pop.surfaceMint,
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
                     Text("🎉").font(.system(size: 28))
                     Text("クリア！")
@@ -2315,6 +2315,18 @@ struct ReorderQuizView: View {
                 Text(model.quiz.explanation)
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+
+                // 解説アニメ — quiz topic に応じて自動選択
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Text("✨").font(.subheadline)
+                        Text("動きで見る")
+                            .font(.caption.weight(.black))
+                            .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                    }
+                    topicAnimationFallback(topic: model.quiz.topic)
+                }
+                .padding(.top, 4)
             }
         }
     }
