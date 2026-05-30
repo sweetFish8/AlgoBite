@@ -1098,7 +1098,7 @@ struct AchievementsView: View {
                 VStack(spacing: 16) {
                     // ヘッダー：アイコン + サマリーテキスト
                     HStack(spacing: 12) {
-                        CakeIcon(size: 56)
+                        TrophyIcon(size: 56)
                         VStack(alignment: .leading, spacing: 2) {
                             Text("これまでの記録")
                                 .font(.headline.weight(.black))
