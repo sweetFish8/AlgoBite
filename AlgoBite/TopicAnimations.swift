@@ -3032,6 +3032,820 @@ struct FibMemoAnim: View {
     }
 }
 
+// MARK: - Valid Parentheses (stack match)
+
+struct ValidParensAnim: View {
+    let s: String = "({[]})"
+    @State private var idx = -1
+    @State private var stack: [Character] = []
+    @State private var matched: Bool = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Valid Parentheses", tint: .green, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(Array(s.enumerated()), id: \.offset) { i, c in
+                        tile(width: 26, height: 28,
+                             bg: i == idx ? .yellow : (i < idx ? .green.opacity(0.45) : .gray.opacity(0.25)),
+                             fg: i == idx ? .black : .white) {
+                            Text(String(c)).font(.system(size: 13, weight: .black, design: .monospaced))
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("stack:").font(.caption2.weight(.black)).foregroundStyle(.green)
+                    ForEach(stack.indices, id: \.self) { i in
+                        tile(width: 22, height: 22, bg: .green.opacity(0.55)) {
+                            Text(String(stack[i])).font(.system(size: 11, weight: .black))
+                        }
+                    }
+                }
+                if matched && idx == s.count - 1 {
+                    Text("✅ すべて対応 → valid")
+                        .font(.caption.weight(.bold)).foregroundStyle(.green)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; stack = []; matched = false
+        let chars = Array(s)
+        let pair: [Character: Character] = [")": "(", "}": "{", "]": "["]
+        var st: [Character] = []; var ok = true
+        for (i, c) in chars.enumerated() {
+            let snap = st
+            let curOk = ok
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.7) {
+                guard t == token else { return }
+                withAnimation { idx = i; stack = snap; matched = curOk && i == chars.count - 1 && st.isEmpty }
+            }
+            if let m = pair[c] {
+                if st.last == m { st.removeLast() } else { ok = false }
+            } else {
+                st.append(c)
+            }
+        }
+        let finalOk = ok && st.isEmpty
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(chars.count) * 0.7) {
+            guard t == token else { return }
+            withAnimation { idx = chars.count - 1; stack = st; matched = finalOk }
+        }
+    }
+}
+
+// MARK: - Next Greater Element (monotonic stack)
+
+struct NextGreaterAnim: View {
+    let nums: [Int] = [2, 1, 3, 2, 5, 4, 6]
+    @State private var i = -1
+    @State private var stack: [Int] = []  // 値を持つ
+    @State private var result: [Int] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Next Greater Element", tint: .purple, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(nums.indices, id: \.self) { k in
+                        tile(width: 28, height: 26,
+                             bg: k == i ? .yellow : .purple.opacity(0.4),
+                             fg: k == i ? .black : .white) { Text("\(nums[k])") }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("stack:").font(.caption2.weight(.black)).foregroundStyle(.purple)
+                    ForEach(stack.indices, id: \.self) { k in
+                        tile(width: 22, height: 22, bg: .purple.opacity(0.55)) { Text("\(stack[k])") }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("ans:").font(.caption2.weight(.black)).foregroundStyle(.green)
+                    ForEach(result.indices, id: \.self) { k in
+                        tile(width: 28, height: 22,
+                             bg: result[k] == -1 ? .gray.opacity(0.5) : .green.opacity(0.55)) {
+                            Text(result[k] == -1 ? "−" : "\(result[k])")
+                        }
+                    }
+                }
+                Text("単調減少 stack に積む → 自分より小さい要素を pop して next = 自分")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        i = -1; stack = []; result = []
+        var st: [Int] = []
+        var ans: [Int] = Array(repeating: -1, count: nums.count)
+        // 後ろから走査して各位置の次に大きい値を求める
+        for k in stride(from: nums.count - 1, through: 0, by: -1) {
+            while let top = st.last, top <= nums[k] { st.removeLast() }
+            ans[k] = st.last ?? -1
+            st.append(nums[k])
+        }
+        // 表示は左から
+        var seen: [Int] = []
+        for k in nums.indices {
+            seen.append(ans[k])
+            let snap = seen
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.7) {
+                guard t == token else { return }
+                withAnimation { i = k; result = snap; stack = Array(seen.prefix(k + 1)) }
+            }
+        }
+    }
+}
+
+// MARK: - Largest Rectangle in Histogram
+
+struct LargestRectAnim: View {
+    let h: [Int] = [2, 1, 5, 6, 2, 3]
+    @State private var idx = -1
+    @State private var best: (left: Int, right: Int, height: Int) = (0, 0, 0)
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Largest Rectangle in Histogram", tint: .red, onReplay: play) {
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(h.indices, id: \.self) { i in
+                    let inBest = i >= best.left && i <= best.right
+                    ZStack(alignment: .bottom) {
+                        if inBest && best.height > 0 {
+                            Rectangle().fill(Color.red.opacity(0.45))
+                                .frame(width: 30, height: CGFloat(best.height) * 18)
+                        }
+                        Rectangle()
+                            .fill(i == idx ? .yellow : .gray.opacity(0.65))
+                            .frame(width: 26, height: CGFloat(h[i]) * 18)
+                    }
+                }
+            }
+            Text("最大面積 = \(best.height) × \(max(0, best.right - best.left + 1)) = \(best.height * max(0, best.right - best.left + 1))")
+                .font(.caption.weight(.bold)).foregroundStyle(.red)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; best = (0, 0, 0)
+        // 全 i,j 走査で最大長方形を計算 (デモ用に明示的に表示)
+        var seq: [(Int, Int, Int)] = []   // (left, right, height)
+        for i in h.indices {
+            var minH = h[i]
+            for j in i..<h.count {
+                minH = min(minH, h[j])
+                seq.append((i, j, minH))
+            }
+        }
+        seq.sort { $0.2 * ($0.1 - $0.0 + 1) < $1.2 * ($1.1 - $1.0 + 1) }
+        // ランダムにいくつかピックして "拡大していく" 見た目に
+        let highlights = seq.suffix(8)
+        for (k, b) in highlights.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.55) {
+                guard t == token else { return }
+                withAnimation { idx = b.1; best = (b.0, b.1, b.2) }
+            }
+        }
+    }
+}
+
+// MARK: - Longest Valid Parens (stack of indices)
+
+struct LongestValidParensAnim: View {
+    let s: String = "(()())(("
+    @State private var idx = -1
+    @State private var stack: [Int] = [-1]
+    @State private var bestLen = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Longest Valid Parentheses", tint: .indigo, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(Array(s.enumerated()), id: \.offset) { i, c in
+                        tile(width: 26, height: 28,
+                             bg: i == idx ? .yellow : .indigo.opacity(0.4),
+                             fg: i == idx ? .black : .white) {
+                            Text(String(c)).font(.system(size: 13, weight: .black, design: .monospaced))
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("stack:").font(.caption2.weight(.black)).foregroundStyle(.indigo)
+                    ForEach(stack.indices, id: \.self) { k in
+                        tile(width: 22, height: 22, bg: .indigo.opacity(0.55)) {
+                            Text("\(stack[k])")
+                        }
+                    }
+                }
+                Text("best valid length = \(bestLen)")
+                    .font(.caption.weight(.bold)).foregroundStyle(.indigo)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; stack = [-1]; bestLen = 0
+        var st: [Int] = [-1]; var best = 0
+        let arr = Array(s)
+        for i in arr.indices {
+            if arr[i] == "(" { st.append(i) }
+            else {
+                st.removeLast()
+                if st.isEmpty { st.append(i) }
+                else { best = max(best, i - st.last!) }
+            }
+            let snap = st; let curBest = best
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.7) {
+                guard t == token else { return }
+                withAnimation { idx = i; stack = snap; bestLen = curBest }
+            }
+        }
+    }
+}
+
+// MARK: - House Robber (DP)
+
+struct HouseRobberAnim: View {
+    let nums: [Int] = [2, 7, 9, 3, 1]
+    @State private var dp: [Int] = []
+    @State private var picks: Set<Int> = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "House Robber", tint: .orange, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .bottom, spacing: 4) {
+                    ForEach(nums.indices, id: \.self) { i in
+                        VStack(spacing: 2) {
+                            Text("\(nums[i])")
+                                .font(.system(size: 10, weight: .bold)).foregroundStyle(.secondary)
+                            Rectangle()
+                                .fill(picks.contains(i) ? Color.orange : Color.gray.opacity(0.5))
+                                .frame(width: 28, height: CGFloat(nums[i]) * 8)
+                            Text("🏠").font(.system(size: 18))
+                                .opacity(picks.contains(i) ? 1 : 0.4)
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("dp:").font(.caption2.weight(.black)).foregroundStyle(.orange)
+                    ForEach(dp.indices, id: \.self) { i in
+                        tile(width: 28, height: 22,
+                             bg: i == dp.count - 1 ? .yellow : .orange.opacity(0.45),
+                             fg: i == dp.count - 1 ? .black : .white) { Text("\(dp[i])") }
+                    }
+                }
+                Text("dp[i] = max(dp[i-1], dp[i-2] + nums[i])")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        dp = []; picks = []
+        let n = nums.count
+        var d = Array(repeating: 0, count: n)
+        for i in 0..<n {
+            if i == 0 { d[i] = nums[0] }
+            else if i == 1 { d[i] = max(nums[0], nums[1]) }
+            else { d[i] = max(d[i - 1], d[i - 2] + nums[i]) }
+        }
+        for i in 0..<n {
+            let v = d[i]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.7) {
+                guard t == token else { return }
+                withAnimation { dp.append(v) }
+            }
+        }
+        // 最終的にどこを robbed したか backtrack
+        var p: Set<Int> = []
+        var i = n - 1
+        while i >= 0 {
+            if i == 0 { if d[0] > 0 { p.insert(0) }; break }
+            if i == 1 { if nums[1] > nums[0] { p.insert(1) } else { p.insert(0) }; break }
+            if d[i] == d[i - 1] { i -= 1 } else { p.insert(i); i -= 2 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(n) * 0.7) {
+            guard t == token else { return }
+            withAnimation { picks = p }
+        }
+    }
+}
+
+// MARK: - LIS (Patience-style DP)
+
+struct LISAnim: View {
+    let nums: [Int] = [10, 9, 2, 5, 3, 7, 101, 18]
+    @State private var dp: [Int] = []
+    @State private var idx = -1
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Longest Increasing Subsequence", tint: .pink, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(nums.indices, id: \.self) { i in
+                        tile(width: 32, height: 26,
+                             bg: i == idx ? .yellow : .pink.opacity(0.4),
+                             fg: i == idx ? .black : .white) { Text("\(nums[i])") }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("dp:").font(.caption2.weight(.black)).foregroundStyle(.pink)
+                    ForEach(dp.indices, id: \.self) { i in
+                        tile(width: 32, height: 22, bg: .pink.opacity(0.55)) { Text("\(dp[i])") }
+                    }
+                }
+                Text("dp[i] = 1 + max(dp[j]) for j<i where nums[j]<nums[i]")
+                    .font(.caption2).foregroundStyle(.secondary)
+                if let m = dp.max() {
+                    Text("LIS = \(m)")
+                        .font(.caption.weight(.bold)).foregroundStyle(.pink)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        dp = []; idx = -1
+        let n = nums.count
+        var d = Array(repeating: 1, count: n)
+        for i in 0..<n {
+            for j in 0..<i where nums[j] < nums[i] { d[i] = max(d[i], d[j] + 1) }
+            let v = d[i]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.7) {
+                guard t == token else { return }
+                withAnimation { idx = i; dp.append(v) }
+            }
+        }
+    }
+}
+
+// MARK: - LCS (2D DP grid for two strings)
+
+struct LCSAnim: View {
+    let a = "abcde"
+    let b = "ace"
+    @State private var grid: [[Int]] = []
+    @State private var cur: (Int, Int)? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Longest Common Subsequence", tint: .teal, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\"\(a)\" ∩ \"\(b)\"")
+                    .font(.caption2).foregroundStyle(.secondary)
+                HStack(spacing: 2) {
+                    tile(width: 22, height: 22, bg: .teal.opacity(0.15)) { Text(" ") }
+                    tile(width: 22, height: 22, bg: .teal.opacity(0.3)) { Text("ε") }
+                    ForEach(Array(b.enumerated()), id: \.offset) { _, c in
+                        tile(width: 22, height: 22, bg: .teal.opacity(0.3)) { Text(String(c)) }
+                    }
+                }
+                ForEach(grid.indices, id: \.self) { i in
+                    HStack(spacing: 2) {
+                        let lbl = i == 0 ? "ε" : String(Array(a)[i - 1])
+                        tile(width: 22, height: 22, bg: .teal.opacity(0.3)) { Text(lbl) }
+                        ForEach(grid[i].indices, id: \.self) { j in
+                            let isCur = cur.map { $0 == (i, j) } ?? false
+                            tile(width: 22, height: 22,
+                                 bg: isCur ? .yellow : .teal.opacity(0.5),
+                                 fg: isCur ? .black : .white) { Text("\(grid[i][j])") }
+                        }
+                    }
+                }
+                if let last = grid.last?.last {
+                    Text("LCS 長 = \(last)").font(.caption.weight(.bold)).foregroundStyle(.teal)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        let n = a.count, m = b.count
+        grid = Array(repeating: Array(repeating: 0, count: m + 1), count: n + 1)
+        cur = nil
+        let aArr = Array(a), bArr = Array(b)
+        var k = 0
+        for i in 0...n {
+            for j in 0...m {
+                let v: Int
+                if i == 0 || j == 0 { v = 0 }
+                else if aArr[i - 1] == bArr[j - 1] { v = grid[i - 1][j - 1] + 1 }
+                else { v = max(grid[i - 1][j], grid[i][j - 1]) }
+                let ii = i, jj = j
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(k) * 0.15) {
+                    guard t == token else { return }
+                    withAnimation { grid[ii][jj] = v; cur = (ii, jj) }
+                }
+                k += 1
+            }
+        }
+    }
+}
+
+// MARK: - 0/1 Knapsack
+
+struct KnapsackAnim: View {
+    let weights = [1, 2, 3, 5]
+    let values  = [10, 15, 40, 50]
+    let cap = 6
+    @State private var grid: [[Int]] = []
+    @State private var cur: (Int, Int)? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "0/1 Knapsack (cap=\(cap))", tint: .orange, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("items: " + weights.indices.map { "(w=\(weights[$0]),v=\(values[$0]))" }.joined(separator: " "))
+                    .font(.system(size: 9, design: .monospaced)).foregroundStyle(.secondary)
+                HStack(spacing: 2) {
+                    tile(width: 22, height: 22, bg: .orange.opacity(0.2)) { Text("") }
+                    ForEach(0...cap, id: \.self) { c in
+                        tile(width: 22, height: 22, bg: .orange.opacity(0.3)) { Text("\(c)") }
+                    }
+                }
+                ForEach(grid.indices, id: \.self) { i in
+                    HStack(spacing: 2) {
+                        tile(width: 22, height: 22, bg: .orange.opacity(0.3)) {
+                            Text(i == 0 ? "∅" : "#\(i)")
+                        }
+                        ForEach(grid[i].indices, id: \.self) { c in
+                            let isCur = cur.map { $0 == (i, c) } ?? false
+                            tile(width: 22, height: 22,
+                                 bg: isCur ? .yellow : .orange.opacity(0.55),
+                                 fg: isCur ? .black : .white) { Text("\(grid[i][c])") }
+                        }
+                    }
+                }
+            }
+            Text("dp[i][c] = max(取らない: dp[i-1][c], 取る: dp[i-1][c-w]+v)")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        let n = weights.count
+        grid = Array(repeating: Array(repeating: 0, count: cap + 1), count: n + 1)
+        cur = nil
+        var k = 0
+        for i in 0...n {
+            for c in 0...cap {
+                let v: Int
+                if i == 0 { v = 0 }
+                else if c < weights[i - 1] { v = grid[i - 1][c] }
+                else { v = max(grid[i - 1][c], grid[i - 1][c - weights[i - 1]] + values[i - 1]) }
+                let ii = i, cc = c
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(k) * 0.18) {
+                    guard t == token else { return }
+                    withAnimation { grid[ii][cc] = v; cur = (ii, cc) }
+                }
+                k += 1
+            }
+        }
+    }
+}
+
+// MARK: - Unique Paths (path count grid)
+
+struct UniquePathsAnim: View {
+    let rows = 4, cols = 5
+    @State private var grid: [[Int]] = []
+    @State private var cur: (Int, Int)? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Unique Paths (\(rows)×\(cols))", tint: .blue, onReplay: play) {
+            VStack(spacing: 3) {
+                ForEach(grid.indices, id: \.self) { r in
+                    HStack(spacing: 3) {
+                        ForEach(grid[r].indices, id: \.self) { c in
+                            let isCur = cur.map { $0 == (r, c) } ?? false
+                            tile(width: 30, height: 26,
+                                 bg: isCur ? .yellow : .blue.opacity(0.5),
+                                 fg: isCur ? .black : .white) { Text("\(grid[r][c])") }
+                        }
+                    }
+                }
+            }
+            Text("dp[r][c] = dp[r-1][c] + dp[r][c-1]")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        grid = Array(repeating: Array(repeating: 0, count: cols), count: rows)
+        cur = nil
+        var k = 0
+        for r in 0..<rows {
+            for c in 0..<cols {
+                let v: Int
+                if r == 0 || c == 0 { v = 1 }
+                else { v = grid[r - 1][c] + grid[r][c - 1] }
+                let rr = r, cc = c
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(k) * 0.15) {
+                    guard t == token else { return }
+                    withAnimation { grid[rr][cc] = v; cur = (rr, cc) }
+                }
+                k += 1
+            }
+        }
+    }
+}
+
+// MARK: - Group Anagrams
+
+struct GroupAnagramsAnim: View {
+    let words = ["eat", "tea", "tan", "ate", "nat", "bat"]
+    @State private var groups: [String: [String]] = [:]
+    @State private var idx = -1
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Group Anagrams", tint: .purple, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(words.indices, id: \.self) { i in
+                        tile(width: 38, height: 26,
+                             bg: i == idx ? .yellow : .purple.opacity(0.4),
+                             fg: i == idx ? .black : .white) {
+                            Text(words[i]).font(.system(size: 11, weight: .black, design: .monospaced))
+                        }
+                    }
+                }
+                Text("ソート文字列をキーにグルーピング")
+                    .font(.caption2).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(groups.sorted(by: { $0.key < $1.key }), id: \.key) { kv in
+                        HStack(spacing: 4) {
+                            Text("\"\(kv.key)\":")
+                                .font(.system(size: 10, weight: .black, design: .monospaced))
+                                .foregroundStyle(.purple)
+                            ForEach(kv.value.indices, id: \.self) { i in
+                                tile(width: 38, height: 22, bg: .purple.opacity(0.55)) {
+                                    Text(kv.value[i]).font(.system(size: 10, weight: .heavy, design: .monospaced))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        groups = [:]; idx = -1
+        for i in words.indices {
+            let key = String(words[i].sorted())
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.7) {
+                guard t == token else { return }
+                withAnimation {
+                    idx = i
+                    groups[key, default: []].append(words[i])
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Subsets (power set bit pattern)
+
+struct SubsetsAnim: View {
+    let nums = [1, 2, 3]
+    @State private var current: [Int] = []
+    @State private var collected: [[Int]] = []
+    @State private var mask = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Subsets of \(nums)", tint: .indigo, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    Text("mask:").font(.caption2.weight(.black)).foregroundStyle(.indigo)
+                    ForEach(nums.indices.reversed(), id: \.self) { bit in
+                        let on = (mask >> bit) & 1 == 1
+                        tile(width: 22, height: 22,
+                             bg: on ? .indigo : .indigo.opacity(0.2),
+                             fg: on ? .white : .white.opacity(0.5)) {
+                            Text(on ? "1" : "0").font(.system(size: 11, weight: .black, design: .monospaced))
+                        }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("current:").font(.caption2.weight(.black)).foregroundStyle(.indigo)
+                    if current.isEmpty {
+                        Text("{}").font(.caption.weight(.black)).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(current.indices, id: \.self) { i in
+                            tile(width: 22, height: 22, bg: .yellow, fg: .black) { Text("\(current[i])") }
+                        }
+                    }
+                }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 4)], spacing: 4) {
+                    ForEach(collected.indices, id: \.self) { i in
+                        HStack(spacing: 2) {
+                            ForEach(collected[i].indices, id: \.self) { j in
+                                tile(width: 18, height: 18, bg: .indigo.opacity(0.55)) {
+                                    Text("\(collected[i][j])")
+                                }
+                            }
+                            if collected[i].isEmpty {
+                                Text("∅").font(.caption.weight(.black)).foregroundStyle(.indigo)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        current = []; collected = []; mask = 0
+        for m in 0..<(1 << nums.count) {
+            var sub: [Int] = []
+            for b in nums.indices where (m >> b) & 1 == 1 { sub.append(nums[b]) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(m) * 0.7) {
+                guard t == token else { return }
+                withAnimation { mask = m; current = sub; collected.append(sub) }
+            }
+        }
+    }
+}
+
+// MARK: - N-Queens (board placement)
+
+struct NQueensAnim: View {
+    let n = 4
+    @State private var board: [Int] = []   // 行 → 列
+    @State private var current = -1
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "\(n)-Queens", tint: .red, onReplay: play) {
+            VStack(spacing: 3) {
+                ForEach(0..<n, id: \.self) { r in
+                    HStack(spacing: 3) {
+                        ForEach(0..<n, id: \.self) { c in
+                            let placed = r < board.count && board[r] == c
+                            let attacked = isAttacked(r: r, c: c)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill((r + c) % 2 == 0 ? Color.white.opacity(0.8) : Color.gray.opacity(0.55))
+                                    .frame(width: 32, height: 32)
+                                if placed { Text("♛").font(.title3).foregroundStyle(.red) }
+                                else if r == current && attacked {
+                                    Text("✕").font(.caption.weight(.bold)).foregroundStyle(.red)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Text("各行に 1 つずつ Queen を置く (列・斜めが衝突しないように)")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func isAttacked(r: Int, c: Int) -> Bool {
+        for prev in 0..<min(r, board.count) {
+            if board[prev] == c { return true }
+            if abs(board[prev] - c) == abs(prev - r) { return true }
+        }
+        return false
+    }
+    private func play() {
+        token += 1; let t = token
+        board = []; current = -1
+        // 4-queens 解: [1,3,0,2]
+        let sol = [1, 3, 0, 2]
+        for (i, c) in sol.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.8) {
+                guard t == token else { return }
+                withAnimation { current = i; board.append(c) }
+            }
+        }
+    }
+}
+
+// MARK: - Word Search (grid DFS)
+
+struct WordSearchAnim: View {
+    let grid: [[Character]] = [
+        ["A","B","C","E"],
+        ["S","F","C","S"],
+        ["A","D","E","E"]
+    ]
+    let word = "ABCCED"
+    @State private var path: [(Int, Int)] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Word Search: \"\(word)\"", tint: .green, onReplay: play) {
+            VStack(spacing: 3) {
+                ForEach(grid.indices, id: \.self) { r in
+                    HStack(spacing: 3) {
+                        ForEach(grid[r].indices, id: \.self) { c in
+                            let order = path.firstIndex(where: { $0 == (r, c) })
+                            tile(width: 32, height: 32,
+                                 bg: order != nil ? .green.opacity(0.7) : .white.opacity(0.18),
+                                 fg: order != nil ? .white : .white) {
+                                VStack(spacing: 0) {
+                                    Text(String(grid[r][c]))
+                                        .font(.system(size: 13, weight: .black, design: .monospaced))
+                                    if let o = order {
+                                        Text("\(o + 1)").font(.system(size: 7))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Text("隣接マスを DFS、word の文字に一致しなければバックトラック")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        path = []
+        // "ABCCED" を辿る正解パス
+        let solution: [(Int, Int)] = [(0,0),(0,1),(0,2),(1,2),(2,2),(2,1)]
+        for (i, p) in solution.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.6) {
+                guard t == token else { return }
+                withAnimation { path.append(p) }
+            }
+        }
+    }
+}
+
+// MARK: - Kth Largest (min-heap of size k)
+
+struct KthLargestAnim: View {
+    let nums = [3, 2, 1, 5, 6, 4]
+    let k = 2
+    @State private var heap: [Int] = []
+    @State private var idx = -1
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Kth Largest (k=\(k))", tint: .pink, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(nums.indices, id: \.self) { i in
+                        tile(width: 28, height: 26,
+                             bg: i == idx ? .yellow : .pink.opacity(0.4),
+                             fg: i == idx ? .black : .white) { Text("\(nums[i])") }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("min-heap (top=k番目に大きい):")
+                        .font(.caption2.weight(.black)).foregroundStyle(.pink)
+                }
+                HStack(spacing: 4) {
+                    ForEach(heap.indices, id: \.self) { i in
+                        tile(width: 28, height: 26,
+                             bg: i == 0 ? .pink : .pink.opacity(0.55)) { Text("\(heap[i])") }
+                    }
+                }
+                if heap.count == k, let top = heap.first {
+                    Text("→ Kth largest = \(top)")
+                        .font(.caption.weight(.bold)).foregroundStyle(.pink)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        heap = []; idx = -1
+        var h: [Int] = []
+        for (i, v) in nums.enumerated() {
+            h.append(v); h.sort()
+            if h.count > k { h.removeFirst() }
+            let snap = h
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.8) {
+                guard t == token else { return }
+                withAnimation { idx = i; heap = snap }
+            }
+        }
+    }
+}
+
 // MARK: - Topic dispatcher
 
 @ViewBuilder
@@ -3061,7 +3875,7 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "trapping-rain":   TrappingRainAnim()
     // Anagram
     case "anagram-check":  AnagramCheckAnim()
-    case "group-anagrams": AnagramAnim(a: "eat", b: "tea")
+    case "group-anagrams": GroupAnagramsAnim()
     // Sorting
     case "bubble-sort": SortingAnim(kind: .bubble)
     case "insertion-sort": SortingAnim(kind: .insertion)
@@ -3072,12 +3886,12 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "dutch-flag": SortingAnim(kind: .dutch)
     case "rotate-array": SortingAnim(kind: .rotate)
     case "merge-intervals": SortingAnim(kind: .merge)
-    // Stack
-    case "valid-parentheses": StackAnim(input: ["(","(",")",")","[","]"], kind: .parens)
-    case "min-stack": MinStackAnim()
-    case "next-greater": StackAnim(input: ["2","1","3","2","4"], kind: .monotonic)
-    case "largest-rectangle": StackAnim(input: ["2","1","5","6","2","3"], kind: .monotonic)
-    case "longest-valid-parens": DPTableAnim(kind: .longestValidParens)
+    // Stack — 専用 SwiftUI に置換
+    case "valid-parentheses":   ValidParensAnim()
+    case "min-stack":            MinStackAnim()
+    case "next-greater":         NextGreaterAnim()
+    case "largest-rectangle":    LargestRectAnim()
+    case "longest-valid-parens": LongestValidParensAnim()
     // Linked list — 各々 専用の SwiftUI 視覚化に置換
     case "reverse-linked-list": ReverseLinkedListAnim()
     case "merge-two-lists":     MergeTwoListsAnim()
@@ -3164,11 +3978,11 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
                           subtitle: "BFS で順番に出力 (null 含む)")
     // DP
     case "fibonacci-memo": FibMemoAnim()
-    case "house-robber": DPTableAnim(kind: .robber)
-    case "lcs": DPTableAnim(kind: .lcs)
-    case "lis": DPTableAnim(kind: .lis)
-    case "knapsack": DPTableAnim(kind: .knapsack)
-    case "unique-paths": DPTableAnim(kind: .uniquePaths)
+    case "house-robber": HouseRobberAnim()
+    case "lcs":          LCSAnim()
+    case "lis":          LISAnim()
+    case "knapsack":     KnapsackAnim()
+    case "unique-paths": UniquePathsAnim()
     case "edit-distance": EditDistanceAnim()
     case "min-path-sum": DPTableAnim(kind: .minPath)
     case "decode-ways": DPTableAnim(kind: .decode)
@@ -3178,7 +3992,7 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "max-subarray": DPTableAnim(kind: .maxSubarray)
     case "count-bits": DPTableAnim(kind: .countBits)
     // Heap
-    case "kth-largest": HeapAnim(kind: .kthLargest)
+    case "kth-largest": KthLargestAnim()
     case "top-k-freq": HeapAnim(kind: .topK)
     case "meeting-rooms": HeapAnim(kind: .meetingRooms)
     // Bit
@@ -3187,10 +4001,10 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "reverse-bits": BitAnim(kind: .reverseBits)
     // Backtracking
     case "combinations": BacktrackingAnim(kind: .combinations)
-    case "subsets": BacktrackingAnim(kind: .subsets)
+    case "subsets":      SubsetsAnim()
     case "permutations": PermutationsTreeAnim()
-    case "n-queens": BacktrackingAnim(kind: .nQueens)
-    case "word-search": BacktrackingAnim(kind: .wordSearch)
+    case "n-queens":     NQueensAnim()
+    case "word-search":  WordSearchAnim()
     // Trie
     case "trie-insert": TrieAnim(kind: .insert)
     case "trie-search": TrieAnim(kind: .search)
