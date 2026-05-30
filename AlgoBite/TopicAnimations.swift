@@ -3846,6 +3846,721 @@ struct KthLargestAnim: View {
     }
 }
 
+// MARK: - Tree helper (visualize a 7-node BT and walk)
+
+private struct TreeNodeView: View {
+    let value: String
+    let bg: Color
+    let fg: Color
+    var body: some View {
+        ZStack {
+            Circle().fill(bg).frame(width: 28, height: 28)
+            Text(value).font(.system(size: 11, weight: .black)).foregroundStyle(fg)
+        }
+    }
+}
+
+private struct LeveledTree: View {
+    let nodes: [Int]   // 7 nodes, level order
+    let highlightVisited: [Int]
+    let current: Int?
+    let palette: (visited: Color, current: Color, base: Color)
+    var body: some View {
+        VStack(spacing: 8) {
+            // root
+            row(indices: [0])
+            row(indices: [1, 2])
+            row(indices: [3, 4, 5, 6])
+        }
+    }
+    private func row(indices: [Int]) -> some View {
+        HStack(spacing: 18) {
+            ForEach(indices, id: \.self) { i in
+                let v = i < nodes.count ? nodes[i] : 0
+                let visited = highlightVisited.contains(v)
+                let isCur = current == v
+                TreeNodeView(value: "\(v)",
+                             bg: isCur ? palette.current : (visited ? palette.visited : palette.base),
+                             fg: .white)
+            }
+        }
+    }
+}
+
+// MARK: - Validate BST (inorder ascending check)
+
+struct ValidateBSTAnim: View {
+    let nodes = [5, 3, 7, 1, 4, 6, 8]  // BST
+    @State private var visited: [Int] = []
+    @State private var cur: Int? = nil
+    @State private var ok = true
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Validate BST (inorder = 昇順 ?)", tint: .green, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: visited, current: cur,
+                        palette: (.green, .yellow, .green.opacity(0.4)))
+            HStack(spacing: 4) {
+                Text("seen:").font(.caption2.weight(.black)).foregroundStyle(.green)
+                ForEach(visited.indices, id: \.self) { i in
+                    tile(width: 22, height: 22, bg: .green.opacity(0.55)) { Text("\(visited[i])") }
+                }
+            }
+            Text(ok ? "🟢 BST: 昇順を維持" : "🔴 違反！")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(ok ? .green : .red)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        visited = []; cur = nil; ok = true
+        // インオーダー (左→根→右) を完全二分木として
+        let seq = [nodes[3], nodes[1], nodes[4], nodes[0], nodes[5], nodes[2], nodes[6]]
+        var seen: [Int] = []
+        for (i, v) in seq.enumerated() {
+            let prevSeen = seen
+            seen.append(v)
+            let stillOk = prevSeen.last.map { $0 < v } ?? true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(i) * 0.6) {
+                guard t == token else { return }
+                withAnimation { cur = v; visited = prevSeen + [v]; ok = ok && stillOk }
+            }
+        }
+    }
+}
+
+// MARK: - Invert Binary Tree
+
+struct InvertTreeAnim: View {
+    @State private var nodes = [4, 2, 7, 1, 3, 6, 9]
+    @State private var swapAt: Int? = nil  // swap している親 index
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Invert Binary Tree", tint: .indigo, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: [], current: swapAt.flatMap { nodes.indices.contains($0) ? nodes[$0] : nil },
+                        palette: (.indigo, .yellow, .indigo.opacity(0.4)))
+            Text("各ノードの左右の子を swap")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        nodes = [4, 2, 7, 1, 3, 6, 9]
+        // 親 index 0 (left=1, right=2), 1 (left=3, right=4), 2 (left=5, right=6) を swap
+        let swaps: [(Int, Int, Int)] = [(0, 1, 2), (1, 3, 4), (2, 5, 6)]
+        for (k, s) in swaps.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 1.0) {
+                guard t == token else { return }
+                withAnimation { swapAt = s.0; nodes.swapAt(s.1, s.2) }
+            }
+        }
+    }
+}
+
+// MARK: - Symmetric Tree (mirror check)
+
+struct SymmetricTreeAnim: View {
+    let nodes = [1, 2, 2, 3, 4, 4, 3]
+    @State private var compareLR: (Int, Int)? = nil
+    @State private var allOk = true
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Symmetric Tree", tint: .purple, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: [], current: nil,
+                        palette: (.purple, .yellow, .purple.opacity(0.4)))
+            HStack(spacing: 14) {
+                if let pair = compareLR {
+                    Text("\(nodes[pair.0])")
+                        .font(.system(size: 14, weight: .black))
+                        .padding(8)
+                        .background(Color.yellow, in: Circle()).foregroundStyle(.black)
+                    Image(systemName: "arrow.left.and.right").foregroundStyle(.purple)
+                    Text("\(nodes[pair.1])")
+                        .font(.system(size: 14, weight: .black))
+                        .padding(8)
+                        .background(Color.yellow, in: Circle()).foregroundStyle(.black)
+                }
+            }
+            Text(allOk ? "🟢 全 mirror 対応" : "🔴 mirror 違反")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(allOk ? .green : .red)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        compareLR = nil; allOk = true
+        // (left, right) のミラーペア
+        let pairs: [(Int, Int)] = [(1, 2), (3, 6), (4, 5)]
+        for (k, p) in pairs.enumerated() {
+            let ok = nodes[p.0] == nodes[p.1]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.9) {
+                guard t == token else { return }
+                withAnimation { compareLR = p; allOk = allOk && ok }
+            }
+        }
+    }
+}
+
+// MARK: - Path Sum (root → leaf with running sum)
+
+struct PathSumAnim: View {
+    let nodes = [5, 4, 8, 11, 2, 13, 1]
+    let target = 22
+    @State private var path: [Int] = []
+    @State private var sum = 0
+    @State private var done = false
+    @State private var found = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Path Sum = \(target)", tint: .orange, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: path, current: path.last,
+                        palette: (.orange, .yellow, .orange.opacity(0.3)))
+            HStack {
+                Text("path: " + path.map(String.init).joined(separator: " → "))
+                    .font(.system(.caption2, design: .monospaced))
+                Spacer()
+                Text("sum=\(sum)")
+                    .font(.caption.weight(.bold)).foregroundStyle(.orange)
+            }
+            if done {
+                Text(found ? "🎯 target 一致" : "ハズレ (このパスは違う)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(found ? .green : .secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        path = []; sum = 0; done = false; found = false
+        // root(5) -> 4 -> 11 -> 2 = 22 ヒット
+        let seqIdx = [0, 1, 3, 4]
+        for (k, i) in seqIdx.enumerated() {
+            let v = nodes[i]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.8) {
+                guard t == token else { return }
+                withAnimation { path.append(v); sum += v }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(seqIdx.count) * 0.8 + 0.3) {
+            guard t == token else { return }
+            withAnimation { done = true; found = sum == target }
+        }
+    }
+}
+
+// MARK: - Max Depth (postorder, returning depth)
+
+struct MaxDepthBTAnim: View {
+    let nodes = [3, 9, 20, 1, 2, 15, 7]
+    @State private var depths: [Int: Int] = [:]   // node value → depth
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Max Depth of Binary Tree", tint: .green, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: Array(depths.keys), current: nil,
+                        palette: (.green, .yellow, .green.opacity(0.4)))
+            HStack(spacing: 4) {
+                Text("depth:").font(.caption2.weight(.black)).foregroundStyle(.green)
+                ForEach(depths.sorted(by: { $0.key < $1.key }), id: \.key) { kv in
+                    tile(width: 32, height: 24, bg: .green.opacity(0.5)) {
+                        VStack(spacing: 0) {
+                            Text("\(kv.key)").font(.system(size: 9))
+                            Text("→\(kv.value)").font(.system(size: 9, weight: .heavy))
+                        }
+                    }
+                }
+            }
+            if let m = depths.values.max() {
+                Text("max depth = \(m)").font(.caption.weight(.bold)).foregroundStyle(.green)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        depths = [:]
+        // 葉から順に depth を確定
+        let order: [(Int, Int)] = [(nodes[3], 1), (nodes[4], 1), (nodes[1], 2),
+                                    (nodes[5], 1), (nodes[6], 1), (nodes[2], 2),
+                                    (nodes[0], 3)]
+        for (k, (v, d)) in order.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.6) {
+                guard t == token else { return }
+                withAnimation { depths[v] = d }
+            }
+        }
+    }
+}
+
+// MARK: - LCA of BST (using BST property)
+
+struct LCAofBSTAnim: View {
+    let nodes = [6, 2, 8, 0, 4, 7, 9]
+    let p = 2, q = 4
+    @State private var path: [Int] = []
+    @State private var lca: Int? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "LCA of BST (p=\(p), q=\(q))", tint: .teal, onReplay: play) {
+            LeveledTree(nodes: nodes, highlightVisited: path,
+                        current: lca, palette: (.teal, .yellow, .teal.opacity(0.4)))
+            HStack {
+                Text("walking:")
+                    .font(.caption2.weight(.black)).foregroundStyle(.teal)
+                Text(path.map(String.init).joined(separator: " → "))
+                    .font(.system(.caption2, design: .monospaced))
+            }
+            if let l = lca {
+                Text("🎯 LCA = \(l)").font(.caption.weight(.bold)).foregroundStyle(.teal)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        path = []; lca = nil
+        // 6 → 2 (両方左) で確定 (p=2, q=4)
+        let walk = [6, 2]
+        for (k, v) in walk.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.8) {
+                guard t == token else { return }
+                withAnimation { path.append(v) }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(walk.count) * 0.8 + 0.2) {
+            guard t == token else { return }
+            withAnimation { lca = 2 }
+        }
+    }
+}
+
+// MARK: - Diameter of Binary Tree
+
+struct DiameterBTAnim: View {
+    let nodes = [1, 2, 3, 4, 5, 6, 7]
+    @State private var leftD: Int? = nil
+    @State private var rightD: Int? = nil
+    @State private var rootHL: Int? = nil
+    @State private var dia = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Diameter of Binary Tree", tint: .red, onReplay: play) {
+            LeveledTree(nodes: nodes,
+                        highlightVisited: [leftD, rightD].compactMap { $0 != nil ? nodes[$0!] : nil },
+                        current: rootHL,
+                        palette: (.red.opacity(0.55), .yellow, .red.opacity(0.3)))
+            HStack(spacing: 8) {
+                if let l = leftD {
+                    Text("left depth=\(l)").font(.caption2.weight(.heavy)).foregroundStyle(.red)
+                }
+                if let r = rightD {
+                    Text("right depth=\(r)").font(.caption2.weight(.heavy)).foregroundStyle(.red)
+                }
+            }
+            Text("diameter = max(左深さ + 右深さ) = \(dia)")
+                .font(.caption.weight(.bold)).foregroundStyle(.red)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        leftD = nil; rightD = nil; rootHL = nil; dia = 0
+        // root の左サブツリー深さ=2, 右=2, 通る経路長=4
+        let steps = [
+            (0.5, { self.rootHL = 1 }),
+            (1.2, { self.leftD = 1 }),
+            (1.8, { self.rightD = 2 }),
+            (2.4, { self.rootHL = nodes[0]; self.dia = 4 })
+        ]
+        for (delay, action) in steps {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                guard t == token else { return }
+                withAnimation { action() }
+            }
+        }
+    }
+}
+
+// MARK: - Bubble Sort Pass (per-pass swap visualization)
+
+struct BubbleSortPassAnim: View {
+    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var i = 0   // j 位置
+    @State private var swapping = false
+    @State private var done = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Bubble Sort 1 パス", tint: .blue, onReplay: play) {
+            HStack(spacing: 5) {
+                ForEach(arr.indices, id: \.self) { idx in
+                    let isCmp = idx == i || idx == i + 1
+                    tile(width: 32, height: 32,
+                         bg: swapping && isCmp ? .red : (isCmp ? .yellow : .blue.opacity(0.4)),
+                         fg: isCmp ? .black : .white) { Text("\(arr[idx])") }
+                }
+            }
+            Text("隣り合う 2 要素を比較し、左 > 右 なら swap")
+                .font(.caption2).foregroundStyle(.secondary)
+            if done {
+                Text("✅ 1 パス完了 (最大値が末尾)")
+                    .font(.caption.weight(.bold)).foregroundStyle(.blue)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        arr = [5, 2, 4, 1, 3]; i = 0; swapping = false; done = false
+        var a = arr
+        var k = 0
+        for j in 0..<(a.count - 1) {
+            let needSwap = a[j] > a[j + 1]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.9) {
+                guard t == token else { return }
+                withAnimation { i = j; swapping = needSwap }
+            }
+            if needSwap {
+                a.swapAt(j, j + 1)
+                let snap = a
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.9 + 0.5) {
+                    guard t == token else { return }
+                    withAnimation { arr = snap }
+                }
+            }
+            k += 1
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.9 + 0.3) {
+            guard t == token else { return }
+            withAnimation { swapping = false; done = true }
+        }
+    }
+}
+
+// MARK: - Selection Sort (find-min and swap)
+
+struct SelectionSortAnim: View {
+    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var startIdx = 0
+    @State private var scanIdx = 0
+    @State private var minIdx = 0
+    @State private var done = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Selection Sort 1 パス", tint: .purple, onReplay: play) {
+            HStack(spacing: 5) {
+                ForEach(arr.indices, id: \.self) { i in
+                    tile(width: 32, height: 32,
+                         bg: i == minIdx ? .green :
+                              (i == scanIdx ? .yellow :
+                                (i < startIdx ? .purple.opacity(0.4) : .purple.opacity(0.20))),
+                         fg: i == scanIdx || i == minIdx ? .black : .white) { Text("\(arr[i])") }
+                }
+            }
+            Text("未ソート部から最小値を探し、先頭と swap")
+                .font(.caption2).foregroundStyle(.secondary)
+            if done {
+                Text("✅ 1 パス完了 (先頭が最小)")
+                    .font(.caption.weight(.bold)).foregroundStyle(.purple)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        arr = [5, 2, 4, 1, 3]; startIdx = 0; scanIdx = 0; minIdx = 0; done = false
+        let a = arr
+        var k = 0
+        var mIdx = 0
+        for j in 1..<a.count {
+            if a[j] < a[mIdx] { mIdx = j }
+            let curMin = mIdx
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.8) {
+                guard t == token else { return }
+                withAnimation { scanIdx = j; minIdx = curMin }
+            }
+            k += 1
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.8 + 0.3) {
+            guard t == token else { return }
+            var b = a; b.swapAt(0, mIdx)
+            withAnimation { arr = b; done = true }
+        }
+    }
+}
+
+// MARK: - Insertion Sort
+
+struct InsertionSortAnim: View {
+    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var sortedEnd = 0   // 0..sortedEnd is sorted
+    @State private var cur = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Insertion Sort 1 パス", tint: .green, onReplay: play) {
+            HStack(spacing: 5) {
+                ForEach(arr.indices, id: \.self) { i in
+                    tile(width: 32, height: 32,
+                         bg: i == cur ? .yellow :
+                              (i <= sortedEnd ? .green : .gray.opacity(0.5)),
+                         fg: i == cur ? .black : .white) { Text("\(arr[i])") }
+                }
+            }
+            Text("緑 = ソート済、黄 = 挿入中。後ろへ shift して正しい位置へ")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        arr = [5, 2, 4, 1, 3]; sortedEnd = 0; cur = 0
+        var a = arr
+        var k = 0
+        for i in 1..<a.count {
+            let key = a[i]
+            var j = i - 1
+            while j >= 0 && a[j] > key { a[j + 1] = a[j]; j -= 1 }
+            a[j + 1] = key
+            let snap = a; let pos = j + 1; let end = i
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.9) {
+                guard t == token else { return }
+                withAnimation { arr = snap; cur = pos; sortedEnd = end }
+            }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Dutch National Flag (3-way partition)
+
+struct DutchFlagAnim: View {
+    @State private var arr: [Int] = [2, 0, 2, 1, 1, 0, 1, 0, 2]
+    @State private var lo = 0
+    @State private var mid = 0
+    @State private var hi = 8
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Dutch National Flag", tint: .orange, onReplay: play) {
+            HStack(spacing: 3) {
+                ForEach(arr.indices, id: \.self) { i in
+                    let bg: Color = arr[i] == 0 ? .red : (arr[i] == 1 ? .white : .blue)
+                    let fg: Color = arr[i] == 1 ? .black : .white
+                    tile(width: 24, height: 28, bg: bg, fg: fg) { Text("\(arr[i])") }
+                }
+            }
+            HStack(spacing: 12) {
+                Text("lo=\(lo)")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.red)
+                Text("mid=\(mid)")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.orange)
+                Text("hi=\(hi)")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.blue)
+            }
+            Text("0 を左へ、2 を右へ、1 はそのまま")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        var a = [2, 0, 2, 1, 1, 0, 1, 0, 2]
+        arr = a; lo = 0; mid = 0; hi = a.count - 1
+        var l = 0, m = 0, h = a.count - 1
+        var k = 0
+        while m <= h {
+            if a[m] == 0 { a.swapAt(l, m); l += 1; m += 1 }
+            else if a[m] == 2 { a.swapAt(m, h); h -= 1 }
+            else { m += 1 }
+            let snap = a; let pl = l, pm = m, ph = h
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.6) {
+                guard t == token else { return }
+                withAnimation { arr = snap; lo = pl; mid = pm; hi = ph }
+            }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Single Number (XOR cascade)
+
+struct SingleNumberAnim: View {
+    let nums = [4, 1, 2, 1, 2]
+    @State private var i = -1
+    @State private var xor = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Single Number (XOR)", tint: .indigo, onReplay: play) {
+            HStack(spacing: 5) {
+                ForEach(nums.indices, id: \.self) { idx in
+                    tile(width: 32, height: 32,
+                         bg: idx == i ? .yellow : .indigo.opacity(0.4),
+                         fg: idx == i ? .black : .white) { Text("\(nums[idx])") }
+                }
+            }
+            VStack(spacing: 3) {
+                HStack(spacing: 6) {
+                    Text("xor →").font(.system(.caption, design: .monospaced))
+                    Text("\(xor)")
+                        .font(.system(.title3, design: .monospaced).weight(.black))
+                        .foregroundStyle(.indigo)
+                }
+                Text("a ^ a = 0, 0 ^ b = b なので重複は消えて単独だけ残る")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        i = -1; xor = 0
+        var x = 0
+        for (k, v) in nums.enumerated() {
+            x ^= v
+            let curX = x
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.7) {
+                guard t == token else { return }
+                withAnimation { i = k; xor = curX }
+            }
+        }
+    }
+}
+
+// MARK: - Reverse Bits
+
+struct ReverseBitsAnim: View {
+    let n: UInt32 = 0b0000_0010_1001_0100_0001_1110_1001_1100
+    @State private var step = -1
+    @State private var rev: UInt32 = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Reverse Bits (32bit)", tint: .blue, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                bitRow("in", value: n, highlight: step, fromLeft: true)
+                bitRow("out", value: rev, highlight: 31 - step, fromLeft: false)
+                Text("各 i について out の (31-i) 番ビットに in の i 番をコピー")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func bitRow(_ label: String, value: UInt32, highlight: Int, fromLeft: Bool) -> some View {
+        HStack(spacing: 1) {
+            Text(label).font(.system(size: 9, weight: .black, design: .monospaced))
+                .frame(width: 26, alignment: .leading).foregroundStyle(.blue)
+            ForEach(0..<32, id: \.self) { i in
+                let bitIdx = fromLeft ? (31 - i) : (31 - i)
+                let on = ((value >> bitIdx) & 1) == 1
+                let isHi = i == (fromLeft ? (31 - highlight) : highlight)
+                Rectangle()
+                    .fill(isHi ? .yellow : (on ? .blue : .gray.opacity(0.35)))
+                    .frame(width: 7, height: 16)
+            }
+        }
+    }
+    private func play() {
+        token += 1; let t = token
+        step = -1; rev = 0
+        var r: UInt32 = 0
+        for i in 0..<32 {
+            let bit = (n >> i) & 1
+            r |= bit << (31 - i)
+            let curR = r
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(i) * 0.12) {
+                guard t == token else { return }
+                withAnimation { step = i; rev = curR }
+            }
+        }
+    }
+}
+
+// MARK: - Number of Islands (flood fill counter)
+
+struct NumIslandsAnim: View {
+    let grid: [[Int]] = [
+        [1, 1, 0, 0, 1],
+        [1, 1, 0, 1, 1],
+        [0, 0, 1, 0, 0],
+        [1, 1, 0, 1, 1]
+    ]
+    @State private var filled: [[Int]] = []   // 0 if water, n=island id, or -1 unvisited land
+    @State private var count = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Number of Islands", tint: .teal, onReplay: play) {
+            VStack(spacing: 3) {
+                ForEach(filled.indices, id: \.self) { r in
+                    HStack(spacing: 3) {
+                        ForEach(filled[r].indices, id: \.self) { c in
+                            let v = filled[r][c]
+                            let bg: Color = v == 0 ? .gray.opacity(0.3) : islandColor(v)
+                            tile(width: 26, height: 26, bg: bg) {
+                                Text(v == 0 ? "~" : "#")
+                                    .font(.system(size: 11, weight: .black))
+                            }
+                        }
+                    }
+                }
+            }
+            Text("島の数 = \(count)").font(.caption.weight(.bold)).foregroundStyle(.teal)
+        }
+        .onAppear { play() }
+    }
+    private func islandColor(_ id: Int) -> Color {
+        let palette: [Color] = [.teal, .orange, .pink, .green, .indigo, .red]
+        return palette[(abs(id) - 1) % palette.count]
+    }
+    private func play() {
+        token += 1; let t = token
+        // 初期: 1 → -1 (未訪問), 0 → 0
+        filled = grid.map { row in row.map { $0 == 0 ? 0 : -1 } }
+        count = 0
+        let rs = grid.count, cs = grid[0].count
+        var visited = Array(repeating: Array(repeating: false, count: cs), count: rs)
+        var id = 0
+        var orderedFills: [(Int, Int, Int)] = []
+        for r in 0..<rs {
+            for c in 0..<cs where grid[r][c] == 1 && !visited[r][c] {
+                id += 1
+                var stack = [(r, c)]
+                while let p = stack.popLast() {
+                    if p.0 < 0 || p.0 >= rs || p.1 < 0 || p.1 >= cs { continue }
+                    if visited[p.0][p.1] || grid[p.0][p.1] == 0 { continue }
+                    visited[p.0][p.1] = true
+                    orderedFills.append((p.0, p.1, id))
+                    stack.append((p.0 + 1, p.1))
+                    stack.append((p.0 - 1, p.1))
+                    stack.append((p.0, p.1 + 1))
+                    stack.append((p.0, p.1 - 1))
+                }
+            }
+        }
+        for (k, f) in orderedFills.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.18) {
+                guard t == token else { return }
+                withAnimation {
+                    filled[f.0][f.1] = f.2
+                    count = max(count, f.2)
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Topic dispatcher
 
 @ViewBuilder
@@ -3876,15 +4591,15 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     // Anagram
     case "anagram-check":  AnagramCheckAnim()
     case "group-anagrams": GroupAnagramsAnim()
-    // Sorting
-    case "bubble-sort": SortingAnim(kind: .bubble)
-    case "insertion-sort": SortingAnim(kind: .insertion)
-    case "selection-sort": SortingAnim(kind: .selection)
-    case "counting-sort": SortingAnim(kind: .counting)
-    case "quicksort": SortingAnim(kind: .quick)
-    case "merge-sort": SortingAnim(kind: .merge)
-    case "dutch-flag": SortingAnim(kind: .dutch)
-    case "rotate-array": SortingAnim(kind: .rotate)
+    // Sorting — 専用化したものから順次置換
+    case "bubble-sort":     BubbleSortPassAnim()
+    case "insertion-sort":  InsertionSortAnim()
+    case "selection-sort":  SelectionSortAnim()
+    case "counting-sort":   SortingAnim(kind: .counting)
+    case "quicksort":       SortingAnim(kind: .quick)
+    case "merge-sort":      SortingAnim(kind: .merge)
+    case "dutch-flag":      DutchFlagAnim()
+    case "rotate-array":    SortingAnim(kind: .rotate)
     case "merge-intervals": SortingAnim(kind: .merge)
     // Stack — 専用 SwiftUI に置換
     case "valid-parentheses":   ValidParensAnim()
@@ -3912,10 +4627,7 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
         GridSearchAnim(kind: .dfs,
                        grid: [[1,1,0,0,0],[1,0,0,1,1],[0,0,1,1,0],[0,1,1,0,0]],
                        subtitle: "深さ優先で 1 本道を最後まで")
-    case "num-islands":
-        GridSearchAnim(kind: .bfs,
-                       grid: [[1,1,0,0,1],[1,0,0,1,1],[0,0,1,0,0],[1,0,0,1,1]],
-                       subtitle: "島ごとに塗りつぶしてカウント")
+    case "num-islands":   NumIslandsAnim()
     case "level-order":
         TreeTraversalAnim(order: .level, nodes: [3,9,20,1,2,15,7],
                           subtitle: "BFS で同じ深さをまとめて出力")
@@ -3937,42 +4649,28 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "inorder-iter":
         TreeTraversalAnim(order: .inorder, nodes: [4,2,6,1,3,5,7],
                           subtitle: "スタックで反復的に inorder")
-    case "validate-bst":
-        TreeTraversalAnim(order: .inorder, nodes: [5,3,8,2,4,7,9],
-                          subtitle: "BST なら inorder = 昇順になる")
+    case "validate-bst":         ValidateBSTAnim()
     case "kth-smallest-bst":
         TreeTraversalAnim(order: .inorder, nodes: [5,3,8,1,4,7,9],
                           subtitle: "inorder の k 番目 = k 番目に小さい値")
     case "lca-bt":
         TreeTraversalAnim(order: .preorder, nodes: [3,5,1,6,2,0,8],
                           subtitle: "LCA 探索の preorder")
-    case "lca-bst":
-        TreeTraversalAnim(order: .preorder, nodes: [6,2,8,0,4,7,9],
-                          subtitle: "BST の性質で左右を絞り込む")
+    case "lca-bst":              LCAofBSTAnim()
     case "flatten-bt":
         TreeTraversalAnim(order: .preorder, nodes: [1,2,5,3,4,0,6],
                           subtitle: "preorder の順に右に flatten")
     case "build-tree-post":
         TreeTraversalAnim(order: .preorder, nodes: [3,9,20,0,0,15,7],
                           subtitle: "inorder+postorder から木を復元")
-    case "max-depth-bt":
-        TreeTraversalAnim(order: .postorder, nodes: [3,9,20,0,0,15,7],
-                          subtitle: "葉まで降りて深さ +1 を返す")
+    case "max-depth-bt":         MaxDepthBTAnim()
     case "balanced-bt":
         TreeTraversalAnim(order: .postorder, nodes: [3,9,20,1,2,15,7],
                           subtitle: "高さ差 ≤ 1 をボトムアップで判定")
-    case "diameter-bt":
-        TreeTraversalAnim(order: .postorder, nodes: [1,2,3,4,5,6,7],
-                          subtitle: "各ノードで 左深さ + 右深さ の最大")
-    case "path-sum":
-        TreeTraversalAnim(order: .postorder, nodes: [5,4,8,11,2,13,1],
-                          subtitle: "葉まで降りて合計が target か")
-    case "invert-bt":
-        TreeTraversalAnim(order: .postorder, nodes: [4,2,7,1,3,6,9],
-                          subtitle: "左右を swap しながら戻る")
-    case "symmetric-tree":
-        TreeTraversalAnim(order: .postorder, nodes: [1,2,2,3,4,4,3],
-                          subtitle: "左右ミラーで対応比較")
+    case "diameter-bt":          DiameterBTAnim()
+    case "path-sum":             PathSumAnim()
+    case "invert-bt":            InvertTreeAnim()
+    case "symmetric-tree":       SymmetricTreeAnim()
     case "serialize-bt":
         TreeTraversalAnim(order: .level, nodes: [1,2,3,4,5,6,7],
                           subtitle: "BFS で順番に出力 (null 含む)")
@@ -3996,9 +4694,9 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "top-k-freq": HeapAnim(kind: .topK)
     case "meeting-rooms": HeapAnim(kind: .meetingRooms)
     // Bit
-    case "single-number": BitAnim(kind: .singleNumber)
-    case "power-of-two": BitAnim(kind: .powerOfTwo)
-    case "reverse-bits": BitAnim(kind: .reverseBits)
+    case "single-number": SingleNumberAnim()
+    case "power-of-two":  BitAnim(kind: .powerOfTwo)
+    case "reverse-bits":  ReverseBitsAnim()
     // Backtracking
     case "combinations": BacktrackingAnim(kind: .combinations)
     case "subsets":      SubsetsAnim()
