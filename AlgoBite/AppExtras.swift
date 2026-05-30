@@ -361,6 +361,256 @@ struct CookieStackIcon: View {
     }
 }
 
+/// トロフィー (実績ボタン用)
+struct TrophyIcon: View {
+    var size: CGFloat = 28
+    var body: some View {
+        ZStack {
+            // 取っ手 (左右)
+            ForEach([-1, 1] as [CGFloat], id: \.self) { side in
+                Path { p in
+                    let w = size, h = size
+                    p.addArc(center: CGPoint(x: w * 0.50 + side * w * 0.30, y: h * 0.40),
+                             radius: w * 0.14,
+                             startAngle: .degrees(side > 0 ? -90 : 90),
+                             endAngle: .degrees(side > 0 ? 90 : 270),
+                             clockwise: false)
+                }
+                .stroke(Color(red: 0.85, green: 0.60, blue: 0.10), lineWidth: size * 0.07)
+            }
+            // カップ部 (台形を曲げた形)
+            Path { p in
+                let w = size
+                p.move(to: CGPoint(x: w * 0.20, y: w * 0.18))
+                p.addLine(to: CGPoint(x: w * 0.80, y: w * 0.18))
+                p.addLine(to: CGPoint(x: w * 0.72, y: w * 0.55))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.28, y: w * 0.55),
+                    control1: CGPoint(x: w * 0.65, y: w * 0.70),
+                    control2: CGPoint(x: w * 0.35, y: w * 0.70))
+                p.closeSubpath()
+            }
+            .fill(LinearGradient(colors: [
+                Color(red: 1.00, green: 0.86, blue: 0.30),
+                Color(red: 0.85, green: 0.58, blue: 0.10)
+            ], startPoint: .top, endPoint: .bottom))
+            .overlay(
+                Path { p in
+                    let w = size
+                    p.move(to: CGPoint(x: w * 0.20, y: w * 0.18))
+                    p.addLine(to: CGPoint(x: w * 0.80, y: w * 0.18))
+                    p.addLine(to: CGPoint(x: w * 0.72, y: w * 0.55))
+                    p.addCurve(
+                        to: CGPoint(x: w * 0.28, y: w * 0.55),
+                        control1: CGPoint(x: w * 0.65, y: w * 0.70),
+                        control2: CGPoint(x: w * 0.35, y: w * 0.70))
+                    p.closeSubpath()
+                }
+                .stroke(Color(red: 0.65, green: 0.40, blue: 0.05), lineWidth: size * 0.04)
+            )
+            // 中央の星
+            Image(systemName: "star.fill")
+                .font(.system(size: size * 0.24, weight: .black))
+                .foregroundStyle(Color(red: 1.00, green: 0.95, blue: 0.70))
+                .offset(y: -size * 0.05)
+            // ステム
+            Rectangle()
+                .fill(LinearGradient(colors: [
+                    Color(red: 0.90, green: 0.65, blue: 0.10),
+                    Color(red: 0.70, green: 0.45, blue: 0.05)
+                ], startPoint: .leading, endPoint: .trailing))
+                .frame(width: size * 0.20, height: size * 0.14)
+                .offset(y: size * 0.30)
+            // ベース (土台)
+            RoundedRectangle(cornerRadius: size * 0.05)
+                .fill(LinearGradient(colors: [
+                    Color(red: 0.65, green: 0.42, blue: 0.10),
+                    Color(red: 0.45, green: 0.28, blue: 0.05)
+                ], startPoint: .top, endPoint: .bottom))
+                .frame(width: size * 0.55, height: size * 0.12)
+                .offset(y: size * 0.42)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+/// いちごアイコン (ロールケーキの上に乗る)
+struct StrawberryIcon: View {
+    var size: CGFloat = 22
+    var body: some View {
+        ZStack {
+            // 葉っぱ (緑のヘタ、ジグザグ)
+            Path { p in
+                let w = size, h = size * 0.30
+                p.move(to: CGPoint(x: w * 0.50, y: 0))
+                p.addLine(to: CGPoint(x: w * 0.15, y: h * 0.55))
+                p.addLine(to: CGPoint(x: w * 0.32, y: h * 0.55))
+                p.addLine(to: CGPoint(x: w * 0.25, y: h))
+                p.addLine(to: CGPoint(x: w * 0.50, y: h * 0.75))
+                p.addLine(to: CGPoint(x: w * 0.75, y: h))
+                p.addLine(to: CGPoint(x: w * 0.68, y: h * 0.55))
+                p.addLine(to: CGPoint(x: w * 0.85, y: h * 0.55))
+                p.closeSubpath()
+            }
+            .fill(LinearGradient(colors: [
+                Color(red: 0.35, green: 0.70, blue: 0.35),
+                Color(red: 0.22, green: 0.52, blue: 0.25)
+            ], startPoint: .top, endPoint: .bottom))
+            .frame(width: size, height: size * 0.30)
+            .offset(y: -size * 0.32)
+
+            // 本体 (赤い苺)
+            Path { p in
+                let w = size, h = size
+                p.move(to: CGPoint(x: w * 0.50, y: h * 0.12))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.10, y: h * 0.45),
+                    control1: CGPoint(x: w * 0.10, y: h * 0.12),
+                    control2: CGPoint(x: w * 0.05, y: h * 0.30))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.50, y: h * 0.98),
+                    control1: CGPoint(x: w * 0.10, y: h * 0.80),
+                    control2: CGPoint(x: w * 0.30, y: h * 0.98))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.90, y: h * 0.45),
+                    control1: CGPoint(x: w * 0.70, y: h * 0.98),
+                    control2: CGPoint(x: w * 0.90, y: h * 0.80))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.50, y: h * 0.12),
+                    control1: CGPoint(x: w * 0.95, y: h * 0.30),
+                    control2: CGPoint(x: w * 0.90, y: h * 0.12))
+                p.closeSubpath()
+            }
+            .fill(LinearGradient(colors: [
+                Color(red: 0.96, green: 0.30, blue: 0.30),
+                Color(red: 0.76, green: 0.10, blue: 0.18)
+            ], startPoint: .topLeading, endPoint: .bottomTrailing))
+
+            // 種 (黄色いつぶつぶ)
+            ForEach(0..<6, id: \.self) { i in
+                Circle()
+                    .fill(Color(red: 1.0, green: 0.88, blue: 0.40))
+                    .frame(width: size * 0.07, height: size * 0.07)
+                    .offset(
+                        x: size * [-0.20, 0.15, -0.05, 0.22, -0.18, 0.08][i],
+                        y: size * [0.28, 0.28, 0.50, 0.52, 0.55, 0.72][i]
+                    )
+            }
+
+            // ハイライト
+            Ellipse()
+                .fill(Color.white.opacity(0.55))
+                .frame(width: size * 0.18, height: size * 0.10)
+                .offset(x: -size * 0.18, y: -size * 0.10)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+/// ロールケーキ風のストリークビュー — 日数に応じて本体が伸び、上に苺が乗る
+struct RollCakeStreak: View {
+    let streak: Int
+    var maxDays: Int = 10   // 視覚的に並べる最大数
+
+    /// 表示する苺の数 (streak を maxDays でキャップ)
+    private var visibleStrawberries: Int { min(streak, maxDays) }
+
+    /// ケーキの長さ。基準幅 + 1 苺ごとに延びる
+    private var cakeLength: CGFloat {
+        let base: CGFloat = 70
+        let perDay: CGFloat = 26
+        return base + CGFloat(visibleStrawberries) * perDay
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            cakeRoll
+                .padding(.top, 26)   // 苺ぶんの余白
+            strawberries
+        }
+        .frame(height: 86)
+        .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
+    }
+
+    /// ケーキ本体
+    private var cakeRoll: some View {
+        ZStack {
+            // 影
+            Capsule()
+                .fill(Color.black.opacity(0.15))
+                .frame(width: cakeLength + 6, height: 8)
+                .blur(radius: 4)
+                .offset(y: 28)
+
+            HStack(spacing: -10) {
+                // 本体 (細長いカプセル)
+                Capsule()
+                    .fill(LinearGradient(colors: [
+                        Color(red: 0.97, green: 0.83, blue: 0.62),
+                        Color(red: 0.92, green: 0.72, blue: 0.45)
+                    ], startPoint: .top, endPoint: .bottom))
+                    .frame(width: cakeLength, height: 50)
+                    .overlay(
+                        Capsule()
+                            .stroke(Color(red: 0.71, green: 0.46, blue: 0.20),
+                                    lineWidth: 1.5)
+                    )
+                    .overlay(
+                        // 中央にハイライト
+                        Capsule()
+                            .fill(Color.white.opacity(0.25))
+                            .frame(height: 6)
+                            .padding(.horizontal, 12)
+                            .offset(y: -16)
+                    )
+
+                // 渦巻きクリーム端 (右側)
+                ZStack {
+                    Circle()
+                        .fill(Color(red: 0.92, green: 0.72, blue: 0.45))
+                        .frame(width: 56, height: 56)
+                    Circle()
+                        .stroke(Color(red: 0.71, green: 0.46, blue: 0.20), lineWidth: 1.5)
+                        .frame(width: 56, height: 56)
+                    Circle()
+                        .fill(LinearGradient(colors: [
+                            Color(red: 1.00, green: 0.95, blue: 0.85),
+                            Color(red: 0.92, green: 0.82, blue: 0.70)
+                        ], startPoint: .top, endPoint: .bottom))
+                        .frame(width: 44, height: 44)
+                    Circle()
+                        .fill(Color(red: 0.85, green: 0.42, blue: 0.36))   // ジャム
+                        .frame(width: 28, height: 28)
+                    Circle()
+                        .fill(LinearGradient(colors: [
+                            Color(red: 1.00, green: 0.95, blue: 0.85),
+                            Color(red: 0.95, green: 0.85, blue: 0.72)
+                        ], startPoint: .top, endPoint: .bottom))
+                        .frame(width: 16, height: 16)
+                    Circle()
+                        .fill(Color(red: 0.85, green: 0.42, blue: 0.36))
+                        .frame(width: 6, height: 6)
+                }
+            }
+        }
+    }
+
+    /// 苺を上に並べる (左から)
+    private var strawberries: some View {
+        HStack(spacing: 4) {
+            ForEach(0..<visibleStrawberries, id: \.self) { i in
+                StrawberryIcon(size: 24)
+                    .transition(.asymmetric(
+                        insertion: .scale(scale: 0.2).combined(with: .opacity).combined(with: .offset(y: -16)),
+                        removal: .opacity
+                    ))
+                    .id(i)
+            }
+        }
+        .padding(.leading, 16)
+    }
+}
+
 /// 炎アイコン (旧 streak 用、他で参照されているので残す)
 struct FlameIcon: View {
     var size: CGFloat = 36

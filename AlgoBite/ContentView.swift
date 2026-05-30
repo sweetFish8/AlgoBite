@@ -738,7 +738,7 @@ struct ContentView: View {
                     Circle()
                         .stroke(Color(red: 0.99, green: 0.79, blue: 0.18), lineWidth: 1.6)
                         .frame(width: 40, height: 40)
-                    CakeIcon(size: 28)
+                    TrophyIcon(size: 30)
                 }
             }
             .buttonStyle(.plain)
@@ -986,8 +986,8 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 14) {
                 // 見出し
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    CookieStackIcon(size: 38)
-                        .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 10 }
+                    StrawberryIcon(size: 32)
+                        .alignmentGuide(.firstTextBaseline) { d in d[VerticalAlignment.center] + 8 }
                     Text("\(vm.streak)")
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(Pop.inkWarm)   // #7C2D12
@@ -1006,39 +1006,17 @@ struct ContentView: View {
                                 in: Capsule())
                 }
 
-                // クッキーの日めくり (7 日まで)
-                HStack(spacing: 8) {
-                    ForEach(0..<7) { i in
-                        let filled = i < min(vm.streak, 7)
-                        VStack(spacing: 4) {
-                            ZStack {
-                                Circle()
-                                    .fill(filled
-                                          ? Color(red: 1.00, green: 0.93, blue: 0.78)
-                                          : Color.white)
-                                    .frame(width: 32, height: 32)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(filled
-                                                    ? Color(red: 0.71, green: 0.46, blue: 0.20)
-                                                    : Color(red: 1.00, green: 0.84, blue: 0.67),
-                                                    lineWidth: 1.4)
-                                    )
-                                if filled {
-                                    CookieIcon(size: 24)
-                                }
-                            }
-                            Text(["月","火","水","木","金","土","日"][i])
-                                .font(.system(size: 9, weight: .heavy))
-                                .foregroundStyle(Pop.inkWarmSub)
-                        }
-                    }
+                // ロールケーキが伸びていって、上に苺が乗っていく演出
+                ScrollView(.horizontal, showsIndicators: false) {
+                    RollCakeStreak(streak: vm.streak)
+                        .padding(.horizontal, 4)
                 }
-                // 7 日を超えたら「+N 日」を金色プレートで表示 (週単位の達成バナー)
-                if vm.streak > 7 {
+                .frame(height: 92)
+                // 10 日を超えたら「+N 日」を金色プレートで表示
+                if vm.streak > 10 {
                     HStack(spacing: 6) {
                         Text("⭐️")
-                        Text("さらに +\(vm.streak - 7) 日達成中！")
+                        Text("さらに +\(vm.streak - 10) 日積み上げ中！")
                             .font(.caption.weight(.black))
                             .foregroundStyle(Pop.inkWarm)
                     }
