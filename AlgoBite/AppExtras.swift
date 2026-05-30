@@ -507,6 +507,64 @@ struct StrawberryIcon: View {
     }
 }
 
+/// ロールケーキの上に乗せる用 — ヘタを外して先端を上に向けた苺
+struct StrawberryTipUp: View {
+    var size: CGFloat = 22
+    var body: some View {
+        ZStack {
+            // 本体 (Tip up = 先端が上、幅広い側が下)
+            Path { p in
+                let w = size, h = size
+                // 上の先端
+                p.move(to: CGPoint(x: w * 0.50, y: h * 0.02))
+                // 右側を膨らませながら下へ
+                p.addCurve(
+                    to: CGPoint(x: w * 0.92, y: h * 0.58),
+                    control1: CGPoint(x: w * 0.62, y: h * 0.10),
+                    control2: CGPoint(x: w * 0.95, y: h * 0.30))
+                // 右下の丸み
+                p.addCurve(
+                    to: CGPoint(x: w * 0.50, y: h * 0.95),
+                    control1: CGPoint(x: w * 0.90, y: h * 0.80),
+                    control2: CGPoint(x: w * 0.72, y: h * 0.95))
+                // 左下の丸み
+                p.addCurve(
+                    to: CGPoint(x: w * 0.08, y: h * 0.58),
+                    control1: CGPoint(x: w * 0.28, y: h * 0.95),
+                    control2: CGPoint(x: w * 0.10, y: h * 0.80))
+                // 左を膨らませながら上へ戻って先端
+                p.addCurve(
+                    to: CGPoint(x: w * 0.50, y: h * 0.02),
+                    control1: CGPoint(x: w * 0.05, y: h * 0.30),
+                    control2: CGPoint(x: w * 0.38, y: h * 0.10))
+                p.closeSubpath()
+            }
+            .fill(LinearGradient(colors: [
+                Color(red: 0.95, green: 0.30, blue: 0.30),
+                Color(red: 0.78, green: 0.10, blue: 0.18)
+            ], startPoint: .topLeading, endPoint: .bottomTrailing))
+
+            // つぶつぶの種 (本体の中央〜下半分に散らす)
+            ForEach(0..<6, id: \.self) { i in
+                Circle()
+                    .fill(Color(red: 1.0, green: 0.88, blue: 0.40))
+                    .frame(width: size * 0.07, height: size * 0.07)
+                    .offset(
+                        x: size * [-0.18, 0.15, -0.05, 0.20, -0.20, 0.05][i],
+                        y: size * [0.40, 0.30, 0.55, 0.55, 0.70, 0.70][i]
+                    )
+            }
+
+            // 上の先端付近のハイライト
+            Ellipse()
+                .fill(Color.white.opacity(0.55))
+                .frame(width: size * 0.18, height: size * 0.08)
+                .offset(x: -size * 0.14, y: -size * 0.20)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
 /// ダークベリー (ブルーベリー/ブラックベリー風の濃い果実)
 struct DarkBerryIcon: View {
     var size: CGFloat = 14
@@ -562,25 +620,26 @@ struct RollCakeStreak: View {
         .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
     }
 
-    /// ケーキ本体 (両端丸い寝かせたカプセル)
+    /// ケーキ本体 (寝かせた円柱風 — 角丸控えめ、端が膨らまない)
     private var cakeBody: some View {
-        ZStack {
+        let cornerR: CGFloat = 14   // 半径 = height/2 - α で「フラット気味」に
+        return ZStack {
             // 影
-            Capsule()
+            RoundedRectangle(cornerRadius: cornerR)
                 .fill(Color.black.opacity(0.18))
                 .frame(width: cakeLength + 4, height: 10)
                 .blur(radius: 4)
                 .offset(y: 26)
             // 本体
-            Capsule()
+            RoundedRectangle(cornerRadius: cornerR)
                 .fill(LinearGradient(colors: [
-                    Color(red: 0.99, green: 0.86, blue: 0.62),   // top: 明るい
-                    Color(red: 0.92, green: 0.72, blue: 0.45),   // bottom: 焼き色
-                    Color(red: 0.80, green: 0.58, blue: 0.32)    // 底: 一番濃い
+                    Color(red: 0.99, green: 0.86, blue: 0.62),
+                    Color(red: 0.92, green: 0.72, blue: 0.45),
+                    Color(red: 0.80, green: 0.58, blue: 0.32)
                 ], startPoint: .top, endPoint: .bottom))
                 .frame(width: cakeLength, height: 52)
                 .overlay(
-                    Capsule()
+                    RoundedRectangle(cornerRadius: cornerR)
                         .stroke(Color(red: 0.62, green: 0.40, blue: 0.18), lineWidth: 1.2)
                 )
             // 表面の粒テクスチャ (ふんわり感)
@@ -595,23 +654,28 @@ struct RollCakeStreak: View {
                              with: .color(baseColor))
                 }
             }
-            .frame(width: cakeLength * 0.95, height: 42)
-            .clipShape(Capsule())
+            .frame(width: cakeLength - 8, height: 44)
+            .clipShape(RoundedRectangle(cornerRadius: cornerR))
             .allowsHitTesting(false)
-            // 端の影 (左右の曲面感)
-            HStack {
-                Ellipse()
-                    .fill(LinearGradient(colors: [.black.opacity(0.18), .clear],
+            // 上面のハイライト (寝かせた円柱の上部反射)
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.white.opacity(0.20))
+                .frame(width: cakeLength - 24, height: 4)
+                .offset(y: -18)
+            // 左右の縁の控えめなシェード (端のロール感)
+            HStack(spacing: 0) {
+                Rectangle()
+                    .fill(LinearGradient(colors: [.black.opacity(0.15), .clear],
                                          startPoint: .leading, endPoint: .trailing))
-                    .frame(width: 18, height: 48)
+                    .frame(width: 8)
                 Spacer()
-                Ellipse()
-                    .fill(LinearGradient(colors: [.clear, .black.opacity(0.18)],
+                Rectangle()
+                    .fill(LinearGradient(colors: [.clear, .black.opacity(0.15)],
                                          startPoint: .leading, endPoint: .trailing))
-                    .frame(width: 18, height: 48)
+                    .frame(width: 8)
             }
-            .frame(width: cakeLength - 4)
-            .clipShape(Capsule())
+            .frame(width: cakeLength, height: 50)
+            .clipShape(RoundedRectangle(cornerRadius: cornerR))
         }
     }
 
@@ -659,54 +723,23 @@ struct RollCakeStreak: View {
         }
     }
 
-    /// ベリー盛り合わせ (苺 + ダークベリー混在で、日数ぶん)
+    /// 苺だけ (streak の日数ぶん)。先端が上を向いた向きで一列に並べる
     private var berriesLayer: some View {
         let count = visibleBerries
-        return ZStack {
-            // 後段の濃いベリー (奥)
-            HStack(spacing: -4) {
-                ForEach(0..<count, id: \.self) { i in
-                    Group {
-                        if i % 3 == 1 {
-                            DarkBerryIcon(size: 13,
-                                          tint: Color(red: 0.25, green: 0.05, blue: 0.20))
-                        } else if i % 3 == 2 {
-                            DarkBerryIcon(size: 12,
-                                          tint: Color(red: 0.60, green: 0.05, blue: 0.10))
-                        } else {
-                            DarkBerryIcon(size: 0)   // 苺は前段で
-                        }
-                    }
-                    .offset(y: 2)
-                }
-            }
-            // 前段の苺と小さなベリー
-            HStack(spacing: -2) {
-                ForEach(0..<count, id: \.self) { i in
-                    Group {
-                        if i % 3 == 0 {
-                            StrawberryIcon(size: 18)
-                                .offset(y: -2)
-                        } else if i % 3 == 1 {
-                            DarkBerryIcon(size: 11,
-                                          tint: Color(red: 0.70, green: 0.10, blue: 0.15))
-                                .offset(y: 1)
-                        } else {
-                            DarkBerryIcon(size: 9,
-                                          tint: Color(red: 0.10, green: 0.05, blue: 0.15))
-                                .offset(y: 3)
-                        }
-                    }
+        return HStack(spacing: 2) {
+            ForEach(0..<count, id: \.self) { i in
+                StrawberryTipUp(size: 22)
+                    // 偶奇でちょっとだけ上下に揺らして "並んでる" 感を出す
+                    .offset(y: i.isMultiple(of: 2) ? -1 : 1)
                     .transition(.asymmetric(
-                        insertion: .scale(scale: 0.1).combined(with: .opacity)
-                                      .combined(with: .offset(y: -20)),
+                        insertion: .scale(scale: 0.2).combined(with: .opacity)
+                                      .combined(with: .offset(y: -16)),
                         removal: .opacity
                     ))
                     .id(i)
-                }
             }
         }
-        .frame(width: cakeLength - 20, height: 22)
+        .frame(height: 24)
     }
 }
 
