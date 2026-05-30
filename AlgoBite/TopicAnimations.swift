@@ -2264,6 +2264,774 @@ struct LongestPalindromeAnim: View {
     }
 }
 
+// MARK: - Reverse Linked List (arrows flip)
+
+struct ReverseLinkedListAnim: View {
+    let vals = [1, 2, 3, 4, 5]
+    @State private var prevIdx = -1  // 既に反転済みの末端
+    @State private var curIdx = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Reverse Linked List", tint: .blue, onReplay: play) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 0) {
+                    ForEach(vals.indices, id: \.self) { i in
+                        let done = i <= prevIdx
+                        let isCur = i == curIdx
+                        tile(width: 30, height: 30,
+                             bg: done ? .green : (isCur ? .yellow : .blue.opacity(0.4)),
+                             fg: isCur ? .black : .white) { Text("\(vals[i])") }
+                        if i < vals.count - 1 {
+                            Image(systemName: i <= prevIdx ? "arrow.left" : "arrow.right")
+                                .font(.caption.weight(.heavy))
+                                .foregroundStyle(i <= prevIdx ? .green : .secondary)
+                                .frame(width: 14)
+                        }
+                    }
+                }
+                Text("prev=\(prevIdx < 0 ? "nil" : "\(vals[prevIdx])")  cur=\(curIdx < vals.count ? "\(vals[curIdx])" : "nil")")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.secondary)
+                Text("cur.next を prev に向け、prev/cur を 1 つ進める")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        prevIdx = -1; curIdx = 0
+        for k in 0...vals.count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.8) {
+                guard t == token else { return }
+                withAnimation { prevIdx = k - 1; curIdx = k }
+            }
+        }
+    }
+}
+
+// MARK: - Merge Two Sorted Lists
+
+struct MergeTwoListsAnim: View {
+    let a = [1, 3, 5, 7]
+    let b = [2, 4, 6, 8, 10]
+    @State private var i = 0
+    @State private var j = 0
+    @State private var merged: [Int] = []
+    @State private var lastFrom: Character? = nil   // 'a' or 'b'
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Merge Two Sorted Lists", tint: .teal, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                row("a", arr: a, ptr: i, color: .blue, taken: lastFrom == "a")
+                row("b", arr: b, ptr: j, color: .orange, taken: lastFrom == "b")
+                HStack(spacing: 4) {
+                    Text("merged →")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .foregroundStyle(.teal)
+                    ForEach(merged.indices, id: \.self) { k in
+                        tile(width: 26, height: 24, bg: .teal.opacity(0.5)) { Text("\(merged[k])") }
+                    }
+                }
+                Text("先頭同士を比較 → 小さい方を取って前進").font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func row(_ label: String, arr: [Int], ptr: Int, color: Color, taken: Bool) -> some View {
+        HStack(spacing: 4) {
+            Text(label)
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .frame(width: 16).foregroundStyle(color)
+            ForEach(arr.indices, id: \.self) { i in
+                tile(width: 26, height: 24,
+                     bg: i < ptr ? color.opacity(0.20)
+                          : (i == ptr ? (taken ? .yellow : color) : color.opacity(0.35)),
+                     fg: i == ptr ? .black : .white) { Text("\(arr[i])") }
+            }
+        }
+    }
+    private func play() {
+        token += 1; let t = token
+        i = 0; j = 0; merged = []; lastFrom = nil
+        var k = 0
+        while i + j < a.count + b.count {
+            let pickA = j == b.count || (i < a.count && a[i] <= b[j])
+            let val = pickA ? a[i] : b[j]
+            let from: Character = pickA ? "a" : "b"
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.7) {
+                guard t == token else { return }
+                withAnimation {
+                    merged.append(val); lastFrom = from
+                    if pickA { i += 1 } else { j += 1 }
+                }
+            }
+            if pickA { i += 1 } else { j += 1 }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Detect Cycle (Floyd's tortoise & hare)
+
+struct DetectCycleFloydAnim: View {
+    // 0→1→2→3→4→5→2 (loop back to 2)
+    let nodes = [0, 1, 2, 3, 4, 5]
+    let cycleStart = 2
+    @State private var slow = 0
+    @State private var fast = 0
+    @State private var found = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Detect Cycle (Floyd)", tint: .red, onReplay: play) {
+            ZStack {
+                // 円周上にノードを配置
+                let cnt = nodes.count
+                ForEach(0..<cnt, id: \.self) { i in
+                    let angle = Double(i) / Double(cnt) * 2 * .pi - .pi / 2
+                    let x = cos(angle) * 70
+                    let y = sin(angle) * 70
+                    ZStack {
+                        Circle().fill(Color.red.opacity(0.35))
+                            .frame(width: 32, height: 32)
+                        Text("\(i)").font(.system(size: 11, weight: .black))
+                            .foregroundStyle(.white)
+                        if slow == i && fast == i && found {
+                            Text("🎯").font(.title3).offset(y: -28)
+                        } else {
+                            if slow == i { Text("🐢").font(.caption).offset(y: -22) }
+                            if fast == i { Text("🐇").font(.caption).offset(y: 22) }
+                        }
+                    }
+                    .offset(x: x, y: y)
+                }
+            }
+            .frame(height: 180)
+            VStack(spacing: 2) {
+                Text("slow=\(slow)  fast=\(fast)")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.secondary)
+                if found {
+                    Text("🎯 兎と亀が出会った → サイクルあり")
+                        .font(.caption.weight(.bold)).foregroundStyle(.red)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func next(_ i: Int) -> Int { i == nodes.count - 1 ? cycleStart : i + 1 }
+    private func play() {
+        token += 1; let t = token
+        slow = 0; fast = 0; found = false
+        var s = 0, f = 0
+        for k in 1...12 {
+            s = next(s); f = next(next(f))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.65) {
+                guard t == token else { return }
+                let curS = s, curF = f
+                withAnimation { slow = curS; fast = curF }
+                if curS == curF {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        guard t == token else { return }
+                        withAnimation { found = true }
+                    }
+                }
+            }
+            if s == f { break }
+        }
+    }
+}
+
+// MARK: - Add Two Numbers (digit column + carry)
+
+struct AddTwoNumbersAnim: View {
+    let a = [2, 4, 3]   // 342 (頭から1の位)
+    let b = [5, 6, 4]   // 465 (頭から1の位)
+    @State private var idx = -1
+    @State private var carry = 0
+    @State private var result: [Int] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Add Two Numbers", tint: .purple, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                row("a", arr: a)
+                row("b", arr: b)
+                HStack(spacing: 6) {
+                    Text("=").font(.system(size: 14, weight: .black))
+                    ForEach(result.indices, id: \.self) { i in
+                        tile(width: 28, height: 28, bg: .purple) { Text("\(result[i])") }
+                    }
+                }
+                Text("carry = \(carry)")
+                    .font(.system(.caption, design: .monospaced).weight(.heavy))
+                    .foregroundStyle(.purple)
+                Text("各桁を a[i] + b[i] + carry、carry = sum / 10")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func row(_ label: String, arr: [Int]) -> some View {
+        HStack(spacing: 6) {
+            Text(label).font(.system(size: 12, weight: .black, design: .monospaced))
+                .frame(width: 16, alignment: .leading).foregroundStyle(.purple)
+            ForEach(arr.indices, id: \.self) { i in
+                tile(width: 28, height: 28,
+                     bg: i == idx ? .yellow : .purple.opacity(0.4),
+                     fg: i == idx ? .black : .white) { Text("\(arr[i])") }
+            }
+        }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; carry = 0; result = []
+        var c = 0
+        for i in 0..<max(a.count, b.count) {
+            let av = i < a.count ? a[i] : 0
+            let bv = i < b.count ? b[i] : 0
+            let sum = av + bv + c
+            let d = sum % 10
+            c = sum / 10
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 1.0) {
+                guard t == token else { return }
+                withAnimation { idx = i; result.append(d); carry = c }
+            }
+        }
+    }
+}
+
+// MARK: - Middle of Linked List (slow / fast)
+
+struct MiddleOfLLAnim: View {
+    let vals = [1, 2, 3, 4, 5, 6, 7]
+    @State private var slow = 0
+    @State private var fast = 0
+    @State private var done = false
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Middle of Linked List", tint: .green, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(vals.indices, id: \.self) { i in
+                        ZStack {
+                            tile(width: 30, height: 32,
+                                 bg: done && i == slow ? .green : .green.opacity(0.35)) {
+                                Text("\(vals[i])")
+                            }
+                            if slow == i { Text("🐢").font(.system(size: 11)).offset(y: -22) }
+                            if fast == i { Text("🐇").font(.system(size: 11)).offset(y: 22) }
+                        }
+                    }
+                }
+                Text("slow=\(slow)  fast=\(fast)")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.secondary)
+                if done {
+                    Text("🎯 fast が末尾に到達 → slow が中央")
+                        .font(.caption.weight(.bold)).foregroundStyle(.green)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        slow = 0; fast = 0; done = false
+        var s = 0, f = 0, k = 1
+        while f + 2 < vals.count {
+            s += 1; f += 2
+            let curS = s, curF = f
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.75) {
+                guard t == token else { return }
+                withAnimation { slow = curS; fast = curF }
+            }
+            k += 1
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.75 + 0.3) {
+            guard t == token else { return }
+            withAnimation { done = true }
+        }
+    }
+}
+
+// MARK: - Container With Most Water
+
+struct ContainerWaterAnim: View {
+    let height = [1, 8, 6, 2, 5, 4, 8, 3, 7]
+    @State private var l = 0
+    @State private var r = 8
+    @State private var best = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Container With Most Water", tint: .cyan, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .bottom, spacing: 4) {
+                    ForEach(height.indices, id: \.self) { i in
+                        ZStack(alignment: .bottom) {
+                            // 水
+                            if i >= l && i <= r {
+                                Rectangle()
+                                    .fill(Color.cyan.opacity(0.45))
+                                    .frame(width: 22, height: CGFloat(min(height[l], height[r])) * 8)
+                            }
+                            // 棒
+                            Rectangle()
+                                .fill(i == l || i == r ? .blue : .gray.opacity(0.45))
+                                .frame(width: 22, height: CGFloat(height[i]) * 8)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+                HStack {
+                    Text("l=\(l)  r=\(r)")
+                        .font(.system(.caption2, design: .monospaced))
+                    Spacer()
+                    Text("best = \(best)")
+                        .font(.caption.weight(.bold)).foregroundStyle(.cyan)
+                }
+                Text("低い側を内側へ動かす (高い側を残す)").font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        l = 0; r = height.count - 1; best = 0
+        var li = 0, ri = height.count - 1
+        var k = 0
+        while li < ri {
+            let area = (ri - li) * min(height[li], height[ri])
+            let curL = li, curR = ri
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.7) {
+                guard t == token else { return }
+                withAnimation { l = curL; r = curR; best = max(best, area) }
+            }
+            if height[li] < height[ri] { li += 1 } else { ri -= 1 }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Trapping Rain Water (per-column water)
+
+struct TrappingRainAnim: View {
+    let height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]
+    @State private var idx = -1
+    @State private var trapped: [Int] = []
+    @State private var leftMax: [Int] = []
+    @State private var rightMax: [Int] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Trapping Rain Water", tint: .blue, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .bottom, spacing: 2) {
+                    ForEach(height.indices, id: \.self) { i in
+                        ZStack(alignment: .bottom) {
+                            if i < trapped.count, trapped[i] > 0 {
+                                Rectangle().fill(Color.blue.opacity(0.55))
+                                    .frame(width: 16, height: CGFloat(trapped[i]) * 14)
+                                    .offset(y: -CGFloat(height[i]) * 14)
+                            }
+                            Rectangle().fill(i == idx ? .yellow : .gray.opacity(0.6))
+                                .frame(width: 16, height: CGFloat(height[i]) * 14)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+                Text("水量 = min(leftMax[i], rightMax[i]) - height[i]")
+                    .font(.caption2).foregroundStyle(.secondary)
+                Text("合計水量 = \(trapped.reduce(0, +))")
+                    .font(.caption.weight(.bold)).foregroundStyle(.blue)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; trapped = []; leftMax = []; rightMax = []
+        let n = height.count
+        var lm = Array(repeating: 0, count: n)
+        var rm = Array(repeating: 0, count: n)
+        var mx = 0
+        for i in 0..<n { mx = max(mx, height[i]); lm[i] = mx }
+        mx = 0
+        for i in stride(from: n - 1, through: 0, by: -1) { mx = max(mx, height[i]); rm[i] = mx }
+        for i in 0..<n {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.35) {
+                guard t == token else { return }
+                let w = max(0, min(lm[i], rm[i]) - height[i])
+                withAnimation { idx = i; trapped.append(w) }
+            }
+        }
+    }
+}
+
+// MARK: - Anagram Check (char count buckets)
+
+struct AnagramCheckAnim: View {
+    let s = "listen"
+    let p = "silent"
+    @State private var idx = -1
+    @State private var counts: [Character: Int] = [:]
+    @State private var phase = 0   // 0=adding s, 1=subtracting p, 2=done
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Anagram Check", tint: .orange, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    Text("s").font(.system(size: 10, weight: .black, design: .monospaced)).frame(width: 14).foregroundStyle(.green)
+                    ForEach(Array(s.enumerated()), id: \.offset) { i, c in
+                        tile(width: 22, height: 22,
+                             bg: phase == 0 && i == idx ? .yellow : .green.opacity(0.4),
+                             fg: phase == 0 && i == idx ? .black : .white) { Text(String(c)) }
+                    }
+                }
+                HStack(spacing: 4) {
+                    Text("p").font(.system(size: 10, weight: .black, design: .monospaced)).frame(width: 14).foregroundStyle(.red)
+                    ForEach(Array(p.enumerated()), id: \.offset) { i, c in
+                        tile(width: 22, height: 22,
+                             bg: phase == 1 && i == idx ? .yellow : .red.opacity(0.4),
+                             fg: phase == 1 && i == idx ? .black : .white) { Text(String(c)) }
+                    }
+                }
+                HStack(spacing: 4) {
+                    ForEach(counts.sorted(by: { $0.key < $1.key }), id: \.key) { kv in
+                        VStack(spacing: 1) {
+                            Text(String(kv.key)).font(.system(size: 10, weight: .black, design: .monospaced))
+                            Text("\(kv.value)").font(.system(size: 11, weight: .heavy))
+                                .foregroundStyle(kv.value == 0 ? .green : (kv.value > 0 ? .blue : .red))
+                        }
+                        .padding(.horizontal, 4)
+                    }
+                }
+                if phase == 2 {
+                    let isAnagram = counts.values.allSatisfy { $0 == 0 }
+                    Text(isAnagram ? "✅ アナグラム" : "❌ 違う")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(isAnagram ? .green : .red)
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        idx = -1; counts = [:]; phase = 0
+        let sArr = Array(s), pArr = Array(p)
+        for i in sArr.indices {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(i) * 0.4) {
+                guard t == token else { return }
+                withAnimation { idx = i; counts[sArr[i], default: 0] += 1 }
+            }
+        }
+        let base = 0.3 + Double(sArr.count) * 0.4 + 0.3
+        for i in pArr.indices {
+            DispatchQueue.main.asyncAfter(deadline: .now() + base + Double(i) * 0.4) {
+                guard t == token else { return }
+                withAnimation { phase = 1; idx = i; counts[pArr[i], default: 0] -= 1 }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + base + Double(pArr.count) * 0.4 + 0.2) {
+            guard t == token else { return }
+            withAnimation { phase = 2 }
+        }
+    }
+}
+
+// MARK: - Edit Distance (DP grid)
+
+struct EditDistanceAnim: View {
+    let a = "kitten"
+    let b = "sitting"
+    @State private var dp: [[Int]] = []
+    @State private var cur: (Int, Int)? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Edit Distance", tint: .indigo, onReplay: play) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\"\(a)\" → \"\(b)\"")
+                    .font(.system(.caption2, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                grid
+                Text("dp[i][j] = 編集距離。挿入 / 削除 / 置換 の最小 +1")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    @ViewBuilder private var grid: some View {
+        // ヘッダ行
+        HStack(spacing: 2) {
+            tile(width: 20, height: 20, bg: .indigo.opacity(0.15)) { Text(" ") }
+            tile(width: 20, height: 20, bg: .indigo.opacity(0.25)) { Text("ε") }
+            ForEach(Array(b.enumerated()), id: \.offset) { _, c in
+                tile(width: 20, height: 20, bg: .indigo.opacity(0.25)) { Text(String(c)) }
+            }
+        }
+        ForEach(dp.indices, id: \.self) { i in
+            HStack(spacing: 2) {
+                let lbl = i == 0 ? "ε" : String(Array(a)[i - 1])
+                tile(width: 20, height: 20, bg: .indigo.opacity(0.25)) { Text(lbl) }
+                ForEach(dp[i].indices, id: \.self) { j in
+                    let isCur = cur.map { $0 == (i, j) } ?? false
+                    tile(width: 20, height: 20,
+                         bg: isCur ? .yellow : .indigo.opacity(0.45),
+                         fg: isCur ? .black : .white) {
+                        Text("\(dp[i][j])")
+                    }
+                }
+            }
+        }
+    }
+    private func play() {
+        token += 1; let t = token
+        let n = a.count, m = b.count
+        dp = Array(repeating: Array(repeating: 0, count: m + 1), count: n + 1)
+        cur = nil
+        let aArr = Array(a), bArr = Array(b)
+        var k = 0
+        for i in 0...n {
+            for j in 0...m {
+                let v: Int
+                if i == 0 { v = j }
+                else if j == 0 { v = i }
+                else if aArr[i - 1] == bArr[j - 1] { v = dp[i - 1][j - 1] }
+                else { v = 1 + min(dp[i - 1][j - 1], min(dp[i][j - 1], dp[i - 1][j])) }
+                let ii = i, jj = j
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 + Double(k) * 0.10) {
+                    guard t == token else { return }
+                    withAnimation { dp[ii][jj] = v; cur = (ii, jj) }
+                }
+                k += 1
+            }
+        }
+    }
+}
+
+// MARK: - Sliding Window Substring (live window)
+
+struct LongestSubstringAnim: View {
+    let s = "abcabcbb"
+    @State private var l = 0
+    @State private var r = 0
+    @State private var best: (l: Int, r: Int) = (0, 0)
+    @State private var seen: [Character: Int] = [:]
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Longest Substring w/o Repeat", tint: .pink, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(Array(s.enumerated()), id: \.offset) { i, c in
+                        let inWindow = i >= l && i <= r && r >= l
+                        let inBest = i >= best.l && i <= best.r
+                        tile(width: 26, height: 30,
+                             bg: inWindow ? .yellow : (inBest ? .pink.opacity(0.55) : .white.opacity(0.18)),
+                             fg: inWindow ? .black : .white) {
+                            Text(String(c)).font(.system(size: 12, weight: .black, design: .monospaced))
+                        }
+                    }
+                }
+                Text("window = [\(l), \(r)]  len = \(max(0, r - l + 1))")
+                    .font(.system(.caption2, design: .monospaced)).foregroundStyle(.secondary)
+                Text("best = \"\(best.r >= best.l ? String(Array(s)[best.l...best.r]) : "")\"  len=\(best.r - best.l + 1)")
+                    .font(.caption.weight(.bold)).foregroundStyle(.pink)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        l = 0; r = -1; best = (0, -1); seen = [:]
+        let arr = Array(s)
+        var ll = 0
+        var k = 0
+        for ri in arr.indices {
+            let c = arr[ri]
+            if let prev = seen[c], prev >= ll { ll = prev + 1 }
+            seen[c] = ri
+            let curL = ll, curR = ri
+            let newBest = (curR - curL) > (best.r - best.l) ? (curL, curR) : best
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.6) {
+                guard t == token else { return }
+                withAnimation { l = curL; r = curR; best = newBest }
+            }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Min Stack (sync min track)
+
+struct MinStackAnim: View {
+    let ops: [(String, Int?)] = [("push", 3), ("push", 5), ("push", 2), ("push", 1),
+                                  ("pop", nil), ("getMin", nil), ("pop", nil), ("getMin", nil)]
+    @State private var stack: [Int] = []
+    @State private var mins: [Int] = []
+    @State private var op = ""
+    @State private var step = -1
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Min Stack", tint: .green, onReplay: play) {
+            HStack(alignment: .bottom, spacing: 20) {
+                stackCol("stack", arr: stack, color: .green)
+                stackCol("mins", arr: mins, color: .orange)
+            }
+            VStack(spacing: 2) {
+                Text(op).font(.caption.weight(.heavy)).foregroundStyle(.green)
+                Text("push 時 min(top, val) も mins に push、pop 時に両方 pop")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func stackCol(_ label: String, arr: [Int], color: Color) -> some View {
+        VStack(spacing: 2) {
+            ForEach(arr.indices.reversed(), id: \.self) { i in
+                tile(width: 38, height: 24,
+                     bg: i == arr.count - 1 ? color : color.opacity(0.5)) { Text("\(arr[i])") }
+            }
+            ForEach(0..<max(0, 4 - arr.count), id: \.self) { _ in
+                tile(width: 38, height: 24, bg: color.opacity(0.12), fg: .white.opacity(0.5)) { Text("·") }
+            }
+            Text(label).font(.caption2.weight(.heavy)).foregroundStyle(color)
+        }
+    }
+    private func play() {
+        token += 1; let t = token
+        stack = []; mins = []; op = ""; step = -1
+        for (k, (a, v)) in ops.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.9) {
+                guard t == token else { return }
+                withAnimation {
+                    step = k
+                    if a == "push", let x = v {
+                        stack.append(x)
+                        mins.append(min(mins.last ?? x, x))
+                        op = "push(\(x))"
+                    } else if a == "pop" {
+                        let p = stack.popLast() ?? 0
+                        _ = mins.popLast()
+                        op = "pop → \(p)"
+                    } else {
+                        op = "getMin → \(mins.last ?? 0)"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Permutations (backtracking tree)
+
+struct PermutationsTreeAnim: View {
+    let nums = [1, 2, 3]
+    @State private var paths: [[Int]] = []
+    @State private var current: [Int] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Permutations of \(nums)", tint: .indigo, onReplay: play) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("current:").font(.caption2.weight(.heavy)).foregroundStyle(.indigo)
+                    HStack(spacing: 4) {
+                        ForEach(current.indices, id: \.self) { i in
+                            tile(width: 24, height: 24, bg: .yellow, fg: .black) { Text("\(current[i])") }
+                        }
+                    }
+                }
+                Text("確定済み順列:").font(.caption2.weight(.heavy)).foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 6)], spacing: 6) {
+                    ForEach(paths.indices, id: \.self) { i in
+                        HStack(spacing: 2) {
+                            ForEach(paths[i].indices, id: \.self) { j in
+                                tile(width: 20, height: 20, bg: .indigo.opacity(0.55)) { Text("\(paths[i][j])") }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        paths = []; current = []
+        var seq: [[Int]] = []
+        func backtrack(used: [Bool], path: [Int]) {
+            if path.count == nums.count { seq.append(path); return }
+            for i in nums.indices where !used[i] {
+                var u = used; u[i] = true
+                backtrack(used: u, path: path + [nums[i]])
+            }
+        }
+        backtrack(used: Array(repeating: false, count: nums.count), path: [])
+        var k = 0
+        for p in seq {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.6) {
+                guard t == token else { return }
+                withAnimation { current = p; paths.append(p) }
+            }
+            k += 1
+        }
+    }
+}
+
+// MARK: - Fibonacci Memo (tree with cache)
+
+struct FibMemoAnim: View {
+    let n = 6
+    @State private var memo: [Int: Int] = [0: 0, 1: 1]
+    @State private var current: Int? = nil
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "fib(\(n)) with memoization", tint: .cyan, onReplay: play) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    ForEach(0...n, id: \.self) { i in
+                        let cached = memo[i] != nil
+                        tile(width: 32, height: 36,
+                             bg: current == i ? .yellow : (cached ? .cyan : .gray.opacity(0.25)),
+                             fg: current == i ? .black : .white) {
+                            VStack(spacing: 0) {
+                                Text("\(i)").font(.system(size: 9))
+                                Text(cached ? "\(memo[i]!)" : "?")
+                                    .font(.system(size: 11, weight: .black))
+                            }
+                        }
+                    }
+                }
+                Text("base case: fib(0)=0, fib(1)=1")
+                    .font(.caption2).foregroundStyle(.secondary)
+                Text("memo[n] が確定済なら再計算しない")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+    private func play() {
+        token += 1; let t = token
+        memo = [0: 0, 1: 1]; current = nil
+        // bottom-up でメモ化を可視化
+        for i in 2...n {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i - 2) * 0.8) {
+                guard t == token else { return }
+                let v = (memo[i - 1] ?? 0) + (memo[i - 2] ?? 0)
+                withAnimation { current = i; memo[i] = v }
+            }
+        }
+    }
+}
+
 // MARK: - Topic dispatcher
 
 @ViewBuilder
@@ -2289,10 +3057,10 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     // Two pointers / strings
     case "palindrome-check": TwoPointerAnim(word: "racecar")
     case "reverse-string": TwoPointerAnim(word: "hello")
-    case "container-water": WaterAnim(kind: .container)
-    case "trapping-rain": WaterAnim(kind: .trapping)
+    case "container-water": ContainerWaterAnim()
+    case "trapping-rain":   TrappingRainAnim()
     // Anagram
-    case "anagram-check": AnagramAnim(a: "anagram", b: "nagaram")
+    case "anagram-check":  AnagramCheckAnim()
     case "group-anagrams": AnagramAnim(a: "eat", b: "tea")
     // Sorting
     case "bubble-sort": SortingAnim(kind: .bubble)
@@ -2306,19 +3074,19 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "merge-intervals": SortingAnim(kind: .merge)
     // Stack
     case "valid-parentheses": StackAnim(input: ["(","(",")",")","[","]"], kind: .parens)
-    case "min-stack": StackAnim(input: ["3","5","2","1"], kind: .minStack)
+    case "min-stack": MinStackAnim()
     case "next-greater": StackAnim(input: ["2","1","3","2","4"], kind: .monotonic)
     case "largest-rectangle": StackAnim(input: ["2","1","5","6","2","3"], kind: .monotonic)
     case "longest-valid-parens": DPTableAnim(kind: .longestValidParens)
-    // Linked list
-    case "reverse-linked-list": LinkedListAnim(kind: .reverse)
-    case "merge-two-lists": LinkedListAnim(kind: .merge)
-    case "middle-ll": LinkedListAnim(kind: .middle)
-    case "detect-cycle": LinkedListAnim(kind: .cycle)
-    case "add-two-numbers": LinkedListAnim(kind: .addNumbers)
-    case "intersection-ll": LinkedListAnim(kind: .intersection)
+    // Linked list — 各々 専用の SwiftUI 視覚化に置換
+    case "reverse-linked-list": ReverseLinkedListAnim()
+    case "merge-two-lists":     MergeTwoListsAnim()
+    case "middle-ll":           MiddleOfLLAnim()
+    case "detect-cycle":        DetectCycleFloydAnim()
+    case "add-two-numbers":     AddTwoNumbersAnim()
+    case "intersection-ll":     LinkedListAnim(kind: .intersection)
     // Sliding window
-    case "longest-substring": SlidingWindowAnim(s: "abcabcbb", initialWidth: 1)
+    case "longest-substring": LongestSubstringAnim()
     case "min-window-substring": SlidingWindowAnim(s: "ADOBECODEBANC", initialWidth: 1)
     case "sliding-window-max": HeapAnim(kind: .slidingMax)
     // BFS / DFS / Graph — それぞれ違うグリッド
@@ -2395,13 +3163,13 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
         TreeTraversalAnim(order: .level, nodes: [1,2,3,4,5,6,7],
                           subtitle: "BFS で順番に出力 (null 含む)")
     // DP
-    case "fibonacci-memo": DPTableAnim(kind: .fib)
+    case "fibonacci-memo": FibMemoAnim()
     case "house-robber": DPTableAnim(kind: .robber)
     case "lcs": DPTableAnim(kind: .lcs)
     case "lis": DPTableAnim(kind: .lis)
     case "knapsack": DPTableAnim(kind: .knapsack)
     case "unique-paths": DPTableAnim(kind: .uniquePaths)
-    case "edit-distance": DPTableAnim(kind: .editDist)
+    case "edit-distance": EditDistanceAnim()
     case "min-path-sum": DPTableAnim(kind: .minPath)
     case "decode-ways": DPTableAnim(kind: .decode)
     case "word-break": DPTableAnim(kind: .wordBreak)
@@ -2420,7 +3188,7 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     // Backtracking
     case "combinations": BacktrackingAnim(kind: .combinations)
     case "subsets": BacktrackingAnim(kind: .subsets)
-    case "permutations": BacktrackingAnim(kind: .permutations)
+    case "permutations": PermutationsTreeAnim()
     case "n-queens": BacktrackingAnim(kind: .nQueens)
     case "word-search": BacktrackingAnim(kind: .wordSearch)
     // Trie
