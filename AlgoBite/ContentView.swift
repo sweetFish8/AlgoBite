@@ -604,7 +604,13 @@ struct PopCard<Content: View>: View {
 struct ContentView: View {
     @StateObject private var vm = GameViewModel()
     @State private var showCopied = false
-    @State private var path: [AppScreen] = []
+    @State private var path: [AppScreen] = {
+        #if DEBUG
+        return DebugCapture.initialPath()
+        #else
+        return []
+        #endif
+    }()
     @State private var showOnboarding: Bool = !appDefaults.bool(forKey: "algobite.onboarded")
 
     var body: some View {
@@ -692,8 +698,7 @@ struct ContentView: View {
                 ScrollView {
                     VStack(spacing: 18) {
                         streakSection      // 最上段 — 連続記録を一番目立たせる
-                        todayPreviewCard
-                        startButton
+                        todayPreviewCard   // (内部にはじめるボタンを含む)
                         reviewCard
                         homeFooter
                     }
@@ -763,9 +768,12 @@ struct ContentView: View {
                         DonutIcon(size: 44)
                     }
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("今日のひと口")
-                            .font(.caption.weight(.heavy))
-                            .foregroundStyle(Pop.inkWarmSub)
+                        HStack(spacing: 4) {
+                            Text("🍽️").font(.caption)
+                            Text("今日のひと口")
+                                .font(.caption.weight(.heavy))
+                                .foregroundStyle(Pop.inkWarmSub)
+                        }
                         Text("Day \(vm.isCompletedToday ? max(vm.streak, 1) : vm.streak + 1)")
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(Pop.inkSub)
@@ -822,6 +830,10 @@ struct ContentView: View {
                     TopicIllustration(topic: ch.topic, size: 76)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                // カード内のはじめるボタン
+                startButton
+                    .padding(.top, 4)
             }
         }
     }
@@ -838,7 +850,7 @@ struct ContentView: View {
                   }) {
             HStack(spacing: 8) {
                 Image(systemName: "play.fill")
-                Text(vm.isCompletedToday ? "結果と解説を見る！" : "はじめる！")
+                Text(vm.isCompletedToday ? "🍽️ 結果と解説を見る！" : "🍽️ いただきます！")
                     .font(.title3.weight(.black))
             }
         }
@@ -1082,6 +1094,9 @@ struct ContentView: View {
                 }
             }
         }
+        #if DEBUG
+        .onAppear { DebugCapture.autoplayProblem(vm: vm) }
+        #endif
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
