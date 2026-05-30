@@ -12,6 +12,7 @@
 		A10000030000000000000001 /* Problems.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000130000000000000001 /* Problems.swift */; };
 		A10000040000000000000001 /* TopicAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000150000000000000001 /* TopicAnimations.swift */; };
 		A10000050000000000000001 /* AppExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000160000000000000001 /* AppExtras.swift */; };
+		A10000060000000000000001 /* DebugCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000170000000000000001 /* DebugCapture.swift */; };
 		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
 		A20000010000000000000001 /* AlgoBiteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */; };
 		A20000020000000000000001 /* AlgoBiteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000120000000000000001 /* AlgoBiteWidget.swift */; };
@@ -24,6 +25,7 @@
 		A10000130000000000000001 /* Problems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Problems.swift; sourceTree = "<group>"; };
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
 		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
+		A10000170000000000000001 /* DebugCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCapture.swift; sourceTree = "<group>"; };
 		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
 		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				A10000130000000000000001 /* Problems.swift */,
 				A10000150000000000000001 /* TopicAnimations.swift */,
 				A10000160000000000000001 /* AppExtras.swift */,
+				A10000170000000000000001 /* DebugCapture.swift */,
 				A30000110000000000000001 /* Assets.xcassets */,
 				A40000110000000000000001 /* AlgoBite.entitlements */,
 			);
@@ -231,6 +234,7 @@
 				A10000030000000000000001 /* Problems.swift in Sources */,
 				A10000040000000000000001 /* TopicAnimations.swift in Sources */,
 				A10000050000000000000001 /* AppExtras.swift in Sources */,
+				A10000060000000000000001 /* DebugCapture.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
