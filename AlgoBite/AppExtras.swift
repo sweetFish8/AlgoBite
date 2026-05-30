@@ -507,107 +507,206 @@ struct StrawberryIcon: View {
     }
 }
 
-/// ロールケーキ風のストリークビュー — 日数に応じて本体が伸び、上に苺が乗る
+/// ダークベリー (ブルーベリー/ブラックベリー風の濃い果実)
+struct DarkBerryIcon: View {
+    var size: CGFloat = 14
+    var tint: Color = Color(red: 0.30, green: 0.05, blue: 0.18)   // dark plum
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(RadialGradient(colors: [
+                    tint.opacity(0.85),
+                    tint
+                ], center: .topLeading, startRadius: 1, endRadius: size * 0.6))
+            // ハイライト
+            Ellipse()
+                .fill(Color.white.opacity(0.55))
+                .frame(width: size * 0.30, height: size * 0.20)
+                .offset(x: -size * 0.18, y: -size * 0.20)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+/// ロールケーキ風のストリークビュー — 寝かせたロール (両端丸い) + piped クリーム + ベリー盛り合わせ
 struct RollCakeStreak: View {
     let streak: Int
-    var maxDays: Int = 10   // 視覚的に並べる最大数
+    var maxDays: Int = 10
 
-    /// 表示する苺の数 (streak を maxDays でキャップ)
-    private var visibleStrawberries: Int { min(streak, maxDays) }
+    private var visibleBerries: Int { min(streak, maxDays) }
 
-    /// ケーキの長さ。基準幅 + 1 苺ごとに延びる
+    /// ケーキの長さ。基準幅 + ベリーぶん伸びる
     private var cakeLength: CGFloat {
-        let base: CGFloat = 70
-        let perDay: CGFloat = 26
-        return base + CGFloat(visibleStrawberries) * perDay
+        let base: CGFloat = 110
+        let perDay: CGFloat = 22
+        return base + CGFloat(visibleBerries) * perDay
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            cakeRoll
-                .padding(.top, 26)   // 苺ぶんの余白
-            strawberries
+        ZStack(alignment: .center) {
+            // 皿
+            Ellipse()
+                .fill(Color.white)
+                .frame(width: cakeLength + 50, height: 18)
+                .overlay(Ellipse().stroke(Color(red: 0.85, green: 0.84, blue: 0.85), lineWidth: 1))
+                .shadow(color: .black.opacity(0.08), radius: 3, y: 1)
+                .offset(y: 38)
+            // 本体 + クリーム + ベリー
+            VStack(spacing: -8) {
+                berriesLayer
+                creamLayer
+                cakeBody
+            }
         }
-        .frame(height: 86)
+        .frame(height: 100)
         .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
     }
 
-    /// ケーキ本体
-    private var cakeRoll: some View {
+    /// ケーキ本体 (両端丸い寝かせたカプセル)
+    private var cakeBody: some View {
         ZStack {
             // 影
             Capsule()
-                .fill(Color.black.opacity(0.15))
-                .frame(width: cakeLength + 6, height: 8)
+                .fill(Color.black.opacity(0.18))
+                .frame(width: cakeLength + 4, height: 10)
                 .blur(radius: 4)
-                .offset(y: 28)
-
-            HStack(spacing: -10) {
-                // 本体 (細長いカプセル)
-                Capsule()
-                    .fill(LinearGradient(colors: [
-                        Color(red: 0.97, green: 0.83, blue: 0.62),
-                        Color(red: 0.92, green: 0.72, blue: 0.45)
-                    ], startPoint: .top, endPoint: .bottom))
-                    .frame(width: cakeLength, height: 50)
-                    .overlay(
-                        Capsule()
-                            .stroke(Color(red: 0.71, green: 0.46, blue: 0.20),
-                                    lineWidth: 1.5)
-                    )
-                    .overlay(
-                        // 中央にハイライト
-                        Capsule()
-                            .fill(Color.white.opacity(0.25))
-                            .frame(height: 6)
-                            .padding(.horizontal, 12)
-                            .offset(y: -16)
-                    )
-
-                // 渦巻きクリーム端 (右側)
-                ZStack {
-                    Circle()
-                        .fill(Color(red: 0.92, green: 0.72, blue: 0.45))
-                        .frame(width: 56, height: 56)
-                    Circle()
-                        .stroke(Color(red: 0.71, green: 0.46, blue: 0.20), lineWidth: 1.5)
-                        .frame(width: 56, height: 56)
-                    Circle()
-                        .fill(LinearGradient(colors: [
-                            Color(red: 1.00, green: 0.95, blue: 0.85),
-                            Color(red: 0.92, green: 0.82, blue: 0.70)
-                        ], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 44, height: 44)
-                    Circle()
-                        .fill(Color(red: 0.85, green: 0.42, blue: 0.36))   // ジャム
-                        .frame(width: 28, height: 28)
-                    Circle()
-                        .fill(LinearGradient(colors: [
-                            Color(red: 1.00, green: 0.95, blue: 0.85),
-                            Color(red: 0.95, green: 0.85, blue: 0.72)
-                        ], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 16, height: 16)
-                    Circle()
-                        .fill(Color(red: 0.85, green: 0.42, blue: 0.36))
-                        .frame(width: 6, height: 6)
+                .offset(y: 26)
+            // 本体
+            Capsule()
+                .fill(LinearGradient(colors: [
+                    Color(red: 0.99, green: 0.86, blue: 0.62),   // top: 明るい
+                    Color(red: 0.92, green: 0.72, blue: 0.45),   // bottom: 焼き色
+                    Color(red: 0.80, green: 0.58, blue: 0.32)    // 底: 一番濃い
+                ], startPoint: .top, endPoint: .bottom))
+                .frame(width: cakeLength, height: 52)
+                .overlay(
+                    Capsule()
+                        .stroke(Color(red: 0.62, green: 0.40, blue: 0.18), lineWidth: 1.2)
+                )
+            // 表面の粒テクスチャ (ふんわり感)
+            Canvas { ctx, sz in
+                let baseColor = Color(red: 0.82, green: 0.62, blue: 0.38).opacity(0.55)
+                for _ in 0..<40 {
+                    let x = Double.random(in: 6...(sz.width - 6))
+                    let y = Double.random(in: 6...(sz.height - 6))
+                    let r = Double.random(in: 0.8...1.6)
+                    ctx.fill(Path(ellipseIn: CGRect(x: x - r, y: y - r,
+                                                    width: r * 2, height: r * 2)),
+                             with: .color(baseColor))
                 }
             }
+            .frame(width: cakeLength * 0.95, height: 42)
+            .clipShape(Capsule())
+            .allowsHitTesting(false)
+            // 端の影 (左右の曲面感)
+            HStack {
+                Ellipse()
+                    .fill(LinearGradient(colors: [.black.opacity(0.18), .clear],
+                                         startPoint: .leading, endPoint: .trailing))
+                    .frame(width: 18, height: 48)
+                Spacer()
+                Ellipse()
+                    .fill(LinearGradient(colors: [.clear, .black.opacity(0.18)],
+                                         startPoint: .leading, endPoint: .trailing))
+                    .frame(width: 18, height: 48)
+            }
+            .frame(width: cakeLength - 4)
+            .clipShape(Capsule())
         }
     }
 
-    /// 苺を上に並べる (左から)
-    private var strawberries: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<visibleStrawberries, id: \.self) { i in
-                StrawberryIcon(size: 24)
+    /// piped クリーム (ドロップを連続配置)
+    private var creamLayer: some View {
+        let dollopCount = max(3, Int(cakeLength / 22))
+        return HStack(spacing: -4) {
+            ForEach(0..<dollopCount, id: \.self) { i in
+                creamDollop
+            }
+        }
+        .frame(width: cakeLength - 14)
+    }
+
+    /// クリーム 1 滴 (花絞り風)
+    private var creamDollop: some View {
+        ZStack {
+            // 底辺の大きい滴
+            Path { p in
+                let w: CGFloat = 24, h: CGFloat = 22
+                p.move(to: CGPoint(x: w * 0.10, y: h))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.50, y: h * 0.10),
+                    control1: CGPoint(x: w * 0.05, y: h * 0.55),
+                    control2: CGPoint(x: w * 0.30, y: h * 0.10))
+                p.addCurve(
+                    to: CGPoint(x: w * 0.90, y: h),
+                    control1: CGPoint(x: w * 0.70, y: h * 0.10),
+                    control2: CGPoint(x: w * 0.95, y: h * 0.55))
+                p.closeSubpath()
+            }
+            .fill(LinearGradient(colors: [
+                Color.white,
+                Color(red: 0.94, green: 0.92, blue: 0.87)
+            ], startPoint: .top, endPoint: .bottom))
+            .frame(width: 24, height: 22)
+            // 渦巻きハイライト (内側に小さなアーチ)
+            Path { p in
+                p.move(to: CGPoint(x: 8, y: 14))
+                p.addQuadCurve(to: CGPoint(x: 16, y: 14),
+                               control: CGPoint(x: 12, y: 4))
+            }
+            .stroke(Color.white.opacity(0.85), lineWidth: 1.4)
+            .frame(width: 24, height: 22)
+        }
+    }
+
+    /// ベリー盛り合わせ (苺 + ダークベリー混在で、日数ぶん)
+    private var berriesLayer: some View {
+        let count = visibleBerries
+        return ZStack {
+            // 後段の濃いベリー (奥)
+            HStack(spacing: -4) {
+                ForEach(0..<count, id: \.self) { i in
+                    Group {
+                        if i % 3 == 1 {
+                            DarkBerryIcon(size: 13,
+                                          tint: Color(red: 0.25, green: 0.05, blue: 0.20))
+                        } else if i % 3 == 2 {
+                            DarkBerryIcon(size: 12,
+                                          tint: Color(red: 0.60, green: 0.05, blue: 0.10))
+                        } else {
+                            DarkBerryIcon(size: 0)   // 苺は前段で
+                        }
+                    }
+                    .offset(y: 2)
+                }
+            }
+            // 前段の苺と小さなベリー
+            HStack(spacing: -2) {
+                ForEach(0..<count, id: \.self) { i in
+                    Group {
+                        if i % 3 == 0 {
+                            StrawberryIcon(size: 18)
+                                .offset(y: -2)
+                        } else if i % 3 == 1 {
+                            DarkBerryIcon(size: 11,
+                                          tint: Color(red: 0.70, green: 0.10, blue: 0.15))
+                                .offset(y: 1)
+                        } else {
+                            DarkBerryIcon(size: 9,
+                                          tint: Color(red: 0.10, green: 0.05, blue: 0.15))
+                                .offset(y: 3)
+                        }
+                    }
                     .transition(.asymmetric(
-                        insertion: .scale(scale: 0.2).combined(with: .opacity).combined(with: .offset(y: -16)),
+                        insertion: .scale(scale: 0.1).combined(with: .opacity)
+                                      .combined(with: .offset(y: -20)),
                         removal: .opacity
                     ))
                     .id(i)
+                }
             }
         }
-        .padding(.leading, 16)
+        .frame(width: cakeLength - 20, height: 22)
     }
 }
 
