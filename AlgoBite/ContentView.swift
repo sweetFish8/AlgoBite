@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var vm = GameViewModel()
-    @State private var showCopied = false
+    @State private var showShareSheet = false
     @State private var path: [AppScreen] = {
         #if DEBUG
         return DebugCapture.initialPath()
@@ -791,16 +791,15 @@ struct ContentView: View {
 
                 PopButton(fill: Color(red: 0.39, green: 0.40, blue: 0.95),        // #6366F1
                           shadow: Color(red: 0.30, green: 0.30, blue: 0.78),
-                          action: {
-                            UIPasteboard.general.string = vm.shareText()
-                            showCopied = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { showCopied = false }
-                          }) {
+                          action: { showShareSheet = true }) {
                     HStack(spacing: 8) {
-                        Image(systemName: showCopied ? "checkmark.circle.fill" : "square.and.arrow.up.fill")
-                        Text(showCopied ? "コピーしたよ！" : "結果をシェア")
+                        Image(systemName: "square.and.arrow.up.fill")
+                        Text("結果をシェア")
                             .font(.subheadline.weight(.heavy))
                     }
+                }
+                .sheet(isPresented: $showShareSheet) {
+                    ShareSheet(items: [vm.shareText()])
                 }
             }
         }
