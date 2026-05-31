@@ -1001,19 +1001,20 @@ struct OnboardingView: View {
                     pageContent(
                         illustration: AnyView(
                             VStack(spacing: 10) {
-                                CookieStackIcon(size: 80)
+                                RollCakeStreak(streak: 5)
+                                    .frame(width: 220, height: 90)
                                 Text("🔥 \(7) 日連続！")
                                     .font(.title2.weight(.black))
                                     .foregroundStyle(Pop.inkWarm)
                             }
                         ),
                         title: "ストリークを伸ばそう",
-                        body: "毎日 1 問解くとクッキーが\n積み上がってストリークに。"
+                        body: "毎日 1 問解くとロールケーキに\nいちごが乗っていくよ。"
                     ).tag(1)
                     pageContent(
                         illustration: AnyView(
                             VStack(spacing: 8) {
-                                CakeIcon(size: 80)
+                                TrophyIcon(size: 80)
                                 HStack(spacing: 6) {
                                     Text("🏆").font(.title)
                                     Text("バッジ").font(.headline.weight(.heavy))
