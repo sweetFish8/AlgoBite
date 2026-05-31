@@ -990,9 +990,9 @@ struct OnboardingView: View {
                     pageContent(
                         illustration: AnyView(
                             HStack(spacing: 14) {
-                                CookieIcon(size: 100)
+                                CookieIcon(size: 80)
                                 DonutIcon(size: 80)
-                                CupcakeIcon(size: 80)
+                                ChocolateIcon(size: 80)
                             }
                         ),
                         title: "AlgoBite へようこそ",

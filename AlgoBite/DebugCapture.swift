@@ -32,7 +32,12 @@ enum DebugCapture {
     static func applyIfRequested() {
         let args = CommandLine.arguments
         guard args.contains("-captureMode") else { return }
-        appDefaults.set(true, forKey: "algobite.onboarded")
+        if args.contains("-keepOnboarding") {
+            // オンボーディング撮影時は onboarded を立てない
+            appDefaults.removeObject(forKey: "algobite.onboarded")
+        } else {
+            appDefaults.set(true, forKey: "algobite.onboarded")
+        }
         appDefaults.set(true, forKey: "algobite.notifications.asked")
         appDefaults.set(5,    forKey: "algobite.streak")
         appDefaults.set(12,   forKey: "algobite.stats.totalSolved")
