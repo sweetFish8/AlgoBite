@@ -56,6 +56,13 @@ enum DebugCapture {
             appDefaults.removeObject(forKey: "algobite.todayResults.\(today)")
             appDefaults.removeObject(forKey: "algobite.todayAttempts.\(today)")
         }
+        // バッジ解放の演出を撮影したいときは -freshBadges でバッジを空にする
+        if args.contains("-freshBadges") {
+            appDefaults.set([String](), forKey: "algobite.badges.unlocked")
+            appDefaults.set(0, forKey: "algobite.stats.totalSolved")
+            appDefaults.set(0, forKey: "algobite.stats.reorderClears")
+            appDefaults.set(0, forKey: "algobite.streak")
+        }
         appDefaults.synchronize()
     }
 

@@ -972,6 +972,20 @@ struct SettingsView: View {
     }
 }
 
+// MARK: - Share Sheet (UIActivityViewController ラッパー)
+
+/// 結果文字列を OS 標準の共有シートに渡す。
+/// SwiftUI の `ShareLink` だと PopButton の 3D スタイルが流用できないので
+/// 既存ボタン → `.sheet` 経由でこの View を提示する形にしてる。
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+    func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
+}
+
 // MARK: - Onboarding — 初回起動時の 3 ステップ紹介
 
 struct OnboardingView: View {
@@ -2772,15 +2786,44 @@ struct BadgeUnlockOverlay: View {
     let badge: Badge
     let onDismiss: () -> Void
 
+    // 解放アニメーション用の駆動 State
+    @State private var burst = false       // confetti 飛散 + emoji 拡大
+    @State private var sparkleAngle = 0.0  // 星マーク回転
+    @State private var emojiBounce = false // emoji の上下バウンス
+
     var body: some View {
         ZStack {
+            // 背景タップで閉じる
             Color.black.opacity(0.35).ignoresSafeArea()
                 .onTapGesture { onDismiss() }
+
+            // 紙吹雪は最背面 (カードに被らないように位置調整)
+            ConfettiBurst(active: burst)
+                .allowsHitTesting(false)
+
             VStack(spacing: 14) {
                 Text("🎉 バッジ解放！")
                     .font(.caption.weight(.heavy))
                     .foregroundStyle(Pop.inkWarm)
-                Text(badge.emoji).font(.system(size: 72))
+
+                // 中央 emoji + 周囲スパークル
+                ZStack {
+                    // 周囲を回るキラキラ (4 個)
+                    ForEach(0..<4) { i in
+                        let baseAngle = Double(i) * 90.0
+                        Text("✨")
+                            .font(.system(size: 22))
+                            .offset(y: -56)
+                            .rotationEffect(.degrees(baseAngle + sparkleAngle))
+                            .opacity(burst ? 0.9 : 0.0)
+                    }
+                    Text(badge.emoji)
+                        .font(.system(size: 72))
+                        .scaleEffect(burst ? 1.0 : 0.4)
+                        .offset(y: emojiBounce ? -4 : 4)
+                }
+                .frame(width: 130, height: 130)
+
                 Text(badge.title)
                     .font(.title2.weight(.black))
                     .foregroundStyle(Pop.ink)
@@ -2801,6 +2844,96 @@ struct BadgeUnlockOverlay: View {
             .shadow(color: .black.opacity(0.25), radius: 18, y: 6)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.85)))
+        .onAppear {
+            // emoji 拡大 + 紙吹雪トリガ
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.55).delay(0.05)) {
+                burst = true
+            }
+            // emoji を上下にゆらゆら
+            withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)
+                            .delay(0.5)) {
+                emojiBounce = true
+            }
+            // スパークルを 1 周だけ回す
+            withAnimation(.easeOut(duration: 2.0).delay(0.1)) {
+                sparkleAngle = 360
+            }
+        }
+    }
+}
+
+/// バッジ解放時の紙吹雪。中心から放射状に 30 個の小片が広がる。
+/// 各小片は (色, 角度, 距離) を持ち、active=true で外側に展開する。
+struct ConfettiBurst: View {
+    let active: Bool
+
+    private struct Piece {
+        let color: Color
+        let angle: Double   // 度
+        let radius: CGFloat // 飛距離
+        let size: CGFloat
+        let kind: Int       // 0=丸 1=三角 2=四角
+    }
+
+    /// 計算済みの 30 個のパーティクル。色と角度を分散させる。
+    private static let pieces: [Piece] = {
+        let palette: [Color] = [
+            Color(red: 0.99, green: 0.79, blue: 0.18),   // 黄
+            Color(red: 0.94, green: 0.27, blue: 0.27),   // 赤
+            Color(red: 0.35, green: 0.80, blue: 0.01),   // 緑
+            Color(red: 0.39, green: 0.40, blue: 0.95),   // 紫
+            Color(red: 1.00, green: 0.48, blue: 0.62),   // ピンク
+        ]
+        return (0..<30).map { i in
+            let baseAngle = Double(i) * (360.0 / 30.0)
+            let jitter    = Double((i * 73) % 30) - 15        // -15..15 度
+            let radius    = CGFloat(120 + (i * 47) % 80)      // 120..200
+            let size      = CGFloat(6 + (i % 4) * 2)          // 6..12
+            return Piece(color: palette[i % palette.count],
+                         angle: baseAngle + jitter,
+                         radius: radius,
+                         size: size,
+                         kind: i % 3)
+        }
+    }()
+
+    var body: some View {
+        ZStack {
+            ForEach(Self.pieces.indices, id: \.self) { i in
+                pieceView(at: i)
+            }
+        }
+        .frame(width: 1, height: 1)
+    }
+
+    @ViewBuilder
+    private func pieceView(at i: Int) -> some View {
+        let p = Self.pieces[i]
+        Group {
+            switch p.kind {
+            case 0: Circle().fill(p.color)
+            case 1: Triangle().fill(p.color)
+            default: Rectangle().fill(p.color)
+            }
+        }
+        .frame(width: p.size, height: p.size)
+        .offset(x: active ? CGFloat(cos(p.angle * .pi / 180)) * p.radius : 0,
+                y: active ? CGFloat(sin(p.angle * .pi / 180)) * p.radius : 0)
+        .opacity(active ? 0.0 : 1.0)
+        .scaleEffect(active ? 0.6 : 0.0)
+        .rotationEffect(.degrees(active ? Double(i * 23) : 0))
+        .animation(.easeOut(duration: 1.4).delay(Double(i) * 0.005), value: active)
+    }
+}
+
+private struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        p.closeSubpath()
+        return p
     }
 }
 
