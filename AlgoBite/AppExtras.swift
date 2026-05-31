@@ -486,14 +486,15 @@ struct StrawberryIcon: View {
                 Color(red: 0.76, green: 0.10, blue: 0.18)
             ], startPoint: .topLeading, endPoint: .bottomTrailing))
 
-            // 種 (黄色いつぶつぶ)
+            // 種 (黄色いつぶつぶ) — オフセットは "frame 中心" からの相対値
+            // (path は y=0.12〜0.98 で本体を描いてるので、種は -0.25〜+0.30 に収める)
             ForEach(0..<6, id: \.self) { i in
                 Circle()
                     .fill(Color(red: 1.0, green: 0.88, blue: 0.40))
-                    .frame(width: size * 0.07, height: size * 0.07)
+                    .frame(width: size * 0.08, height: size * 0.08)
                     .offset(
-                        x: size * [-0.20, 0.15, -0.05, 0.22, -0.18, 0.08][i],
-                        y: size * [0.28, 0.28, 0.50, 0.52, 0.55, 0.72][i]
+                        x: size * [-0.15,  0.15,  0.00, -0.18,  0.18,  0.00][i],
+                        y: size * [-0.18, -0.18, -0.05,  0.08,  0.08,  0.22][i]
                     )
             }
 
@@ -545,13 +546,15 @@ struct StrawberryTipUp: View {
             ], startPoint: .topLeading, endPoint: .bottomTrailing))
 
             // つぶつぶの種 (本体の中央〜下半分に散らす)
+            // path は y=0.02〜0.95 で本体を描いてるので、frame 中心からの
+            // 相対オフセットで -0.15〜+0.30 に収める (下寄り)
             ForEach(0..<6, id: \.self) { i in
                 Circle()
                     .fill(Color(red: 1.0, green: 0.88, blue: 0.40))
-                    .frame(width: size * 0.07, height: size * 0.07)
+                    .frame(width: size * 0.08, height: size * 0.08)
                     .offset(
-                        x: size * [-0.18, 0.15, -0.05, 0.20, -0.20, 0.05][i],
-                        y: size * [0.40, 0.30, 0.55, 0.55, 0.70, 0.70][i]
+                        x: size * [ 0.00, -0.15,  0.15,  0.00, -0.18,  0.18][i],
+                        y: size * [-0.05, -0.05,  0.05,  0.18,  0.20,  0.20][i]
                     )
             }
 
