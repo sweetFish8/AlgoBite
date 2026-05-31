@@ -13,6 +13,22 @@
 		A10000040000000000000001 /* TopicAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000150000000000000001 /* TopicAnimations.swift */; };
 		A10000050000000000000001 /* AppExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000160000000000000001 /* AppExtras.swift */; };
 		A10000060000000000000001 /* DebugCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000170000000000000001 /* DebugCapture.swift */; };
+		A10000A00000000000000001 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B00000000000000001 /* Models.swift */; };
+		A10000A10000000000000001 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B10000000000000001 /* GameViewModel.swift */; };
+		A10000A20000000000000001 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B20000000000000001 /* AppTypes.swift */; };
+		A10000A30000000000000001 /* PopStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B30000000000000001 /* PopStyle.swift */; };
+		A10000A40000000000000001 /* ExplanationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B40000000000000001 /* ExplanationView.swift */; };
+		A10000A50000000000000001 /* BuiltInAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B50000000000000001 /* BuiltInAnimations.swift */; };
+		A10000A60000000000000001 /* ReorderQuiz.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B60000000000000001 /* ReorderQuiz.swift */; };
+		A10000A70000000000000001 /* Animations_Sorting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B70000000000000001 /* Animations_Sorting.swift */; };
+		A10000A80000000000000001 /* Animations_LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B80000000000000001 /* Animations_LinkedList.swift */; };
+		A10000A90000000000000001 /* Animations_Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B90000000000000001 /* Animations_Tree.swift */; };
+		A10000AA0000000000000001 /* Animations_Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BA0000000000000001 /* Animations_Graph.swift */; };
+		A10000AB0000000000000001 /* Animations_DP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BB0000000000000001 /* Animations_DP.swift */; };
+		A10000AC0000000000000001 /* Animations_String.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BC0000000000000001 /* Animations_String.swift */; };
+		A10000AD0000000000000001 /* Animations_Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BD0000000000000001 /* Animations_Stack.swift */; };
+		A10000AE0000000000000001 /* Animations_Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BE0000000000000001 /* Animations_Math.swift */; };
+		A10000AF0000000000000001 /* Animations_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BF0000000000000001 /* Animations_Misc.swift */; };
 		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
 		A20000010000000000000001 /* AlgoBiteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */; };
 		A20000020000000000000001 /* AlgoBiteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000120000000000000001 /* AlgoBiteWidget.swift */; };
@@ -26,6 +42,22 @@
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
 		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
 		A10000170000000000000001 /* DebugCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCapture.swift; sourceTree = "<group>"; };
+		A10000B00000000000000001 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A10000B10000000000000001 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		A10000B20000000000000001 /* AppTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
+		A10000B30000000000000001 /* PopStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopStyle.swift; sourceTree = "<group>"; };
+		A10000B40000000000000001 /* ExplanationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplanationView.swift; sourceTree = "<group>"; };
+		A10000B50000000000000001 /* BuiltInAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInAnimations.swift; sourceTree = "<group>"; };
+		A10000B60000000000000001 /* ReorderQuiz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReorderQuiz.swift; sourceTree = "<group>"; };
+		A10000B70000000000000001 /* Animations_Sorting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Sorting.swift; sourceTree = "<group>"; };
+		A10000B80000000000000001 /* Animations_LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_LinkedList.swift; sourceTree = "<group>"; };
+		A10000B90000000000000001 /* Animations_Tree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Tree.swift; sourceTree = "<group>"; };
+		A10000BA0000000000000001 /* Animations_Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Graph.swift; sourceTree = "<group>"; };
+		A10000BB0000000000000001 /* Animations_DP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_DP.swift; sourceTree = "<group>"; };
+		A10000BC0000000000000001 /* Animations_String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_String.swift; sourceTree = "<group>"; };
+		A10000BD0000000000000001 /* Animations_Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Stack.swift; sourceTree = "<group>"; };
+		A10000BE0000000000000001 /* Animations_Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Math.swift; sourceTree = "<group>"; };
+		A10000BF0000000000000001 /* Animations_Misc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Misc.swift; sourceTree = "<group>"; };
 		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
 		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
@@ -97,6 +129,22 @@
 				A10000150000000000000001 /* TopicAnimations.swift */,
 				A10000160000000000000001 /* AppExtras.swift */,
 				A10000170000000000000001 /* DebugCapture.swift */,
+				A10000B00000000000000001 /* Models.swift */,
+				A10000B10000000000000001 /* GameViewModel.swift */,
+				A10000B20000000000000001 /* AppTypes.swift */,
+				A10000B30000000000000001 /* PopStyle.swift */,
+				A10000B40000000000000001 /* ExplanationView.swift */,
+				A10000B50000000000000001 /* BuiltInAnimations.swift */,
+				A10000B60000000000000001 /* ReorderQuiz.swift */,
+				A10000B70000000000000001 /* Animations_Sorting.swift */,
+				A10000B80000000000000001 /* Animations_LinkedList.swift */,
+				A10000B90000000000000001 /* Animations_Tree.swift */,
+				A10000BA0000000000000001 /* Animations_Graph.swift */,
+				A10000BB0000000000000001 /* Animations_DP.swift */,
+				A10000BC0000000000000001 /* Animations_String.swift */,
+				A10000BD0000000000000001 /* Animations_Stack.swift */,
+				A10000BE0000000000000001 /* Animations_Math.swift */,
+				A10000BF0000000000000001 /* Animations_Misc.swift */,
 				A30000110000000000000001 /* Assets.xcassets */,
 				A40000110000000000000001 /* AlgoBite.entitlements */,
 			);
@@ -235,6 +283,22 @@
 				A10000040000000000000001 /* TopicAnimations.swift in Sources */,
 				A10000050000000000000001 /* AppExtras.swift in Sources */,
 				A10000060000000000000001 /* DebugCapture.swift in Sources */,
+				A10000A00000000000000001 /* Models.swift in Sources */,
+				A10000A10000000000000001 /* GameViewModel.swift in Sources */,
+				A10000A20000000000000001 /* AppTypes.swift in Sources */,
+				A10000A30000000000000001 /* PopStyle.swift in Sources */,
+				A10000A40000000000000001 /* ExplanationView.swift in Sources */,
+				A10000A50000000000000001 /* BuiltInAnimations.swift in Sources */,
+				A10000A60000000000000001 /* ReorderQuiz.swift in Sources */,
+				A10000A70000000000000001 /* Animations_Sorting.swift in Sources */,
+				A10000A80000000000000001 /* Animations_LinkedList.swift in Sources */,
+				A10000A90000000000000001 /* Animations_Tree.swift in Sources */,
+				A10000AA0000000000000001 /* Animations_Graph.swift in Sources */,
+				A10000AB0000000000000001 /* Animations_DP.swift in Sources */,
+				A10000AC0000000000000001 /* Animations_String.swift in Sources */,
+				A10000AD0000000000000001 /* Animations_Stack.swift in Sources */,
+				A10000AE0000000000000001 /* Animations_Math.swift in Sources */,
+				A10000AF0000000000000001 /* Animations_Misc.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
