@@ -1046,7 +1046,7 @@ struct OnboardingView: View {
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .frame(maxHeight: 460)
 
-                PopButton(fill: Pop.primary, shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent, shadow: Pop.accentShadow,
                           action: { advance() }) {
                     Text(step == total - 1 ? "はじめる！" : "次へ")
                         .font(.title3.weight(.black))
@@ -2584,7 +2584,7 @@ struct StatsCard: View {
                     Text("\(badges.unlocked.count)/\(BadgeCatalog.all.count) バッジ")
                         .font(.caption2.weight(.heavy))
                         .padding(.horizontal, 8).padding(.vertical, 4)
-                        .background(Color(red: 0.99, green: 0.90, blue: 0.52), in: Capsule())
+                        .background(Color(red: 1.00, green: 0.95, blue: 0.74), in: Capsule())
                         .foregroundStyle(Pop.inkWarmSub)
                 }
                 HStack(spacing: 10) {
@@ -2682,7 +2682,7 @@ struct BadgesCard: View {
                         Text("詳細")
                             .font(.caption2.weight(.heavy))
                             .padding(.horizontal, 10).padding(.vertical, 5)
-                            .background(Color(red: 0.99, green: 0.90, blue: 0.52), in: Capsule())
+                            .background(Color(red: 1.00, green: 0.95, blue: 0.74), in: Capsule())
                             .foregroundStyle(Pop.inkWarmSub)
                     }
                     .buttonStyle(.plain)
@@ -2834,7 +2834,7 @@ struct BadgeUnlockOverlay: View {
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Pop.inkSub)
                     .multilineTextAlignment(.center)
-                PopButton(fill: Pop.primary, shadow: Pop.primaryShadow, action: onDismiss) {
+                PopButton(fill: Pop.accent, shadow: Pop.accentShadow, action: onDismiss) {
                     Text("やった！").font(.subheadline.weight(.heavy))
                 }
             }
@@ -3325,7 +3325,7 @@ struct PracticeView: View {
                         .foregroundStyle(Pop.inkSub)
                 }
 
-                PopButton(fill: Pop.primary, shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent, shadow: Pop.accentShadow,
                           action: { session.runCheck() }) {
                     Text("こたえる！")
                         .font(.headline.weight(.black))
@@ -3371,7 +3371,7 @@ struct PracticeView: View {
                         .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
                         .multilineTextAlignment(.leading)
                 }
-                PopButton(fill: Pop.primary, shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent, shadow: Pop.accentShadow,
                           action: { session.reset() }) {
                     Text("もう一回やる")
                         .font(.subheadline.weight(.heavy))

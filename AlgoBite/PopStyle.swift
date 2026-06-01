@@ -69,8 +69,8 @@ struct PopButton<Label: View>: View {
     let label: () -> Label
     @State private var pressed = false
 
-    init(fill: Color = Pop.primary,
-         shadow: Color = Pop.primaryShadow,
+    init(fill: Color = Pop.accent,
+         shadow: Color = Pop.accentShadow,
          radius: CGFloat = 16,
          action: @escaping () -> Void,
          @ViewBuilder label: @escaping () -> Label) {

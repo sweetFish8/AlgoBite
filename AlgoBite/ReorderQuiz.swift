@@ -334,8 +334,8 @@ struct ReorderQuizView: View {
                 .opacity((model.picks.isEmpty || model.isGrading) ? 0.5 : 1)
 
                 let ready = model.picks.count == model.quiz.answer.count
-                PopButton(fill: Pop.primary,
-                          shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent,
+                          shadow: Pop.accentShadow,
                           action: { model.submit() }) {
                     Text("こたえる！")
                         .font(.title3.weight(.black))
@@ -361,8 +361,8 @@ struct ReorderQuizView: View {
                         }
                     }
                 }
-                PopButton(fill: Pop.primary,
-                          shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent,
+                          shadow: Pop.accentShadow,
                           action: { dismiss() }) {
                     Text("ホームへ")
                         .font(.subheadline.weight(.heavy))
