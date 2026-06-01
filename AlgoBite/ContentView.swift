@@ -127,7 +127,7 @@ struct ContentView: View {
             .foregroundStyle(Pop.inkWarmSub)
             .padding(.leading, 6).padding(.trailing, 10)
             .padding(.vertical, 5)
-            .background(Color(red: 1.00, green: 0.84, blue: 0.67),
+            .background(Color(red: 1.00, green: 0.94, blue: 0.85),
                         in: Capsule())
             .overlay(Capsule().stroke(Color(red: 0.99, green: 0.73, blue: 0.45), lineWidth: 1.5))
             // 実績ショートカット (右上)
@@ -193,13 +193,13 @@ struct ContentView: View {
                     popBadge(ch.kindLabel == "穴埋め" ? "✏️ 穴埋め" : "🔀 並べ替え",
                              bg: ch.kindLabel == "穴埋め"
                                  ? Color(red: 0.87, green: 0.84, blue: 0.99)
-                                 : Color(red: 0.99, green: 0.90, blue: 0.52),
+                                 : Color(red: 1.00, green: 0.95, blue: 0.74),
                              fg: ch.kindLabel == "穴埋め"
                                  ? Color(red: 0.30, green: 0.18, blue: 0.50)
                                  : Color(red: 0.57, green: 0.25, blue: 0.05))
                     let topic = ch.topic.components(separatedBy: " / ").first ?? ch.topic
                     popBadge("📌 \(topic)",
-                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),
+                             bg: Color(red: 1.00, green: 0.95, blue: 0.74),
                              fg: Color(red: 0.57, green: 0.25, blue: 0.05))
                     let d = ch.difficulty
                     let (db, df): (Color, Color) = {
@@ -238,8 +238,8 @@ struct ContentView: View {
     }
 
     private var startButton: some View {
-        PopButton(fill: Pop.primary,
-                  shadow: Pop.primaryShadow,
+        PopButton(fill: Pop.accent,
+                  shadow: Pop.accentShadow,
                   action: {
                     Haptics.medium()
                     switch vm.todayChallenge {
@@ -320,7 +320,7 @@ struct ContentView: View {
                     }
                     Spacer()
                     popBadge("全 \(vm.problems.count) 問",
-                             bg: Color(red: 0.99, green: 0.90, blue: 0.52),
+                             bg: Color(red: 1.00, green: 0.95, blue: 0.74),
                              fg: Color(red: 0.57, green: 0.25, blue: 0.05))
                 }
                 PopButton(fill: Pop.accent,
@@ -407,13 +407,13 @@ struct ContentView: View {
                         .foregroundStyle(Pop.inkWarmSub)
                     Spacer()
                     HStack(spacing: 4) {
-                        CakeIcon(size: 16)
+                        StrawberryIcon(size: 16)
                         Text("ストリーク")
                             .font(.caption2.weight(.heavy))
                             .foregroundStyle(Pop.inkWarmSub)
                     }
                     .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(Color(red: 1.00, green: 0.91, blue: 0.78),
+                    .background(Color(red: 1.00, green: 0.96, blue: 0.88),
                                 in: Capsule())
                 }
 
@@ -700,7 +700,7 @@ struct ContentView: View {
                     }
                 }
 
-                PopButton(fill: Pop.primary, shadow: Pop.primaryShadow,
+                PopButton(fill: Pop.accent, shadow: Pop.accentShadow,
                           action: { vm.runCheck() }) {
                     HStack(spacing: 8) {
                         Image(systemName: "play.fill")

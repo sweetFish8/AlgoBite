@@ -29,16 +29,41 @@
 		A10000AD0000000000000001 /* Animations_Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BD0000000000000001 /* Animations_Stack.swift */; };
 		A10000AE0000000000000001 /* Animations_Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BE0000000000000001 /* Animations_Math.swift */; };
 		A10000AF0000000000000001 /* Animations_Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000BF0000000000000001 /* Animations_Misc.swift */; };
-		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
 		A20000010000000000000001 /* AlgoBiteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */; };
 		A20000020000000000000001 /* AlgoBiteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000120000000000000001 /* AlgoBiteWidget.swift */; };
 		A20000030000000000000001 /* AlgoBiteWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000140000000000000001 /* AlgoBiteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A20000700000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000700000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A20000400000000000000001;
+			remoteInfo = AlgoBiteWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A20000520000000000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A20000030000000000000001 /* AlgoBiteWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		A10000110000000000000001 /* AlgoBiteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteApp.swift; sourceTree = "<group>"; };
 		A10000120000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A10000130000000000000001 /* Problems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Problems.swift; sourceTree = "<group>"; };
+		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
 		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
 		A10000170000000000000001 /* DebugCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCapture.swift; sourceTree = "<group>"; };
@@ -58,14 +83,13 @@
 		A10000BD0000000000000001 /* Animations_Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Stack.swift; sourceTree = "<group>"; };
 		A10000BE0000000000000001 /* Animations_Math.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Math.swift; sourceTree = "<group>"; };
 		A10000BF0000000000000001 /* Animations_Misc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations_Misc.swift; sourceTree = "<group>"; };
-		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
-		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
-		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidgetBundle.swift; sourceTree = "<group>"; };
 		A20000120000000000000001 /* AlgoBiteWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteWidget.swift; sourceTree = "<group>"; };
 		A20000130000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000140000000000000001 /* AlgoBiteWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AlgoBiteWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
+		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,20 +109,6 @@
 		};
 /* End PBXFrameworksBuildPhase section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		A20000520000000000000001 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				A20000030000000000000001 /* AlgoBiteWidget.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXGroup section */
 		A10000300000000000000001 = {
 			isa = PBXGroup;
@@ -107,17 +117,6 @@
 				A20000310000000000000001 /* AlgoBiteWidget */,
 				A10000320000000000000001 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		A20000310000000000000001 /* AlgoBiteWidget */ = {
-			isa = PBXGroup;
-			children = (
-				A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */,
-				A20000120000000000000001 /* AlgoBiteWidget.swift */,
-				A20000130000000000000001 /* Info.plist */,
-				A40000120000000000000001 /* AlgoBiteWidget.entitlements */,
-			);
-			path = AlgoBiteWidget;
 			sourceTree = "<group>";
 		};
 		A10000310000000000000001 /* AlgoBite */ = {
@@ -160,6 +159,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A20000310000000000000001 /* AlgoBiteWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A20000110000000000000001 /* AlgoBiteWidgetBundle.swift */,
+				A20000120000000000000001 /* AlgoBiteWidget.swift */,
+				A20000130000000000000001 /* Info.plist */,
+				A40000120000000000000001 /* AlgoBiteWidget.entitlements */,
+			);
+			path = AlgoBiteWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -200,24 +210,6 @@
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
-
-/* Begin PBXTargetDependency section */
-		A20000710000000000000001 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = A20000400000000000000001 /* AlgoBiteWidget */;
-			targetProxy = A20000700000000000000001 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		A20000700000000000000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A10000700000000000000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A20000400000000000000001;
-			remoteInfo = AlgoBiteWidget;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXProject section */
 		A10000700000000000000001 /* Project object */ = {
@@ -312,6 +304,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A20000710000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A20000400000000000000001 /* AlgoBiteWidget */;
+			targetProxy = A20000700000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A10000810000000000000001 /* Debug */ = {
@@ -435,7 +435,7 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 487PWH4FC4;
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -443,7 +443,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -466,7 +466,7 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 487PWH4FC4;
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -474,7 +474,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -577,7 +577,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = A10000700000000000000001 /* Project object */;
 }
