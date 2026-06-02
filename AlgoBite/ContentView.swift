@@ -494,7 +494,10 @@ struct ContentView: View {
             }
         }
         #if DEBUG
-        .onAppear { DebugCapture.autoplayProblem(vm: vm) }
+        .onAppear {
+            DebugCapture.selectProblemSlot(vm: vm)
+            DebugCapture.autoplayProblem(vm: vm)
+        }
         #endif
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -799,4 +802,3 @@ struct ContentView: View {
         }
     }
 }
-

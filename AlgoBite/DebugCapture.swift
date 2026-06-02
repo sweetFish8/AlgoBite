@@ -19,6 +19,8 @@
 //        screen: problem / achievements / settings / reorderList / review
 //     -autoplay <mode>           問題画面で自動で answer を埋めて runCheck
 //        mode: correct / wrong
+//     -selectSlot <mode>         問題画面で指定スロットを選択状態にする
+//        mode: first
 //
 
 #if DEBUG
@@ -106,6 +108,19 @@ enum DebugCapture {
                 vm.runCheck()
             default: break
             }
+        }
+    }
+
+    /// 問題画面の onAppear から呼ぶ。-selectSlot first で選択肢パネルを撮影しやすくする
+    @MainActor
+    static func selectProblemSlot(vm: GameViewModel) {
+        let args = CommandLine.arguments
+        guard let i = args.firstIndex(of: "-selectSlot"),
+              i + 1 < args.count,
+              args[i + 1] == "first",
+              let id = vm.todayProblem.orderedSlotIDs.first else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            vm.selectSlot(id)
         }
     }
 }

@@ -598,7 +598,7 @@ struct RollCakeStreak: View {
     let streak: Int
     var maxDays: Int = 10
 
-    private var visibleBerries: Int { min(streak, maxDays) }
+    private var visibleBerries: Int { min(max(streak, 0), maxDays) }
 
     /// 表示中の苺数。streak より遅延させて、ケーキが伸び切ってから苺を出す
     @State private var revealedBerries: Int = 0
@@ -746,15 +746,15 @@ struct RollCakeStreak: View {
         }
     }
 
-    /// 苺だけ (streak の日数ぶん)。先端が上を向いた向きで一列に並べる
+    /// 苺だけ (streak の日数ぶん)。ケーキ幅に合わせて等間隔に載せる
     /// 新規追加分は上からぽとっと落ちてくる
     private var berriesLayer: some View {
         let count = revealedBerries
-        return HStack(spacing: 2) {
+        return ZStack(alignment: .topLeading) {
             ForEach(0..<count, id: \.self) { i in
                 StrawberryTipUp(size: 22)
-                    // 偶奇でちょっとだけ上下に揺らして "並んでる" 感を出す
-                    .offset(y: i.isMultiple(of: 2) ? -1 : 1)
+                    .position(x: berryX(index: i, slotCount: visibleBerries),
+                              y: i.isMultiple(of: 2) ? 11 : 13)
                     .transition(.asymmetric(
                         insertion: .move(edge: .top).combined(with: .opacity)
                                       .combined(with: .scale(scale: 0.55, anchor: .bottom)),
@@ -763,7 +763,15 @@ struct RollCakeStreak: View {
                     .id(i)
             }
         }
+        .frame(width: cakeLength)
         .frame(height: 24)
+    }
+
+    private func berryX(index: Int, slotCount: Int) -> CGFloat {
+        guard slotCount > 1 else { return cakeLength / 2 }
+        let sideInset: CGFloat = 30
+        let usableWidth = max(1, cakeLength - sideInset * 2)
+        return sideInset + CGFloat(index) * usableWidth / CGFloat(slotCount - 1)
     }
 }
 
@@ -2856,7 +2864,7 @@ struct BadgeUnlockOverlay: View {
                     .foregroundStyle(Pop.inkSub)
                     .multilineTextAlignment(.center)
                 PopButton(fill: Pop.accent, shadow: Pop.accentShadow, action: onDismiss) {
-                    Text("やった！").font(.subheadline.weight(.heavy))
+                    Text("閉じる").font(.subheadline.weight(.heavy))
                 }
             }
             .padding(24)
