@@ -590,11 +590,18 @@ struct DarkBerryIcon: View {
 }
 
 /// ロールケーキ風のストリークビュー — 寝かせたロール (両端丸い) + piped クリーム + ベリー盛り合わせ
+///
+/// streak が増えた時の演出:
+///   1. ケーキ本体が左 → 右に伸びる (spring)
+///   2. 伸び終わったタイミングで新しい苺が上から落ちて乗る
 struct RollCakeStreak: View {
     let streak: Int
     var maxDays: Int = 10
 
     private var visibleBerries: Int { min(streak, maxDays) }
+
+    /// 表示中の苺数。streak より遅延させて、ケーキが伸び切ってから苺を出す
+    @State private var revealedBerries: Int = 0
 
     /// ケーキの長さ。基準幅 + ベリーぶん伸びる
     private var cakeLength: CGFloat {
@@ -604,23 +611,36 @@ struct RollCakeStreak: View {
     }
 
     var body: some View {
-        ZStack(alignment: .center) {
-            // 皿
+        ZStack(alignment: .leading) {
+            // 皿 (ケーキの中心に合わせて両側に少しはみ出す)
             Ellipse()
                 .fill(Color.white)
                 .frame(width: cakeLength + 50, height: 18)
                 .overlay(Ellipse().stroke(Color(red: 0.85, green: 0.84, blue: 0.85), lineWidth: 1))
                 .shadow(color: .black.opacity(0.08), radius: 3, y: 1)
-                .offset(y: 38)
-            // 本体 + クリーム + ベリー
-            VStack(spacing: -8) {
+                .offset(x: -25, y: 38)
+            // 本体 + クリーム + ベリー (leading 揃え → 左から右に伸びる)
+            VStack(alignment: .leading, spacing: -8) {
                 berriesLayer
                 creamLayer
                 cakeBody
             }
         }
-        .frame(height: 100)
+        .frame(width: cakeLength + 25, height: 100, alignment: .leading)
+        // ケーキ本体の伸びは spring で全体に効かせる
         .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
+        .onAppear {
+            // 初回表示は遅延無しで即時セット
+            revealedBerries = visibleBerries
+        }
+        .onChange(of: streak) { _, _ in
+            // ケーキが伸び切る ~0.35s 待ってから、新しい苺をぽとっと落とす
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) {
+                    revealedBerries = visibleBerries
+                }
+            }
+        }
     }
 
     /// ケーキ本体 (寝かせた円柱風 — 角丸控えめ、端が膨らまない)
@@ -727,16 +747,17 @@ struct RollCakeStreak: View {
     }
 
     /// 苺だけ (streak の日数ぶん)。先端が上を向いた向きで一列に並べる
+    /// 新規追加分は上からぽとっと落ちてくる
     private var berriesLayer: some View {
-        let count = visibleBerries
+        let count = revealedBerries
         return HStack(spacing: 2) {
             ForEach(0..<count, id: \.self) { i in
                 StrawberryTipUp(size: 22)
                     // 偶奇でちょっとだけ上下に揺らして "並んでる" 感を出す
                     .offset(y: i.isMultiple(of: 2) ? -1 : 1)
                     .transition(.asymmetric(
-                        insertion: .scale(scale: 0.2).combined(with: .opacity)
-                                      .combined(with: .offset(y: -16)),
+                        insertion: .move(edge: .top).combined(with: .opacity)
+                                      .combined(with: .scale(scale: 0.55, anchor: .bottom)),
                         removal: .opacity
                     ))
                     .id(i)
@@ -3299,9 +3320,15 @@ struct PracticeView: View {
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 12) {
                 if let slot = session.problem.slots[session.activeSlotID ?? ""] {
-                    Text("選択中: \(slot.label)")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Pop.inkSub)
+                    HStack(spacing: 6) {
+                        Image(systemName: "pencil.tip.crop.circle.fill")
+                            .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))
+                        Text(slot.label)
+                            .font(.caption.weight(.heavy))
+                            .padding(.horizontal, 8).padding(.vertical, 3)
+                            .background(Color(red: 1.00, green: 0.95, blue: 0.78), in: Capsule())
+                            .foregroundStyle(Color(red: 0.57, green: 0.25, blue: 0.05))
+                    }
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
                             ForEach(Array(slot.choices.enumerated()), id: \.offset) { i, c in
@@ -3319,10 +3346,6 @@ struct PracticeView: View {
                         }
                     }
                     .frame(minHeight: 44)
-                } else {
-                    Text("↑ スロット（___）をタップしてね")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Pop.inkSub)
                 }
 
                 PopButton(fill: Pop.accent, shadow: Pop.accentShadow,

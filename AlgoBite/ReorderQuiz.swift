@@ -231,11 +231,12 @@ struct ReorderQuizView: View {
                         .foregroundStyle(Pop.inkSub)
                 }
                 if model.picks.isEmpty {
-                    Text("↓ 下の候補から順番にタップしてね")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Pop.inkSub.opacity(0.6))
+                    // 空状態: 候補から並べていく動線を矢印アイコンだけで示す
+                    Image(systemName: "arrow.down")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(Pop.inkSub.opacity(0.45))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
+                        .padding(.vertical, 22)
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 56), spacing: 8)],
                               spacing: 8) {

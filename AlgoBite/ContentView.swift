@@ -500,14 +500,11 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button { path.removeLast() } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left.circle.fill")
-                            .font(.title3)
-                        Text("ホーム")
-                    }
-                    .font(.subheadline.weight(.heavy))
-                    .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))   // #6366F1
+                    Image(systemName: "chevron.left")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))
                 }
+                .accessibilityLabel("戻る")
             }
         }
     }
@@ -658,34 +655,31 @@ struct ContentView: View {
     }
 
     // MARK: Answers panel
+    // 文字説明はあえて置かない — スロットを tap すると選択肢の chip が出てくる、
+    // という関係を UI 構造そのもので示す
     private var answersPanel: some View {
         PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {      // #DDD6FE
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    Image(systemName: "pencil.tip.crop.circle.fill")
-                        .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))
-                    Text(vm.selectedSlot == nil
-                         ? "↑ スロット（___）をタップしてね"
-                         : "選択中:")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Pop.inkSub)
-                    if let s = vm.selectedSlot {
+                // スロット選択中だけヘッダ + 選択肢の chip 列を出す
+                if let s = vm.selectedSlot {
+                    HStack(spacing: 6) {
+                        Image(systemName: "pencil.tip.crop.circle.fill")
+                            .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))
                         popBadge(s.label,
                                  bg: Color(red: 1.00, green: 0.95, blue: 0.78),
                                  fg: Color(red: 0.57, green: 0.25, blue: 0.05))
                     }
-                }
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(Array((vm.selectedSlot?.choices ?? []).enumerated()), id: \.offset) { i, c in
-                            choiceChip(c, index: i)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(Array(s.choices.enumerated()), id: \.offset) { i, c in
+                                choiceChip(c, index: i)
+                            }
                         }
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
+                    .frame(minHeight: 44)
                 }
-                .frame(minHeight: 44)
 
                 HStack(spacing: 10) {
                     smallBtn("💡 ヒント", fill: Pop.accent, shadow: Pop.accentShadow) { vm.revealHint() }
