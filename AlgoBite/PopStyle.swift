@@ -42,6 +42,7 @@ enum Pop {
     static let accentShadow  = Color(red: 0.84, green: 0.46, blue: 0.05)  // #D97706
     static let danger        = Color(red: 0.94, green: 0.27, blue: 0.27)  // #EF4444
     static let dangerShadow  = Color(red: 0.72, green: 0.11, blue: 0.11)  // #B91C1C
+    static let navTint       = Color(red: 0.39, green: 0.40, blue: 0.95)  // #6366F1
 
     // テキスト
     static let ink = Color.dyn(

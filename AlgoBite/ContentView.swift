@@ -21,36 +21,51 @@ struct ContentView: View {
                         case .problem:
                             problemScreen
                         case .reorder(let q):
-                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q),
-                                            onNext: { next in
-                                                // パスを差し替えて新しいクイズへ移動
-                                                if let lastIdx = path.lastIndex(where: {
-                                                    if case .reorder = $0 { return true } else { return false }
-                                                }) {
-                                                    path[lastIdx] = .reorder(next)
-                                                }
-                                            })
+                            appBackButton {
+                                ReorderQuizView(model: ReorderQuizViewModel(quiz: q),
+                                                onNext: { next in
+                                                    // パスを差し替えて新しいクイズへ移動
+                                                    if let lastIdx = path.lastIndex(where: {
+                                                        if case .reorder = $0 { return true } else { return false }
+                                                    }) {
+                                                        path[lastIdx] = .reorder(next)
+                                                    }
+                                                })
+                            }
                         case .dailyReorder(let q):
-                            ReorderQuizView(model: ReorderQuizViewModel(quiz: q, isDaily: true),
-                                            onNext: nil,
-                                            onDailyCleared: { vm.markDailyReorderCleared() })
+                            appBackButton {
+                                ReorderQuizView(model: ReorderQuizViewModel(quiz: q, isDaily: true),
+                                                onNext: nil,
+                                                onDailyCleared: { vm.markDailyReorderCleared() })
+                            }
                         case .reorderList:
-                            ReorderQuizListView { q in
-                                path.append(.reorder(q))
+                            appBackButton {
+                                ReorderQuizListView { q in
+                                    path.append(.reorder(q))
+                                }
                             }
                         case .review:
-                            ReviewListView(problems: vm.problems) { p in
-                                path.append(.practice(p))
+                            appBackButton {
+                                ReviewListView(problems: vm.problems) { p in
+                                    path.append(.practice(p))
+                                }
                             }
                         case .practice(let p):
-                            PracticeView(session: PracticeSession(problem: p))
+                            appBackButton {
+                                PracticeView(session: PracticeSession(problem: p))
+                            }
                         case .achievements:
-                            AchievementsView(stats: vm.stats, badges: vm.badges)
+                            appBackButton {
+                                AchievementsView(stats: vm.stats, badges: vm.badges)
+                            }
                         case .settings:
-                            SettingsView()
+                            appBackButton {
+                                SettingsView()
+                            }
                         }
                     }
             }
+            .tint(Pop.navTint)
             // ④ バッジ解放オーバーレイ
             if let badge = vm.badges.justUnlocked {
                 BadgeUnlockOverlay(badge: badge) {
@@ -69,6 +84,23 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
         .animation(.easeInOut(duration: 0.30), value: showOnboarding)
+    }
+
+    private func appBackButton<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        content()
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        if !path.isEmpty { path.removeLast() }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(Pop.navTint)
+                    }
+                    .accessibilityLabel("戻る")
+                }
+            }
     }
 
     // MARK: 背景 (画面全体)
@@ -505,7 +537,7 @@ struct ContentView: View {
                 Button { path.removeLast() } label: {
                     Image(systemName: "chevron.left")
                         .font(.title3.weight(.semibold))
-                        .foregroundStyle(Color(red: 0.39, green: 0.40, blue: 0.95))
+                        .foregroundStyle(Pop.navTint)
                 }
                 .accessibilityLabel("戻る")
             }
