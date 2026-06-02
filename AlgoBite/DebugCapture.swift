@@ -34,6 +34,9 @@ enum DebugCapture {
     static func applyIfRequested() {
         let args = CommandLine.arguments
         guard args.contains("-captureMode") else { return }
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        let today = f.string(from: Date())
+        let yesterday = f.string(from: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date())
         if args.contains("-keepOnboarding") {
             // オンボーディング撮影時は onboarded を立てない
             appDefaults.removeObject(forKey: "algobite.onboarded")
@@ -42,6 +45,7 @@ enum DebugCapture {
         }
         appDefaults.set(true, forKey: "algobite.notifications.asked")
         appDefaults.set(5,    forKey: "algobite.streak")
+        appDefaults.set(today, forKey: "algobite.lastSolvedDate")
         appDefaults.set(12,   forKey: "algobite.stats.totalSolved")
         appDefaults.set(3,    forKey: "algobite.stats.reorderClears")
         appDefaults.set(["first_clear", "streak_3", "reorder_first", "total_10"],
@@ -51,9 +55,19 @@ enum DebugCapture {
                         forKey: "algobite.stats.solvedDates")
         // autoplay を使う場合は「今日まだ未完」状態にリセット
         if args.contains("-autoplay") {
-            appDefaults.removeObject(forKey: "algobite.lastSolvedDate")
-            let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
-            let today = f.string(from: Date())
+            appDefaults.set(yesterday, forKey: "algobite.lastSolvedDate")
+            appDefaults.removeObject(forKey: "algobite.todayAnswers.\(today)")
+            appDefaults.removeObject(forKey: "algobite.todayResults.\(today)")
+            appDefaults.removeObject(forKey: "algobite.todayAttempts.\(today)")
+        }
+        if let i = args.firstIndex(of: "-autoplay"),
+           i + 1 < args.count,
+           args[i + 1] == "correct" {
+            // 正解撮影では「昨日まで4日、今日の回答で5日」にする
+            appDefaults.set(4, forKey: "algobite.streak")
+        }
+        if args.contains("-selectSlot") {
+            appDefaults.set(yesterday, forKey: "algobite.lastSolvedDate")
             appDefaults.removeObject(forKey: "algobite.todayAnswers.\(today)")
             appDefaults.removeObject(forKey: "algobite.todayResults.\(today)")
             appDefaults.removeObject(forKey: "algobite.todayAttempts.\(today)")
