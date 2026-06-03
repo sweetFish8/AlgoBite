@@ -643,7 +643,11 @@ struct ContentView: View {
             let shakes = vm.shakeTrigger[id] ?? 0
             // 「直前間違えたよ」マーク (idle に戻った後も赤波線で残す)
             let wasWrong = state == .idle && vm.lastWrongIDs.contains(id)
-            Button { vm.selectSlot(id) } label: {
+            Button { 
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                    vm.selectSlot(id) 
+                }
+            } label: {
                 Text(val)
                     .font(.system(size: 13, weight: .heavy, design: .monospaced))
                     .padding(.horizontal, 8).padding(.vertical, 3)
@@ -759,13 +763,18 @@ struct ContentView: View {
             (Color(red: 0.87, green: 0.84, blue: 0.99), Color(red: 0.30, green: 0.11, blue: 0.58)),
         ]
         let (bg, fg) = palette[index % palette.count]
-        return Button { vm.fillChoice(c) } label: {
+        return Button { 
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                vm.fillChoice(c) 
+            }
+        } label: {
             Text(c)
                 .font(.system(size: 14, weight: .heavy, design: .monospaced))
                 .padding(.horizontal, 14).padding(.vertical, 9)
                 .background(bg, in: Capsule())
                 .foregroundStyle(fg)
                 .overlay(Capsule().stroke(fg.opacity(0.25), lineWidth: 1))
+                .shadow(color: fg.opacity(0.15), radius: 4, y: 2)
         }
         .buttonStyle(.plain)
     }

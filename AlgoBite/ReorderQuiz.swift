@@ -265,7 +265,9 @@ struct ReorderQuizView: View {
                       : Pop.ink
 
         return Button {
-            model.removeAt(position)
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                model.removeAt(position)
+            }
         } label: {
             Text(value)
                 .font(.system(size: 20, weight: .black, design: .rounded))
@@ -273,6 +275,7 @@ struct ReorderQuizView: View {
                 .background(bg, in: RoundedRectangle(cornerRadius: 12))
                 .overlay(RoundedRectangle(cornerRadius: 12)
                     .stroke(border, lineWidth: 2))
+                .shadow(color: isLCS ? Color(red: 0.13, green: 0.77, blue: 0.37).opacity(0.3) : Color.black.opacity(0.1), radius: isLCS ? 8 : 4, y: 3)
                 .foregroundStyle(fg)
         }
         .buttonStyle(.plain)
@@ -298,7 +301,11 @@ struct ReorderQuizView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 56), spacing: 8)],
                               spacing: 8) {
                         ForEach(Array(remaining.enumerated()), id: \.offset) { _, v in
-                            Button { model.pick(v) } label: {
+                            Button { 
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                                    model.pick(v) 
+                                }
+                            } label: {
                                 Text(v)
                                     .font(.system(size: 20, weight: .black, design: .rounded))
                                     .frame(minWidth: 50, minHeight: 50)
@@ -307,6 +314,7 @@ struct ReorderQuizView: View {
                                     .overlay(RoundedRectangle(cornerRadius: 12)
                                         .stroke(Color(red: 0.99, green: 0.79, blue: 0.18),
                                                 lineWidth: 2))
+                                    .shadow(color: Color(red: 0.99, green: 0.79, blue: 0.18).opacity(0.4), radius: 4, y: 3)
                                     .foregroundStyle(Pop.inkWarm)
                             }
                             .buttonStyle(.plain)

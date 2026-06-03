@@ -7,11 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04CCF24D63B2FFC648BB4F66 /* BadgesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D639D7B499CB7D51B893CA /* BadgesCard.swift */; };
+		0993A114BC936F920091B2FF /* ReorderQuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDF40FA4C5DCB4BD9BFB3E4 /* ReorderQuizList.swift */; };
+		206196F498DE26BDDB3DA2A7 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC74332E2B850A99D186FB7D /* Badges.swift */; };
+		2F7C7AEB2D14D401B955E104 /* AppDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E42D06D8C54F22926CDB9A2 /* AppDefaults.swift */; };
+		340F3E538B1FEC43BD21BD3D /* TopicIllustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2CD3228FD7CA5DCCE1653C /* TopicIllustration.swift */; };
+		65869F67C7E762686A40811A /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D330858C8ACEFA4690AC89 /* ShareSheet.swift */; };
+		81E4AFE435DAB0C62C9EF8F4 /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC3602E3EEFE44F94ED48D9E /* Icons.swift */; };
+		82B3EC558C00114FA9D5A01F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6938608F341CA7D598FD7B83 /* SettingsView.swift */; };
+		8FE6A6AA71509B390AA10DFD /* AchievementsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CFDB8BAF6FA4AE2CB63F05F /* AchievementsView.swift */; };
+		90396212E96F03992608210C /* StatsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F93F70EC7043FCBF0A0E1A9 /* StatsCard.swift */; };
+		9BC52879D11065AB383E81A1 /* HintStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A41182DBB9E5BFF555382A1 /* HintStore.swift */; };
+		9EB65B9035DABF56374B1AA0 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2357F6FC0E7E5D613E448FC2 /* AppNotifications.swift */; };
 		A10000010000000000000001 /* AlgoBiteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000110000000000000001 /* AlgoBiteApp.swift */; };
 		A10000020000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000120000000000000001 /* ContentView.swift */; };
 		A10000030000000000000001 /* Problems.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000130000000000000001 /* Problems.swift */; };
 		A10000040000000000000001 /* TopicAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000150000000000000001 /* TopicAnimations.swift */; };
-		A10000050000000000000001 /* AppExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000160000000000000001 /* AppExtras.swift */; };
 		A10000060000000000000001 /* DebugCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000170000000000000001 /* DebugCapture.swift */; };
 		A10000A00000000000000001 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B00000000000000001 /* Models.swift */; };
 		A10000A10000000000000001 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000B10000000000000001 /* GameViewModel.swift */; };
@@ -33,6 +44,11 @@
 		A20000020000000000000001 /* AlgoBiteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000120000000000000001 /* AlgoBiteWidget.swift */; };
 		A20000030000000000000001 /* AlgoBiteWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A20000140000000000000001 /* AlgoBiteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A30000010000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A30000110000000000000001 /* Assets.xcassets */; };
+		A68A0A6CB596DACC6B03E567 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186D80FCEBC51ED531D8E43C /* OnboardingView.swift */; };
+		BBFBEDA2EB9CA79E260F4887 /* ReviewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E79028E201BBB3521AB8CB /* ReviewMode.swift */; };
+		CAE8EDAF33D827B79ED56071 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6DF37620F8374227BEB33D /* Haptics.swift */; };
+		F268F049F50D2C1749CB68D3 /* ReorderQuizData.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB8C2B36E1239F297A0B785F /* ReorderQuizData.swift */; };
+		FC19BA4ED1D2F603B652235A /* StatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7419E94D624EEAB06703FE67 /* StatsStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,12 +76,24 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		186D80FCEBC51ED531D8E43C /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		2357F6FC0E7E5D613E448FC2 /* AppNotifications.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
+		29E79028E201BBB3521AB8CB /* ReviewMode.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReviewMode.swift; sourceTree = "<group>"; };
+		2A41182DBB9E5BFF555382A1 /* HintStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HintStore.swift; sourceTree = "<group>"; };
+		5CFDB8BAF6FA4AE2CB63F05F /* AchievementsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AchievementsView.swift; sourceTree = "<group>"; };
+		5F93F70EC7043FCBF0A0E1A9 /* StatsCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StatsCard.swift; sourceTree = "<group>"; };
+		6938608F341CA7D598FD7B83 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		6A6DF37620F8374227BEB33D /* Haptics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		6E42D06D8C54F22926CDB9A2 /* AppDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDefaults.swift; sourceTree = "<group>"; };
+		7419E94D624EEAB06703FE67 /* StatsStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StatsStore.swift; sourceTree = "<group>"; };
+		78D639D7B499CB7D51B893CA /* BadgesCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgesCard.swift; sourceTree = "<group>"; };
+		7C2CD3228FD7CA5DCCE1653C /* TopicIllustration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TopicIllustration.swift; sourceTree = "<group>"; };
+		81D330858C8ACEFA4690AC89 /* ShareSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		A10000110000000000000001 /* AlgoBiteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoBiteApp.swift; sourceTree = "<group>"; };
 		A10000120000000000000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A10000130000000000000001 /* Problems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Problems.swift; sourceTree = "<group>"; };
 		A10000140000000000000001 /* AlgoBite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoBite.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000150000000000000001 /* TopicAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicAnimations.swift; sourceTree = "<group>"; };
-		A10000160000000000000001 /* AppExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppExtras.swift; sourceTree = "<group>"; };
 		A10000170000000000000001 /* DebugCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCapture.swift; sourceTree = "<group>"; };
 		A10000B00000000000000001 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A10000B10000000000000001 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
@@ -90,6 +118,10 @@
 		A30000110000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A40000110000000000000001 /* AlgoBite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBite.entitlements; sourceTree = "<group>"; };
 		A40000120000000000000001 /* AlgoBiteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AlgoBiteWidget.entitlements; sourceTree = "<group>"; };
+		AC3602E3EEFE44F94ED48D9E /* Icons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Icons.swift; sourceTree = "<group>"; };
+		BB8C2B36E1239F297A0B785F /* ReorderQuizData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReorderQuizData.swift; sourceTree = "<group>"; };
+		CC74332E2B850A99D186FB7D /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
+		DFDF40FA4C5DCB4BD9BFB3E4 /* ReorderQuizList.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReorderQuizList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +142,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		29364D3702E7C189C9CEEAC9 /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				5CFDB8BAF6FA4AE2CB63F05F /* AchievementsView.swift */,
+				6E42D06D8C54F22926CDB9A2 /* AppDefaults.swift */,
+				2357F6FC0E7E5D613E448FC2 /* AppNotifications.swift */,
+				CC74332E2B850A99D186FB7D /* Badges.swift */,
+				78D639D7B499CB7D51B893CA /* BadgesCard.swift */,
+				6A6DF37620F8374227BEB33D /* Haptics.swift */,
+				2A41182DBB9E5BFF555382A1 /* HintStore.swift */,
+				AC3602E3EEFE44F94ED48D9E /* Icons.swift */,
+				186D80FCEBC51ED531D8E43C /* OnboardingView.swift */,
+				BB8C2B36E1239F297A0B785F /* ReorderQuizData.swift */,
+				DFDF40FA4C5DCB4BD9BFB3E4 /* ReorderQuizList.swift */,
+				29E79028E201BBB3521AB8CB /* ReviewMode.swift */,
+				6938608F341CA7D598FD7B83 /* SettingsView.swift */,
+				81D330858C8ACEFA4690AC89 /* ShareSheet.swift */,
+				5F93F70EC7043FCBF0A0E1A9 /* StatsCard.swift */,
+				7419E94D624EEAB06703FE67 /* StatsStore.swift */,
+				7C2CD3228FD7CA5DCCE1653C /* TopicIllustration.swift */,
+			);
+			name = Extras;
+			path = Extras;
+			sourceTree = "<group>";
+		};
 		A10000300000000000000001 = {
 			isa = PBXGroup;
 			children = (
@@ -126,7 +183,6 @@
 				A10000120000000000000001 /* ContentView.swift */,
 				A10000130000000000000001 /* Problems.swift */,
 				A10000150000000000000001 /* TopicAnimations.swift */,
-				A10000160000000000000001 /* AppExtras.swift */,
 				A10000170000000000000001 /* DebugCapture.swift */,
 				A10000B00000000000000001 /* Models.swift */,
 				A10000B10000000000000001 /* GameViewModel.swift */,
@@ -146,6 +202,7 @@
 				A10000BF0000000000000001 /* Animations_Misc.swift */,
 				A30000110000000000000001 /* Assets.xcassets */,
 				A40000110000000000000001 /* AlgoBite.entitlements */,
+				29364D3702E7C189C9CEEAC9 /* Extras */,
 			);
 			path = AlgoBite;
 			sourceTree = "<group>";
@@ -273,7 +330,6 @@
 				A10000020000000000000001 /* ContentView.swift in Sources */,
 				A10000030000000000000001 /* Problems.swift in Sources */,
 				A10000040000000000000001 /* TopicAnimations.swift in Sources */,
-				A10000050000000000000001 /* AppExtras.swift in Sources */,
 				A10000060000000000000001 /* DebugCapture.swift in Sources */,
 				A10000A00000000000000001 /* Models.swift in Sources */,
 				A10000A10000000000000001 /* GameViewModel.swift in Sources */,
@@ -291,6 +347,23 @@
 				A10000AD0000000000000001 /* Animations_Stack.swift in Sources */,
 				A10000AE0000000000000001 /* Animations_Math.swift in Sources */,
 				A10000AF0000000000000001 /* Animations_Misc.swift in Sources */,
+				8FE6A6AA71509B390AA10DFD /* AchievementsView.swift in Sources */,
+				2F7C7AEB2D14D401B955E104 /* AppDefaults.swift in Sources */,
+				9EB65B9035DABF56374B1AA0 /* AppNotifications.swift in Sources */,
+				206196F498DE26BDDB3DA2A7 /* Badges.swift in Sources */,
+				04CCF24D63B2FFC648BB4F66 /* BadgesCard.swift in Sources */,
+				CAE8EDAF33D827B79ED56071 /* Haptics.swift in Sources */,
+				9BC52879D11065AB383E81A1 /* HintStore.swift in Sources */,
+				81E4AFE435DAB0C62C9EF8F4 /* Icons.swift in Sources */,
+				A68A0A6CB596DACC6B03E567 /* OnboardingView.swift in Sources */,
+				F268F049F50D2C1749CB68D3 /* ReorderQuizData.swift in Sources */,
+				0993A114BC936F920091B2FF /* ReorderQuizList.swift in Sources */,
+				BBFBEDA2EB9CA79E260F4887 /* ReviewMode.swift in Sources */,
+				82B3EC558C00114FA9D5A01F /* SettingsView.swift in Sources */,
+				65869F67C7E762686A40811A /* ShareSheet.swift in Sources */,
+				90396212E96F03992608210C /* StatsCard.swift in Sources */,
+				FC19BA4ED1D2F603B652235A /* StatsStore.swift in Sources */,
+				340F3E538B1FEC43BD21BD3D /* TopicIllustration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
