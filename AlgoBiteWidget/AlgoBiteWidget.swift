@@ -13,7 +13,7 @@ import SwiftUI
 /// App Group 経由でメインアプリと共有する UserDefaults。
 /// 環境が無い時は fallback として .standard を返す。
 private let sharedDefaults: UserDefaults = {
-    UserDefaults(suiteName: "group.app.Goto.Sakana.AlgoBite") ?? .standard
+    UserDefaults(suiteName: "group.group.app.Goto.Sakana.AlgoBite") ?? .standard
 }()
 
 // MARK: - Entry

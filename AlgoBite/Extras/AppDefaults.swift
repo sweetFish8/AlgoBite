@@ -7,6 +7,6 @@ import UserNotifications
 /// メインアプリと Widget で共有する UserDefaults。
 /// App Group が有効ならそちら、無ければ .standard にフォールバック。
 let appDefaults: UserDefaults = {
-    UserDefaults(suiteName: "group.app.Goto.Sakana.AlgoBite") ?? .standard
+    UserDefaults(suiteName: "group.group.app.Goto.Sakana.AlgoBite") ?? .standard
 }()
 

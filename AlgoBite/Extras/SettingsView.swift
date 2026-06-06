@@ -118,9 +118,20 @@ struct SettingsView: View {
                                     .font(.subheadline.weight(.black))
                                     .foregroundStyle(Pop.ink)
                             }
-                            Text("Version 1.0\n毎日ひと口、アルゴリズム。\nMade with 🍪 by ayu")
+                            Text("Version 1.1.0\n毎日ひと口、アルゴリズム。\nMade with 🍪 by ayu")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Pop.inkSub)
+                            Divider()
+                            // プライバシーポリシー（App Store 審査要件 5.1.1）
+                            Link(destination: URL(string: "https://lifeistech.co.jp/privacy")!) {
+                                HStack(spacing: 4) {
+                                    Text("プライバシーポリシー")
+                                        .font(.caption.weight(.semibold))
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.caption2)
+                                }
+                                .foregroundStyle(Pop.accent)
+                            }
                         }
                     }
                 }
