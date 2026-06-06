@@ -163,7 +163,6 @@
 				7419E94D624EEAB06703FE67 /* StatsStore.swift */,
 				7C2CD3228FD7CA5DCCE1653C /* TopicIllustration.swift */,
 			);
-			name = Extras;
 			path = Extras;
 			sourceTree = "<group>";
 		};
@@ -569,7 +568,7 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 487PWH4FC4;
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
@@ -597,7 +596,7 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = 487PWH4FC4;
+				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;

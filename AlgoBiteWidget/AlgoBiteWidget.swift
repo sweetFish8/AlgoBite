@@ -97,13 +97,27 @@ struct AlgoBiteWidgetView: View {
         ], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
+    private var backgroundWithDecorations: some View {
+        ZStack {
+            bgGradient
+            GeometryReader { geo in
+                Text("🍩").font(.system(size: 44)).rotationEffect(.degrees(-15))
+                    .opacity(0.15)
+                    .position(x: geo.size.width * 0.85, y: geo.size.height * 0.1)
+                Text("🍫").font(.system(size: 36)).rotationEffect(.degrees(20))
+                    .opacity(0.12)
+                    .position(x: geo.size.width * 0.15, y: geo.size.height * 0.85)
+            }
+        }
+    }
+
     private var ink: Color { Color(red: 0.49, green: 0.18, blue: 0.07) }
     private var subInk: Color { Color(red: 0.60, green: 0.20, blue: 0.07) }
 
     // 小サイズ
     private var small: some View {
         ZStack {
-            bgGradient
+            backgroundWithDecorations
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 4) {
                     Text("🍪").font(.system(size: 22))
@@ -134,7 +148,7 @@ struct AlgoBiteWidgetView: View {
     // 中サイズ
     private var medium: some View {
         ZStack {
-            bgGradient
+            backgroundWithDecorations
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 4) {
@@ -164,9 +178,10 @@ struct AlgoBiteWidgetView: View {
                         .foregroundStyle(subInk)
                 }
                 .frame(width: 90)
-                .padding(.vertical, 4)
-                .background(Color.white.opacity(0.55),
-                            in: RoundedRectangle(cornerRadius: 14))
+                .padding(.vertical, 8)
+                .background(Color.white.opacity(0.75),
+                            in: RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.black.opacity(0.08), radius: 4, y: 2)
             }
             .padding(14)
         }
@@ -180,9 +195,11 @@ struct AlgoBiteWidgetView: View {
                Color(red: 0.49, green: 0.18, blue: 0.07), "▶ チャレンジ")
         return Text(txt)
             .font(.system(size: 10, weight: .heavy))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
             .background(bg, in: Capsule())
+            .overlay(Capsule().stroke(Color.white.opacity(0.4), lineWidth: 1))
+            .shadow(color: bg.opacity(0.5), radius: 3, y: 2)
             .foregroundStyle(fg)
     }
 }
