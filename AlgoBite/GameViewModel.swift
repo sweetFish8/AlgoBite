@@ -15,6 +15,7 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var attemptCount: Int = 0
     @Published private(set) var slotResults: [String: Bool] = [:]
     @Published var hintLevel: HintLevel = .none
+    @Published var gentleHintText: String?
     /// 直前に不正解だったスロット (赤波線で表示し続ける)
     @Published var lastWrongIDs: Set<String> = []
 
@@ -136,16 +137,21 @@ final class GameViewModel: ObservableObject {
         activeSlotID = nil
         slotStates = [:]
         hintLevel = .none
+        gentleHintText = nil
         logMessage = "リセットしました"
         Haptics.light()
     }
 
-    /// 段階的ヒント (⑤)
-    /// none → fillOne (1スロット埋める) → fillAll (全部埋める、採点なし)
+    /// 段階的ヒント: none → gentle (テキスト表示) → fillOne (1スロット埋める)
     func revealHint() {
         guard !isCompletedToday else { return }
         switch hintLevel {
         case .none:
+            gentleHintText = HintStore.gentleText(for: todayProblem)
+            hintLevel = .gentle
+            logMessage = "💭 ヒント1/2: ふんわりヒント"
+            Haptics.light()
+        case .gentle:
             // 1 スロット埋める
             let ids = todayProblem.orderedSlotIDs
             if let id = ids.first(where: { answers[$0] != todayProblem.slots[$0]?.answer }),
@@ -153,22 +159,11 @@ final class GameViewModel: ObservableObject {
                 answers[id] = answer
                 slotStates = [:]
                 activeSlotID = nextEmptySlot(after: id)
-                logMessage = "💡 ヒント1/2: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
+                logMessage = "💡 ヒント2/2: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
             }
             hintLevel = .fillOne
             Haptics.medium()
         case .fillOne:
-            // 全部埋める（採点はしない — 自分で答え合わせボタンを押す）
-            let ids = todayProblem.orderedSlotIDs
-            for id in ids {
-                answers[id] = todayProblem.slots[id]?.answer
-            }
-            slotStates = [:]
-            activeSlotID = nil
-            logMessage = "🔓 ヒント2/2: 全部埋めたよ。答え合わせしてみよう！"
-            hintLevel = .fillAll
-            Haptics.medium()
-        case .fillAll:
             logMessage = "もうヒントはないよ"
             Haptics.warning()
         }
@@ -177,8 +172,8 @@ final class GameViewModel: ObservableObject {
     var hintLabel: String {
         switch hintLevel {
         case .none:    return "💡 ヒント (1/2)"
-        case .fillOne: return "💡 答えを見る (2/2)"
-        case .fillAll: return "💡 ヒント済"
+        case .gentle:  return "💡 もう少し (2/2)"
+        case .fillOne: return "💡 ヒント済"
         }
     }
 
@@ -294,6 +289,7 @@ final class GameViewModel: ObservableObject {
         activeSlotID = nil
         slotStates = [:]
         hintLevel = .none
+        gentleHintText = nil
         lastWrongIDs = []
         logMessage = "今日はパスしたよ"
         Haptics.light()

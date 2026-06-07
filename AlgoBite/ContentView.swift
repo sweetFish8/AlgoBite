@@ -758,6 +758,18 @@ struct ContentView: View {
                         .foregroundStyle(vm.resultMood == .fail ? Pop.danger : Pop.inkSub)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                if let hint = vm.gentleHintText {
+                    Text(hint)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(Pop.inkSub)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(red: 1.00, green: 0.97, blue: 0.87),
+                                    in: RoundedRectangle(cornerRadius: 10))
+                        .overlay(RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(red: 0.99, green: 0.79, blue: 0.45), lineWidth: 1))
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
         }
     }
