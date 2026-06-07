@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import WidgetKit
 
 // MARK: - Settings Screen — 設定画面
 
@@ -38,6 +39,10 @@ final class SettingsStore: ObservableObject {
         }
         // インメモリのバッジ状態もクリア（ディスクだけ消してもメモリに残る）
         BadgeStore.shared.resetAll()
+        // GameViewModel のメモリ上の状態もリセットする
+        NotificationCenter.default.post(name: .algoBiteProgressDidReset, object: nil)
+        // Widget のタイムラインも即時リロード
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 

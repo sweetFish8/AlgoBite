@@ -109,12 +109,31 @@ final class GameViewModel: ObservableObject {
         }
 
         // BadgeStore の変更 (justUnlocked の set/clear) を ContentView に伝播する。
-        // badges は @Published でないため、BadgeStore.objectWillChange を購読して
-        // GameViewModel.objectWillChange を再発火させることで UI が更新される。
         badges.objectWillChange
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
+
+        // 設定画面の「進捗リセット」後にメモリ上の状態もクリアする
+        NotificationCenter.default.publisher(for: .algoBiteProgressDidReset)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.resetProgress() }
+            .store(in: &cancellables)
+    }
+
+    /// 進捗リセット時にメモリ上の状態をすべて初期化する
+    private func resetProgress() {
+        isCompletedToday = false
+        streak = 0
+        answers = [:]
+        activeSlotID = nil
+        slotStates = [:]
+        slotResults = [:]
+        hintLevel = .none
+        gentleHintText = nil
+        lastWrongIDs = []
+        attemptCount = 0
+        logMessage = ""
     }
 
     func selectSlot(_ id: String) {

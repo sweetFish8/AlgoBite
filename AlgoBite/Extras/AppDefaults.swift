@@ -10,3 +10,10 @@ let appDefaults: UserDefaults = {
     UserDefaults(suiteName: "group.group.app.Goto.Sakana.AlgoBite") ?? .standard
 }()
 
+// MARK: - Notification Names
+
+extension Notification.Name {
+    /// SettingsStore.resetAll() 後に投げる。GameViewModel がメモリ状態をリセットする。
+    static let algoBiteProgressDidReset = Notification.Name("algoBiteProgressDidReset")
+}
+
