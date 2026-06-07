@@ -62,5 +62,11 @@ final class BadgeStore: ObservableObject {
     }
 
     func dismissJustUnlocked() { justUnlocked = nil }
+
+    /// SettingsStore.resetAll() と合わせて呼ぶ。インメモリの解放済みバッジをクリアする。
+    func resetAll() {
+        unlocked = []
+        justUnlocked = nil
+    }
 }
 

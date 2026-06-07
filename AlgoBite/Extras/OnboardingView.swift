@@ -30,7 +30,7 @@ struct OnboardingView: View {
                     pageContent(
                         illustration: AnyView(
                             VStack(spacing: 10) {
-                                RollCakeStreak(streak: 5)
+                                RollCakeStreak(streak: 7)
                                     .frame(width: 220, height: 90)
                                 Text("🔥 \(7) 日連続！")
                                     .font(.title2.weight(.black))

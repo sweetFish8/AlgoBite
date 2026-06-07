@@ -36,6 +36,8 @@ final class SettingsStore: ObservableObject {
             if key.hasPrefix("algobite.notify") || key.hasPrefix("algobite.notifications") { continue }
             d.removeObject(forKey: key)
         }
+        // インメモリのバッジ状態もクリア（ディスクだけ消してもメモリに残る）
+        BadgeStore.shared.resetAll()
     }
 }
 
