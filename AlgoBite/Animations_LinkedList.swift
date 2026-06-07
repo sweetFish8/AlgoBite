@@ -674,8 +674,10 @@ struct IntersectionLLAnim: View {
     let b = [5, 6, 1]
     let shared = [8, 4, 5]
     // ポインタの現在位置: row 0=A, 1=B / そのrow内のindex
-    @State private var aRow = 0, aIdx = 0
-    @State private var bRow = 1, bIdx = 0
+    @State private var aRow = 0
+    @State private var aIdx = 0
+    @State private var bRow = 1
+    @State private var bIdx = 0
     @State private var token = 0
     @State private var hit: Int? = nil
 

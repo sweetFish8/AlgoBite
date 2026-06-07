@@ -720,9 +720,10 @@ struct LCSAnim: View {
 // MARK: - 0/1 Knapsack
 
 struct KnapsackAnim: View {
-    let weights = [1, 2, 3, 5]
-    let values  = [10, 15, 40, 50]
-    let cap = 6
+    // 問題例 (W=4, wt=[1,3,4], val=[1,4,5] → 5) に合わせる
+    let weights = [1, 3, 4]
+    let values  = [1, 4, 5]
+    let cap = 4
     @State private var grid: [[Int]] = []
     @State private var cur: (Int, Int)? = nil
     @State private var token = 0
@@ -783,7 +784,8 @@ struct KnapsackAnim: View {
 // MARK: - Unique Paths (path count grid)
 
 struct UniquePathsAnim: View {
-    let rows = 4, cols = 5
+    // 問題例 (m=3, n=7 → 28) に合わせる
+    let rows = 3, cols = 7
     @State private var grid: [[Int]] = []
     @State private var cur: (Int, Int)? = nil
     @State private var token = 0

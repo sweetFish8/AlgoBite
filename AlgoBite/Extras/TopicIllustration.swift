@@ -24,11 +24,14 @@ struct TopicIllustration: View {
         if t.contains("queue")                                     { return .queue }
         if t.contains("linked list")                               { return .linkedList }
         if t.contains("tree") || t.contains("bst") || t.contains("trie") { return .tree }
+        // backtrack / bit / sliding は graph(dfs) や dp より先に判定する
+        // ("Backtracking / DFS" が .graph に、"Bit Manipulation / DP" が .dp に
+        //  誤分類されるのを防ぐ)
+        if t.contains("backtrack")                                 { return .backtracking }
+        if t.contains("bit")                                       { return .bit }
+        if t.contains("sliding")                                   { return .slidingWindow }
         if t.contains("graph") || t.contains("bfs") || t.contains("dfs") { return .graph }
         if t.contains("dp") || t.contains("dynamic")               { return .dp }
-        if t.contains("backtrack")                                 { return .backtracking }
-        if t.contains("sliding")                                   { return .slidingWindow }
-        if t.contains("bit")                                       { return .bit }
         if t.contains("string")                                    { return .string }
         return .generic
     }

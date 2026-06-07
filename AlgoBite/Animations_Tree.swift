@@ -302,7 +302,8 @@ struct MaxDepthBTAnim: View {
 
 struct LCAofBSTAnim: View {
     let nodes = [6, 2, 8, 0, 4, 7, 9]
-    let p = 2, q = 4
+    // 問題例 (p=2, q=8 → node(6)) に合わせる
+    let p = 2, q = 8
     @State private var path: [Int] = []
     @State private var lca: Int? = nil
     @State private var token = 0
@@ -326,8 +327,8 @@ struct LCAofBSTAnim: View {
     private func play() {
         token += 1; let t = token
         path = []; lca = nil
-        // 6 → 2 (両方左) で確定 (p=2, q=4)
-        let walk = [6, 2]
+        // p=2 < 6 < q=8 で左右に分岐 → 6 が LCA
+        let walk = [6]
         for (k, v) in walk.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.8) {
                 guard t == token else { return }
@@ -336,7 +337,7 @@ struct LCAofBSTAnim: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(walk.count) * 0.8 + 0.2) {
             guard t == token else { return }
-            withAnimation { lca = 2 }
+            withAnimation { lca = 6 }
         }
     }
 }

@@ -265,18 +265,20 @@ func topicAnimationFallback(topic: String) -> some View {
         TrieAnim(kind: .insert)
     } else if t.contains("tree") || t.contains("bst") || t.contains("木") {
         TreeTraversalAnim(order: .inorder)
+    } else if t.contains("backtrack") || t.contains("バックトラック") || t.contains("順列") {
+        // backtrack / bit / sliding は graph(dfs) や dp より先に判定する
+        // ("Backtracking / DFS" が graph に、"Bit ... / DP" が dp に誤マッチするのを防ぐ)
+        BacktrackingAnim(kind: .combinations)
+    } else if t.contains("bit") || t.contains("ビット") {
+        BitAnim(kind: .singleNumber)
+    } else if t.contains("sliding") || t.contains("スライディング") {
+        SlidingWindowAnim(s: "abcabc", initialWidth: 1)
     } else if t.contains("dijkstra") || t.contains("ダイクストラ") {
         GridSearchAnim(kind: .bfs)
     } else if t.contains("graph") || t.contains("bfs") || t.contains("dfs") || t.contains("グラフ") {
         GridSearchAnim(kind: .bfs)
     } else if t.contains("dp") || t.contains("dynamic") || t.contains("メモ化") || t.contains("lis") {
         DPTableAnim(kind: .fib)
-    } else if t.contains("backtrack") || t.contains("バックトラック") || t.contains("順列") {
-        BacktrackingAnim(kind: .combinations)
-    } else if t.contains("sliding") || t.contains("スライディング") {
-        SlidingWindowAnim(s: "abcabc", initialWidth: 1)
-    } else if t.contains("bit") || t.contains("ビット") {
-        BitAnim(kind: .singleNumber)
     } else if t.contains("greedy") || t.contains("貪欲") {
         SortingAnim(kind: .selection)
     } else if t.contains("heap") || t.contains("ヒープ") {

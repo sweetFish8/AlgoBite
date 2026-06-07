@@ -415,8 +415,10 @@ struct PowerOfTwoAnim: View {
 // MARK: - Power: Fast Exponentiation (binary expand)
 
 struct FastPowBinaryAnim: View {
+    // 問題例 (fast_pow(2, 10, 1000) → 24) に合わせる
     let base: Double = 2
-    let exp: Int = 13
+    let exp: Int = 10
+    let mod: Double = 1000
     @State private var step = -1
     @State private var bits: [Int] = []
     @State private var partials: [(Double, Bool)] = []   // (val, contributed)
@@ -424,7 +426,7 @@ struct FastPowBinaryAnim: View {
     @State private var token = 0
 
     var body: some View {
-        AnimFrame(title: "Fast Pow: \(base)^\(exp)", tint: .yellow, onReplay: play) {
+        AnimFrame(title: "Fast Pow: \(Int(base))^\(exp) % \(Int(mod))", tint: .yellow, onReplay: play) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 4) {
                     Text("\(exp) =").font(.system(size: 10, weight: .black, design: .monospaced))
@@ -448,7 +450,7 @@ struct FastPowBinaryAnim: View {
                 }
                 Text("result = " + String(format: "%.0f", result))
                     .font(.caption.weight(.bold)).foregroundStyle(.yellow)
-                Text("bit が 1 のところだけ部分積を掛ける")
+                Text("bit が 1 のところだけ部分積を掛けて mod \(Int(mod)) を取る")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
@@ -462,18 +464,18 @@ struct FastPowBinaryAnim: View {
         while e > 0 { b.append(e & 1); e >>= 1 }
         bits = b
         var p: [(Double, Bool)] = []
-        var cur: Double = base
+        var cur: Double = base.truncatingRemainder(dividingBy: mod)
         var res: Double = 1
         for i in b.indices {
             let contribute = b[i] == 1
-            if contribute { res *= cur }
+            if contribute { res = (res * cur).truncatingRemainder(dividingBy: mod) }
             p.append((cur, contribute))
             let snap = p; let curRes = res
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(i) * 0.8) {
                 guard t == token else { return }
                 withAnimation { step = i; partials = snap; result = curRes }
             }
-            cur *= cur
+            cur = (cur * cur).truncatingRemainder(dividingBy: mod)
         }
     }
 }
