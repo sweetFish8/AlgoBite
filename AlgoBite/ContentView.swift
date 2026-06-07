@@ -295,44 +295,10 @@ struct ContentView: View {
         }
     }
 
+    // (旧)並べ替え練習カード — 並べ替えは「今日のひと口」に穴埋めと混ぜて出題するため廃止。
+    // reorderList 画面自体は DebugCapture のスクショ用に AppScreen に残してある。
     private var reorderPracticeCard: some View {
-        PopCard(fill: Pop.surface,
-                border: Color(red: 0.87, green: 0.84, blue: 0.99)) {     // #DDD6FE
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(red: 0.96, green: 0.93, blue: 1.00))   // #F3F0FF
-                            .frame(width: 56, height: 56)
-                        Circle()
-                            .stroke(Color(red: 0.78, green: 0.72, blue: 0.98), lineWidth: 2)
-                            .frame(width: 56, height: 56)
-                        CupcakeIcon(size: 44)
-                    }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("並べ替え練習")
-                            .font(.subheadline.weight(.black))
-                            .foregroundStyle(Pop.ink)
-                        Text("全 \(ReorderQuiz.allList.count) 問")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(Pop.inkSub)
-                    }
-                    Spacer()
-                    popBadge("\(ReorderQuiz.allList.count) 問",
-                             bg: Color(red: 0.99, green: 0.79, blue: 0.18),
-                             fg: Color(red: 0.49, green: 0.18, blue: 0.07))
-                }
-                PopButton(fill: Color(red: 0.55, green: 0.49, blue: 0.92),
-                          shadow: Color(red: 0.40, green: 0.34, blue: 0.78),
-                          action: { path.append(.reorderList) }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "list.bullet.rectangle.fill")
-                        Text("一覧から選ぶ！")
-                            .font(.subheadline.weight(.heavy))
-                    }
-                }
-            }
-        }
+        EmptyView()
     }
 
     // ⑥ 復習モードの導線
@@ -382,9 +348,6 @@ struct ContentView: View {
             HStack(spacing: 10) {
                 footerLink(title: "実績", icon: AnyView(CakeIcon(size: 26))) {
                     path.append(.achievements)
-                }
-                footerLink(title: "並べ替え", icon: AnyView(CupcakeIcon(size: 26))) {
-                    path.append(.reorderList)
                 }
                 footerLink(title: "復習", icon: AnyView(ChocolateIcon(size: 26))) {
                     path.append(.review)
