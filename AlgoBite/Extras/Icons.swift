@@ -263,32 +263,12 @@ struct CakeIcon: View {
                 .frame(width: size * 0.80, height: size * 0.16)
                 .offset(y: -size * 0.16)
             // イチゴ
-            ForEach(0..<3, id: \.self) { i in
-                Path { p in
-                    // ハート型の苺
-                    let cx = CGFloat(i - 1) * size * 0.22
-                    p.move(to: CGPoint(x: cx, y: -size * 0.20))
-                    p.addCurve(
-                        to: CGPoint(x: cx + size * 0.06, y: -size * 0.30),
-                        control1: CGPoint(x: cx, y: -size * 0.27),
-                        control2: CGPoint(x: cx + size * 0.06, y: -size * 0.30))
-                    p.addCurve(
-                        to: CGPoint(x: cx, y: -size * 0.20),
-                        control1: CGPoint(x: cx + size * 0.10, y: -size * 0.25),
-                        control2: CGPoint(x: cx + size * 0.06, y: -size * 0.20))
-                    p.addCurve(
-                        to: CGPoint(x: cx - size * 0.06, y: -size * 0.30),
-                        control1: CGPoint(x: cx - size * 0.06, y: -size * 0.20),
-                        control2: CGPoint(x: cx - size * 0.10, y: -size * 0.25))
-                    p.addCurve(
-                        to: CGPoint(x: cx, y: -size * 0.20),
-                        control1: CGPoint(x: cx - size * 0.06, y: -size * 0.30),
-                        control2: CGPoint(x: cx, y: -size * 0.27))
-                    p.closeSubpath()
+            HStack(spacing: size * 0.04) {
+                ForEach(0..<3, id: \.self) { _ in
+                    StrawberryIcon(size: size * 0.24)
                 }
-                .fill(Color(red: 0.95, green: 0.28, blue: 0.32))
-                .offset(y: size * 0.04)
             }
+            .offset(y: -size * 0.30)
         }
         .frame(width: size, height: size)
     }

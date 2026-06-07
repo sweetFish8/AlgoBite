@@ -84,6 +84,9 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: vm.badges.justUnlocked)
         .animation(.easeInOut(duration: 0.30), value: showOnboarding)
+        .onReceive(NotificationCenter.default.publisher(for: .algoBiteProgressDidReset)) { _ in
+            showOnboarding = true
+        }
     }
 
     private func appBackButton<Content: View>(@ViewBuilder content: () -> Content) -> some View {
