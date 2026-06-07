@@ -673,17 +673,18 @@ struct IntersectionLLAnim: View {
     let a = [4, 1]
     let b = [5, 6, 1]
     let shared = [8, 4, 5]
-    @State private var pA: Int = 0
-    @State private var pB: Int = 0
+    // ポインタの現在位置: row 0=A, 1=B / そのrow内のindex
+    @State private var aRow = 0, aIdx = 0
+    @State private var bRow = 1, bIdx = 0
     @State private var token = 0
     @State private var hit: Int? = nil
 
     var body: some View {
         AnimFrame(title: "Intersection of Two LLs", tint: .blue, onReplay: play) {
             VStack(alignment: .leading, spacing: 8) {
-                listRow("A", arr: a + shared, ptr: pA, color: .blue, intersect: a.count)
-                listRow("B", arr: b + shared, ptr: pB, color: .orange, intersect: b.count)
-                Text("片方が末尾に着いたらもう片方の先頭にジャンプ。長さ差を吸収する")
+                listRow("A", rowId: 0, arr: a + shared, color: .blue, intersect: a.count)
+                listRow("B", rowId: 1, arr: b + shared, color: .orange, intersect: b.count)
+                Text("片方が末尾に着いたらもう片方の先頭にジャンプ。長さ差を吸収して同じノードで出会う")
                     .font(.caption2).foregroundStyle(.secondary)
                 if let h = hit {
                     Text("🎯 交点 = \(h)").font(.caption.weight(.bold)).foregroundStyle(.green)
@@ -692,46 +693,66 @@ struct IntersectionLLAnim: View {
         }
         .onAppear { play() }
     }
-    private func listRow(_ label: String, arr: [Int], ptr: Int, color: Color, intersect: Int) -> some View {
+
+    private func listRow(_ label: String, rowId: Int, arr: [Int], color: Color, intersect: Int) -> some View {
         HStack(spacing: 4) {
             Text(label).font(.system(size: 12, weight: .black, design: .monospaced))
                 .frame(width: 14).foregroundStyle(color)
             ForEach(arr.indices, id: \.self) { i in
+                let isPtr = (aRow == rowId && aIdx == i) || (bRow == rowId && bIdx == i)
                 tile(width: 28, height: 28,
-                     bg: i == ptr ? .yellow : (i >= intersect ? .green.opacity(0.55) : color.opacity(0.45)),
-                     fg: i == ptr ? .black : .white) { Text("\(arr[i])") }
+                     bg: isPtr ? .yellow : (i >= intersect ? .green.opacity(0.55) : color.opacity(0.45)),
+                     fg: isPtr ? .black : .white) { Text("\(arr[i])") }
             }
         }
     }
+
+    /// 表示位置 (row, idx) と、ノード同一判定用ID をまとめた1ステップ
+    private struct Step { let row: Int; let idx: Int; let id: String }
+
+    /// A行の各ノードID (前半=A固有, 後半=共有S)
+    private var aRowIDs: [String] {
+        (0..<a.count).map { "A\($0)" } + (0..<shared.count).map { "S\($0)" }
+    }
+    private var bRowIDs: [String] {
+        (0..<b.count).map { "B\($0)" } + (0..<shared.count).map { "S\($0)" }
+    }
+    /// ポインタAの旅: A行を最後まで → B行の先頭へジャンプ
+    private var journeyA: [Step] {
+        aRowIDs.enumerated().map { Step(row: 0, idx: $0.offset, id: $0.element) }
+        + bRowIDs.enumerated().map { Step(row: 1, idx: $0.offset, id: $0.element) }
+    }
+    /// ポインタBの旅: B行を最後まで → A行の先頭へジャンプ
+    private var journeyB: [Step] {
+        bRowIDs.enumerated().map { Step(row: 1, idx: $0.offset, id: $0.element) }
+        + aRowIDs.enumerated().map { Step(row: 0, idx: $0.offset, id: $0.element) }
+    }
+
     private func play() {
         token += 1; let t = token
-        pA = 0; pB = 0; hit = nil
-        let aFull = a + shared
-        let bFull = b + shared
-        var i = 0, j = 0
-        var loop = aFull[i]
-        var loop2 = bFull[j]
-        var done = false
-        var k = 0
-        while !done && k < 12 {
-            let curA = i, curB = j
+        hit = nil
+        let jA = journeyA, jB = journeyB
+        let n = min(jA.count, jB.count)
+        aRow = 0; aIdx = 0; bRow = 1; bIdx = 0
+
+        // 同一ノード (同じID) に同時に到達したステップ = 交点
+        var meetK: Int? = nil
+        for k in 0..<n where jA[k].id == jB[k].id { meetK = k; break }
+        let last = meetK ?? (n - 1)
+
+        for k in 0...last {
+            let sA = jA[k], sB = jB[k]
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.7) {
                 guard t == token else { return }
-                withAnimation { pA = curA; pB = curB }
-            }
-            if loop == loop2 { done = true; let foundVal = loop
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k + 1) * 0.7) {
-                    guard t == token else { return }
-                    withAnimation { hit = foundVal }
+                withAnimation { aRow = sA.row; aIdx = sA.idx; bRow = sB.row; bIdx = sB.idx }
+                if k == last, let mk = meetK {
+                    // 交点ノードのID "S<offset>" から共有配列の値を引く → 8
+                    let off = Int(jA[mk].id.dropFirst()) ?? 0
+                    if shared.indices.contains(off) {
+                        withAnimation { hit = shared[off] }
+                    }
                 }
-                break
             }
-            i = (i + 1) % aFull.count
-            j = (j + 1) % bFull.count
-            // 単純化のため: 末尾を超えたら他方の先頭に飛ぶ風
-            if i < aFull.count { loop = aFull[i] }
-            if j < bFull.count { loop2 = bFull[j] }
-            k += 1
         }
     }
 }

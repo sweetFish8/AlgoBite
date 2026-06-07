@@ -28,9 +28,13 @@ final class GameViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
 
+    /// 今日のひと口が穴埋めのとき、その問題本体。
+    /// todayChallenge と同じインデックスから導出するので、ホームのプレビューと
+    /// 開いた先の問題・アニメ・答えが必ず一致する。
+    /// (並べ替えの日はこの問題画面は表示されないが、安全にフォールバックを返す)
     var todayProblem: PuzzleProblem {
-        let day = Calendar.current.ordinality(of: .day, in: .era, for: Date()) ?? 0
-        return problems[day % problems.count]
+        if case .puzzle(let p) = todayChallenge { return p }
+        return problems[0]
     }
 
     /// 穴埋めと並べ替えを混ぜた「今日の一問」プール。
