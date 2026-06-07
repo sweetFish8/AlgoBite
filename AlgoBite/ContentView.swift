@@ -202,7 +202,7 @@ struct ContentView: View {
     private var todayPreviewCard: some View {
         let ch = vm.todayChallenge
         return PopCard(fill: Pop.surface,
-                       border: Color(red: 0.99, green: 0.79, blue: 0.79)) {
+                       border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 12) {
                     ZStack {
@@ -239,16 +239,12 @@ struct ContentView: View {
                 HStack(spacing: 6) {
                     // クイズの形式バッジ (穴埋め / 並べ替え)
                     popBadge(ch.kindLabel == "穴埋め" ? "✏️ 穴埋め" : "🔀 並べ替え",
-                             bg: ch.kindLabel == "穴埋め"
-                                 ? Color(red: 0.87, green: 0.84, blue: 0.99)
-                                 : Color(red: 1.00, green: 0.95, blue: 0.74),
-                             fg: ch.kindLabel == "穴埋め"
-                                 ? Color(red: 0.30, green: 0.18, blue: 0.50)
-                                 : Color(red: 0.57, green: 0.25, blue: 0.05))
+                             bg: Color(red: 0.87, green: 0.84, blue: 0.99),
+                             fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                     let topic = ch.topic.components(separatedBy: " / ").first ?? ch.topic
                     popBadge("📌 \(topic)",
-                             bg: Color(red: 1.00, green: 0.95, blue: 0.74),
-                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))
+                             bg: Color(red: 0.87, green: 0.84, blue: 0.99),
+                             fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                     let d = ch.difficulty
                     let (db, df): (Color, Color) = {
                         switch d {
@@ -334,8 +330,8 @@ struct ContentView: View {
                     }
                     Spacer()
                     popBadge("全 \(vm.problems.count) 問",
-                             bg: Color(red: 1.00, green: 0.95, blue: 0.74),
-                             fg: Color(red: 0.57, green: 0.25, blue: 0.05))
+                             bg: Color(red: 0.87, green: 0.84, blue: 0.99),
+                             fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                 }
                 PopButton(fill: Pop.accent,
                           shadow: Pop.accentShadow,
@@ -396,8 +392,7 @@ struct ContentView: View {
             .background(Pop.surface,
                         in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(red: 0.99, green: 0.79, blue: 0.45).opacity(0.5),
-                        lineWidth: 1.2))
+                .stroke(Pop.borderDefault, lineWidth: 1.2))
         }
         .buttonStyle(.plain)
     }
@@ -563,7 +558,7 @@ struct ContentView: View {
     // MARK: Problem card
     private var problemCard: some View {
         PopCard(fill: Pop.surface,
-                border: Color(red: 0.78, green: 0.82, blue: 0.99)) {      // #C7D2FE
+                border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(vm.todayProblem.title)
@@ -591,7 +586,7 @@ struct ContentView: View {
                     .foregroundStyle(Pop.inkSub)
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(red: 0.96, green: 0.97, blue: 1.00),   // #F5F7FF
+                    .background(Pop.surfaceLavender,
                                 in: RoundedRectangle(cornerRadius: 10))
             }
         }
@@ -663,26 +658,26 @@ struct ContentView: View {
 
     private func slotBg(_ active: Bool, _ s: SlotCheckState) -> Color {
         switch s {
-        case .correct: Color(red: 0.73, green: 0.97, blue: 0.82)   // #BBF7D0
-        case .wrong:   Color(red: 1.00, green: 0.78, blue: 0.78)   // #FECACA
+        case .correct: Pop.correctBg
+        case .wrong:   Pop.wrongBg
         case .idle:    active
-                            ? Color(red: 1.00, green: 0.94, blue: 0.54)   // #FEF08A
+                            ? Color(red: 1.00, green: 0.94, blue: 0.54)
                             : Color.white.opacity(0.08)
         }
     }
     private func slotBorder(_ active: Bool, _ s: SlotCheckState) -> Color {
         switch s {
-        case .correct: Color(red: 0.13, green: 0.77, blue: 0.37)   // #22C55E
+        case .correct: Pop.correctBorder
         case .wrong:   Pop.danger
         case .idle:    active
-                            ? Color(red: 0.92, green: 0.70, blue: 0.03)
+                            ? Pop.accentShadow
                             : Color.white.opacity(0.30)
         }
     }
     private func slotFg(_ s: SlotCheckState) -> Color {
         switch s {
-        case .correct: Color(red: 0.08, green: 0.32, blue: 0.18)   // dark green
-        case .wrong:   Color(red: 0.50, green: 0.11, blue: 0.11)
+        case .correct: Pop.correctFg
+        case .wrong:   Pop.wrongFg
         case .idle:    Color(red: 0.86, green: 0.89, blue: 0.97)
         }
     }
@@ -692,7 +687,7 @@ struct ContentView: View {
     // という関係を UI 構造そのもので示す
     private var answersPanel: some View {
         PopCard(fill: Pop.surface,
-                border: Color(red: 0.87, green: 0.84, blue: 0.99)) {      // #DDD6FE
+                border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 12) {
                 // スロット選択中だけヘッダ + 選択肢の chip 列を出す
                 if let s = vm.selectedSlot {
@@ -720,8 +715,8 @@ struct ContentView: View {
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) { vm.resetCurrent() }
                     smallBtn("⤼ スキップ",
-                             fill: Color(red: 0.78, green: 0.72, blue: 0.98),
-                             shadow: Color(red: 0.55, green: 0.49, blue: 0.92)) {
+                             fill: Color(red: 0.61, green: 0.64, blue: 0.71),
+                             shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) {
                         vm.skipToday()
                         path.removeLast()
                     }
@@ -759,14 +754,11 @@ struct ContentView: View {
     }
 
     private func choiceChip(_ c: String, index: Int) -> some View {
-        // パステル6色を循環
+        // 3色を循環 (グリーン・ブルー・ラベンダー)
         let palette: [(Color, Color)] = [
-            (Color(red: 0.65, green: 0.95, blue: 0.82), Color(red: 0.02, green: 0.37, blue: 0.27)),
-            (Color(red: 0.98, green: 0.81, blue: 0.91), Color(red: 0.62, green: 0.09, blue: 0.30)),
+            (Pop.correctBg,                              Pop.correctFg),
             (Color(red: 0.75, green: 0.86, blue: 1.00), Color(red: 0.12, green: 0.23, blue: 0.54)),
-            (Color(red: 1.00, green: 0.84, blue: 0.84), Color(red: 0.50, green: 0.11, blue: 0.11)),
-            (Color(red: 0.73, green: 0.97, blue: 0.82), Color(red: 0.08, green: 0.32, blue: 0.18)),
-            (Color(red: 0.87, green: 0.84, blue: 0.99), Color(red: 0.30, green: 0.11, blue: 0.58)),
+            (Color(red: 0.87, green: 0.84, blue: 0.99), Color(red: 0.30, green: 0.18, blue: 0.50)),
         ]
         let (bg, fg) = palette[index % palette.count]
         return Button { 
@@ -831,7 +823,7 @@ struct ContentView: View {
                 }
                 Text("✨ \(vm.attemptCount) 回でクリア ✨")
                     .font(.caption.weight(.heavy))
-                    .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                    .foregroundStyle(Pop.correctFg)
 
                 PopButton(fill: Color(red: 0.39, green: 0.40, blue: 0.95),        // #6366F1
                           shadow: Color(red: 0.30, green: 0.30, blue: 0.78),

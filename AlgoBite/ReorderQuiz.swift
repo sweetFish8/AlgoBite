@@ -254,14 +254,14 @@ struct ReorderQuizView: View {
         let isLCS  = inGrading && model.gradedMask[position]
         let isMiss = inGrading && !model.gradedMask[position]
 
-        let bg: Color = isLCS  ? Color(red: 0.73, green: 0.97, blue: 0.82)
-                      : isMiss ? Color(red: 1.00, green: 0.78, blue: 0.78)
+        let bg: Color = isLCS  ? Pop.correctBg
+                      : isMiss ? Pop.wrongBg
                       : Color.white
-        let border: Color = isLCS  ? Color(red: 0.13, green: 0.77, blue: 0.37)
+        let border: Color = isLCS  ? Pop.correctBorder
                           : isMiss ? Pop.danger
-                          : Color(red: 0.87, green: 0.84, blue: 0.99)
-        let fg: Color = isLCS  ? Color(red: 0.08, green: 0.32, blue: 0.18)
-                      : isMiss ? Color(red: 0.50, green: 0.11, blue: 0.11)
+                          : Pop.borderDefault
+        let fg: Color = isLCS  ? Pop.correctFg
+                      : isMiss ? Pop.wrongFg
                       : Pop.ink
 
         return Button {
@@ -275,7 +275,7 @@ struct ReorderQuizView: View {
                 .background(bg, in: RoundedRectangle(cornerRadius: 12))
                 .overlay(RoundedRectangle(cornerRadius: 12)
                     .stroke(border, lineWidth: 2))
-                .shadow(color: isLCS ? Color(red: 0.13, green: 0.77, blue: 0.37).opacity(0.3) : Color.black.opacity(0.1), radius: isLCS ? 8 : 4, y: 3)
+                .shadow(color: isLCS ? Pop.correctBorder.opacity(0.3) : Color.black.opacity(0.1), radius: isLCS ? 8 : 4, y: 3)
                 .foregroundStyle(fg)
         }
         .buttonStyle(.plain)
@@ -286,7 +286,7 @@ struct ReorderQuizView: View {
 
     private var poolArea: some View {
         PopCard(fill: Pop.surface,
-                border: Color(red: 0.99, green: 0.90, blue: 0.52)) {
+                border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 10) {
                 Text("候補")
                     .font(.caption.weight(.heavy))
@@ -301,21 +301,20 @@ struct ReorderQuizView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 56), spacing: 8)],
                               spacing: 8) {
                         ForEach(Array(remaining.enumerated()), id: \.offset) { _, v in
-                            Button { 
+                            Button {
                                 withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
-                                    model.pick(v) 
+                                    model.pick(v)
                                 }
                             } label: {
                                 Text(v)
                                     .font(.system(size: 20, weight: .black, design: .rounded))
                                     .frame(minWidth: 50, minHeight: 50)
-                                    .background(Color(red: 1.00, green: 0.95, blue: 0.78),
+                                    .background(Color(red: 0.87, green: 0.84, blue: 0.99),
                                                 in: RoundedRectangle(cornerRadius: 12))
                                     .overlay(RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(red: 0.99, green: 0.79, blue: 0.18),
-                                                lineWidth: 2))
-                                    .shadow(color: Color(red: 0.99, green: 0.79, blue: 0.18).opacity(0.4), radius: 4, y: 3)
-                                    .foregroundStyle(Pop.inkWarm)
+                                        .stroke(Pop.borderDefault, lineWidth: 2))
+                                    .shadow(color: Pop.borderDefault.opacity(0.4), radius: 4, y: 3)
+                                    .foregroundStyle(Color(red: 0.30, green: 0.18, blue: 0.50))
                             }
                             .buttonStyle(.plain)
                             .disabled(model.isGrading)
@@ -329,15 +328,14 @@ struct ReorderQuizView: View {
     private var actionRow: some View {
         HStack(spacing: 10) {
             if !model.isCompleted {
-                PopButton(fill: Color(red: 0.99, green: 0.90, blue: 0.52),
-                          shadow: Color(red: 0.92, green: 0.70, blue: 0.03),
+                PopButton(fill: Color(red: 0.61, green: 0.64, blue: 0.71),
+                          shadow: Color(red: 0.41, green: 0.45, blue: 0.50),
                           action: { model.reset() }) {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.counterclockwise")
                         Text("リセット")
                             .font(.subheadline.weight(.heavy))
                     }
-                    .foregroundStyle(Pop.inkWarm)
                 }
                 .disabled(model.picks.isEmpty || model.isGrading)
                 .opacity((model.picks.isEmpty || model.isGrading) ? 0.5 : 1)

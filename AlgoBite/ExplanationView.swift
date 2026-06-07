@@ -13,7 +13,7 @@ struct ExplanationView: View {
 
     var body: some View {
         PopCard(fill: Pop.surface,
-                border: Color(red: 0.99, green: 0.90, blue: 0.52)) {        // #FDE68A
+                border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     HStack(spacing: 6) {
@@ -123,18 +123,18 @@ struct ExplanationView: View {
         let label = revealed ? answer : "___"
 
         let bg: Color
-        if highlight { bg = Color(red: 1.00, green: 0.94, blue: 0.54) }            // #FEF08A
-        else if revealed { bg = Color(red: 0.73, green: 0.97, blue: 0.82) }        // #BBF7D0
+        if highlight { bg = Color(red: 1.00, green: 0.94, blue: 0.54) }
+        else if revealed { bg = Pop.correctBg }
         else { bg = Color.white.opacity(0.10) }
 
         let stroke: Color
-        if highlight { stroke = Color(red: 0.92, green: 0.70, blue: 0.03) }
-        else if revealed { stroke = Color(red: 0.13, green: 0.77, blue: 0.37) }
+        if highlight { stroke = Pop.accentShadow }
+        else if revealed { stroke = Pop.correctBorder }
         else { stroke = Color.white.opacity(0.30) }
 
         let fg: Color
-        if highlight { fg = Color(red: 0.44, green: 0.25, blue: 0.07) }            // #713F12
-        else if revealed { fg = Color(red: 0.08, green: 0.32, blue: 0.18) }
+        if highlight { fg = Color(red: 0.44, green: 0.25, blue: 0.07) }
+        else if revealed { fg = Pop.correctFg }
         else { fg = Color(red: 0.86, green: 0.89, blue: 0.97) }
 
         return Text(label)

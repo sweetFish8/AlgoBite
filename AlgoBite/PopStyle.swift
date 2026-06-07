@@ -44,6 +44,17 @@ enum Pop {
     static let dangerShadow  = Color(red: 0.72, green: 0.11, blue: 0.11)  // #B91C1C
     static let navTint       = Color(red: 0.39, green: 0.40, blue: 0.95)  // #6366F1
 
+    // 枠線 (カードのデフォルト枠)
+    static let borderDefault = Color(red: 0.93, green: 0.91, blue: 0.97)   // lavender #EDE9F7
+    static let borderWarm    = Color(red: 0.99, green: 0.73, blue: 0.45)   // #FDBA74
+
+    // スロット / 選択肢の状態色
+    static let correctBg     = Color(red: 0.73, green: 0.97, blue: 0.82)   // #BBF7D0
+    static let correctFg     = Color(red: 0.08, green: 0.32, blue: 0.18)   // dark green
+    static let correctBorder = Color(red: 0.13, green: 0.77, blue: 0.37)   // #22C55E
+    static let wrongBg       = Color(red: 1.00, green: 0.78, blue: 0.78)   // #FECACA
+    static let wrongFg       = Color(red: 0.50, green: 0.11, blue: 0.11)   // dark red
+
     // テキスト
     static let ink = Color.dyn(
         light: Color(red: 0.17, green: 0.18, blue: 0.20),
