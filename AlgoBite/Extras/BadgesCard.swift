@@ -37,6 +37,8 @@ struct BadgesCard: View {
         }
         .sheet(isPresented: $showDetails) {
             BadgeDetailSheet(badges: badges)
+                .presentationDetents([.large])
+                .frame(maxWidth: 640)
         }
     }
 
@@ -107,6 +109,8 @@ struct BadgeDetailSheet: View {
                     }
                 }
                 .padding(16)
+                .frame(maxWidth: 560)
+                .frame(maxWidth: .infinity)
             }
             .background(LinearGradient(colors: [Pop.bgNeutralTop, Pop.bgNeutralBottom],
                                        startPoint: .topLeading, endPoint: .bottomTrailing)

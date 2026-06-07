@@ -125,7 +125,10 @@ struct ContentView: View {
         ZStack {
             screenBackground(vm.isCompletedToday ? .success : .neutral)
             VStack(spacing: 0) {
-                homeHeader.padding(.horizontal, 18)
+                homeHeader
+                    .padding(.horizontal, 18)
+                    .frame(maxWidth: 560)
+                    .frame(maxWidth: .infinity)
                 ScrollView {
                     VStack(spacing: 18) {
                         streakSection      // 最上段 — 連続記録を一番目立たせる
@@ -136,6 +139,8 @@ struct ContentView: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 6)
                     .padding(.bottom, 28)
+                    .frame(maxWidth: 560)
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -506,7 +511,10 @@ struct ContentView: View {
         ZStack {
             screenBackground(vm.resultMood)
             VStack(spacing: 0) {
-                headerBar.padding(.horizontal, 18)
+                headerBar
+                    .padding(.horizontal, 18)
+                    .frame(maxWidth: 560)
+                    .frame(maxWidth: .infinity)
                 ScrollView {
                     VStack(spacing: 14) {
                         problemCard
@@ -522,6 +530,8 @@ struct ContentView: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 10)
                     .padding(.bottom, 28)
+                    .frame(maxWidth: 560)
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
