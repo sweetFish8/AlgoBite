@@ -32,9 +32,12 @@ struct OnboardingView: View {
                             VStack(spacing: 10) {
                                 RollCakeStreak(streak: 7)
                                     .frame(width: 220, height: 90)
-                                Text("🔥 \(7) 日連続！")
-                                    .font(.title2.weight(.black))
-                                    .foregroundStyle(Pop.inkWarm)
+                                HStack(spacing: 6) {
+                                    Image(systemName: "flame.fill").foregroundStyle(.orange)
+                                    Text("\(7) 日連続！")
+                                }
+                                .font(.title2.weight(.black))
+                                .foregroundStyle(Pop.inkWarm)
                             }
                         ),
                         title: "ストリークを伸ばそう",
@@ -44,11 +47,9 @@ struct OnboardingView: View {
                         illustration: AnyView(
                             VStack(spacing: 8) {
                                 TrophyIcon(size: 80)
-                                HStack(spacing: 6) {
-                                    Text("🏆").font(.title)
-                                    Text("バッジ").font(.headline.weight(.heavy))
-                                        .foregroundStyle(Pop.ink)
-                                }
+                                Text("バッジ")
+                                    .font(.headline.weight(.heavy))
+                                    .foregroundStyle(Pop.ink)
                             }
                         ),
                         title: "実績を集めよう",

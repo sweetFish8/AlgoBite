@@ -383,10 +383,10 @@ struct ReorderQuizView: View {
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
-                    Text("🎉").font(.system(size: 28))
+                    Image(systemName: "party.popper.fill").font(.system(size: 26)).foregroundStyle(Pop.accent)
                     Text("クリア！")
                         .font(.title2.weight(.black))
-                        .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                        .foregroundStyle(Pop.correctFg)
                     Spacer()
                     Text("試行 \(model.attemptCount)回")
                         .font(.caption2.weight(.heavy))
@@ -399,7 +399,7 @@ struct ReorderQuizView: View {
                 // 解説アニメ — quiz topic に応じて自動選択
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
-                        Text("✨").font(.subheadline)
+                        Image(systemName: "sparkles").font(.subheadline).foregroundStyle(Pop.accent)
                         Text("動きで見る")
                             .font(.caption.weight(.black))
                             .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))

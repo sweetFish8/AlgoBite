@@ -216,7 +216,7 @@ struct ContentView: View {
                     }
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 4) {
-                            Text("🍽️").font(.caption)
+                            Image(systemName: "fork.knife").font(.caption)
                             Text("今日のひと口")
                                 .font(.caption.weight(.heavy))
                                 .foregroundStyle(Pop.inkWarmSub)
@@ -227,36 +227,37 @@ struct ContentView: View {
                     }
                     Spacer()
                     if vm.isCompletedToday {
-                        Text("✓ クリア")
-                            .font(.caption2.weight(.heavy))
-                            .padding(.horizontal, 10).padding(.vertical, 5)
-                            .background(Color(red: 0.73, green: 0.97, blue: 0.82),
-                                        in: Capsule())
-                            .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark").font(.caption2.weight(.black))
+                            Text("クリア")
+                        }
+                        .font(.caption2.weight(.heavy))
+                        .padding(.horizontal, 10).padding(.vertical, 5)
+                        .background(Pop.correctBg, in: Capsule())
+                        .foregroundStyle(Pop.correctFg)
                     }
                 }
 
                 HStack(spacing: 6) {
                     // クイズの形式バッジ (穴埋め / 並べ替え)
-                    popBadge(ch.kindLabel == "穴埋め" ? "✏️ 穴埋め" : "🔀 並べ替え",
-                             bg: Color(red: 0.87, green: 0.84, blue: 0.99),
-                             fg: Color(red: 0.30, green: 0.18, blue: 0.50))
+                    iconBadge(systemImage: ch.kindLabel == "穴埋め" ? "pencil" : "arrow.left.arrow.right",
+                              ch.kindLabel,
+                              bg: Color(red: 0.87, green: 0.84, blue: 0.99),
+                              fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                     let topic = ch.topic.components(separatedBy: " / ").first ?? ch.topic
-                    popBadge("📌 \(topic)",
-                             bg: Color(red: 0.87, green: 0.84, blue: 0.99),
-                             fg: Color(red: 0.30, green: 0.18, blue: 0.50))
+                    iconBadge(systemImage: "tag.fill", topic,
+                              bg: Color(red: 0.87, green: 0.84, blue: 0.99),
+                              fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                     let d = ch.difficulty
                     let (db, df): (Color, Color) = {
                         switch d {
-                        case "Easy":   return (Color(red: 0.73, green: 0.97, blue: 0.82),
-                                               Color(red: 0.08, green: 0.32, blue: 0.18))
-                        case "Hard":   return (Color(red: 1.00, green: 0.78, blue: 0.78),
-                                               Color(red: 0.50, green: 0.11, blue: 0.11))
+                        case "Easy":   return (Pop.correctBg, Pop.correctFg)
+                        case "Hard":   return (Pop.wrongBg, Pop.wrongFg)
                         default:       return (Color(red: 1.00, green: 0.93, blue: 0.72),
                                                Color(red: 0.57, green: 0.25, blue: 0.05))
                         }
                     }()
-                    popBadge("★ \(d)", bg: db, fg: df)
+                    iconBadge(systemImage: "star.fill", d, bg: db, fg: df)
                 }
 
                 HStack(alignment: .top, spacing: 12) {
@@ -292,8 +293,8 @@ struct ContentView: View {
                     }
                   }) {
             HStack(spacing: 8) {
-                Image(systemName: "play.fill")
-                Text(vm.isCompletedToday ? "🍽️ 結果と解説を見る！" : "🍽️ いただきます！")
+                Image(systemName: "fork.knife")
+                Text(vm.isCompletedToday ? "結果と解説を見る！" : "いただきます！")
                     .font(.title3.weight(.black))
             }
         }
@@ -432,7 +433,7 @@ struct ContentView: View {
                 // 10 日を超えたら「+N 日」を金色プレートで表示
                 if vm.streak > 10 {
                     HStack(spacing: 6) {
-                        Text("⭐️")
+                        Image(systemName: "star.fill").foregroundStyle(.yellow)
                         Text("さらに +\(vm.streak - 10) 日積み上げ中！")
                             .font(.caption.weight(.black))
                             .foregroundStyle(Pop.inkWarm)
@@ -475,6 +476,17 @@ struct ContentView: View {
             .foregroundStyle(fg)
     }
 
+    private func iconBadge(systemImage: String, _ text: String, bg: Color, fg: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage).font(.caption2.weight(.black))
+            Text(text)
+        }
+        .font(.caption.weight(.heavy))
+        .padding(.horizontal, 10).padding(.vertical, 5)
+        .background(bg, in: Capsule())
+        .foregroundStyle(fg)
+    }
+
     // MARK: Problem screen
     private var problemScreen: some View {
         ZStack {
@@ -497,7 +509,7 @@ struct ContentView: View {
                                       shadow: Color(red: 0.08, green: 0.55, blue: 0.26),
                                       action: { withAnimation { path = [] } }) {
                                 HStack(spacing: 8) {
-                                    Text("🍽️")
+                                    Image(systemName: "fork.knife")
                                     Text("ごちそうさまでした！")
                                         .font(.headline.weight(.black))
                                 }
@@ -537,14 +549,14 @@ struct ContentView: View {
     private var headerBar: some View {
         HStack {
             HStack(spacing: 4) {
-                Text("🍪")
+                CookieIcon(size: 20)
                 Text("AlgoBite")
                     .font(.system(size: 20, weight: .black, design: .rounded))
                     .foregroundStyle(Pop.inkWarm)
             }
             Spacer()
             HStack(spacing: 4) {
-                Text("🔥").font(.title3)
+                Image(systemName: "flame.fill").font(.title3).foregroundStyle(.orange)
                 Text("\(vm.streak)")
                     .font(.system(size: 24, weight: .black, design: .rounded))
                     .foregroundStyle(Pop.inkWarmSub)
@@ -710,11 +722,12 @@ struct ContentView: View {
                 }
 
                 HStack(spacing: 10) {
-                    smallBtn("💡 ヒント", fill: Pop.accent, shadow: Pop.accentShadow) { vm.revealHint() }
-                    smallBtn("↻ リセット",
+                    smallBtn("ヒント", systemImage: "lightbulb.fill",
+                             fill: Pop.accent, shadow: Pop.accentShadow) { vm.revealHint() }
+                    smallBtn("リセット", systemImage: "arrow.counterclockwise",
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) { vm.resetCurrent() }
-                    smallBtn("⤼ スキップ",
+                    smallBtn("スキップ", systemImage: "forward.end.fill",
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) {
                         vm.skipToday()
@@ -778,11 +791,16 @@ struct ContentView: View {
     }
 
     private func smallBtn(_ t: String,
+                          systemImage: String,
                           fill: Color,
                           shadow: Color,
                           action: @escaping () -> Void) -> some View {
         PopButton(fill: fill, shadow: shadow, radius: 12, action: action) {
-            Text(t).font(.subheadline.weight(.heavy))
+            HStack(spacing: 5) {
+                Image(systemName: systemImage)
+                Text(t)
+            }
+            .font(.subheadline.weight(.heavy))
         }
     }
 
@@ -791,16 +809,16 @@ struct ContentView: View {
         PopCard(fill: Pop.surfaceMint,                                           // #DCFCE7
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {            // #22C55E
             VStack(spacing: 20) {
-                HStack(spacing: 6) {
-                    Text("🎉").font(.system(size: 40))
+                HStack(spacing: 10) {
+                    Image(systemName: "party.popper.fill").font(.system(size: 36)).foregroundStyle(Pop.accent)
                     Text("クリア！")
                         .font(.system(size: 30, weight: .black, design: .rounded))
-                        .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
-                    Text("🎊").font(.system(size: 40))
+                        .foregroundStyle(Pop.correctFg)
+                    Image(systemName: "sparkles").font(.system(size: 32)).foregroundStyle(Pop.accent)
                 }
 
                 HStack(spacing: 14) {
-                    Text("🔥").font(.system(size: 36))
+                    Image(systemName: "flame.fill").font(.system(size: 36)).foregroundStyle(.orange)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             Text("\(vm.streak)")
@@ -817,11 +835,12 @@ struct ContentView: View {
 
                 HStack(spacing: 8) {
                     ForEach(vm.todayProblem.orderedSlotIDs, id: \.self) { id in
-                        Text(vm.slotResults[id] == true ? "🟢" : "🔴")
-                            .font(.system(size: 30))
+                        Image(systemName: vm.slotResults[id] == true ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(vm.slotResults[id] == true ? Pop.correctBorder : Pop.danger)
                     }
                 }
-                Text("✨ \(vm.attemptCount) 回でクリア ✨")
+                Text("\(vm.attemptCount) 回でクリア")
                     .font(.caption.weight(.heavy))
                     .foregroundStyle(Pop.correctFg)
 

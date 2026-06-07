@@ -17,7 +17,7 @@ struct ExplanationView: View {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     HStack(spacing: 6) {
-                        Text("✨").font(.title3)
+                        Image(systemName: "sparkles").font(.title3).foregroundStyle(Pop.accent)
                         Text("解説アニメーション")
                             .font(.subheadline.weight(.black))
                             .foregroundStyle(Pop.inkWarmSub)
@@ -61,7 +61,7 @@ struct ExplanationView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 6) {
-                        Text("💡").font(.title3)
+                        Image(systemName: "lightbulb.fill").font(.title3).foregroundStyle(Pop.accent)
                         Text("ポイント")
                             .font(.subheadline.weight(.black))
                             .foregroundStyle(Pop.inkWarm)

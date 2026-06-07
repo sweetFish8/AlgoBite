@@ -159,7 +159,7 @@ struct SettingsView: View {
         }
         .overlay(alignment: .top) {
             if resetDone {
-                Text("✓ リセットしたよ")
+                Label("リセットしたよ", systemImage: "checkmark")
                     .font(.caption.weight(.heavy))
                     .padding(.horizontal, 14).padding(.vertical, 8)
                     .background(Pop.surface, in: Capsule())

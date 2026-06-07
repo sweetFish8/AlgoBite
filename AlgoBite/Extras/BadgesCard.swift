@@ -12,7 +12,7 @@ struct BadgesCard: View {
                 border: Color(red: 0.99, green: 0.79, blue: 0.18)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 6) {
-                    Text("🏆").font(.title3)
+                    TrophyIcon(size: 22)
                     Text("バッジコレクション")
                         .font(.subheadline.weight(.black))
                         .foregroundStyle(Pop.inkWarm)
@@ -148,17 +148,21 @@ struct BadgeUnlockOverlay: View {
                 .allowsHitTesting(false)
 
             VStack(spacing: 14) {
-                Text("🎉 バッジ解放！")
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(Pop.inkWarm)
+                HStack(spacing: 5) {
+                    Image(systemName: "party.popper.fill")
+                    Text("バッジ解放！")
+                }
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Pop.inkWarm)
 
                 // 中央 emoji + 周囲スパークル
                 ZStack {
                     // 周囲を回るキラキラ (4 個)
                     ForEach(0..<4) { i in
                         let baseAngle = Double(i) * 90.0
-                        Text("✨")
-                            .font(.system(size: 22))
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(Pop.accent)
                             .offset(y: -56)
                             .rotationEffect(.degrees(baseAngle + sparkleAngle))
                             .opacity(burst ? 0.9 : 0.0)

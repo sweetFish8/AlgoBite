@@ -185,7 +185,7 @@ final class GameViewModel: ObservableObject {
                 answers[id] = answer
                 slotStates = [:]
                 activeSlotID = nextEmptySlot(after: id)
-                logMessage = "💡 ヒント2/2: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
+                logMessage = "ヒント2/2: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
             }
             hintLevel = .fillOne
             Haptics.medium()
@@ -197,9 +197,9 @@ final class GameViewModel: ObservableObject {
 
     var hintLabel: String {
         switch hintLevel {
-        case .none:    return "💡 ヒント (1/2)"
-        case .gentle:  return "💡 もう少し (2/2)"
-        case .fillOne: return "💡 ヒント済"
+        case .none:    return "ヒント (1/2)"
+        case .gentle:  return "もう少し (2/2)"
+        case .fillOne: return "ヒント済"
         }
     }
 

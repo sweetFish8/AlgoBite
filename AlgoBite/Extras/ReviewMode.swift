@@ -371,14 +371,14 @@ struct PracticeView: View {
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
             VStack(spacing: 14) {
                 HStack(spacing: 6) {
-                    Text("🎉").font(.system(size: 36))
+                    Image(systemName: "party.popper.fill").font(.system(size: 32)).foregroundStyle(Pop.accent)
                     Text("復習クリア！")
                         .font(.title2.weight(.black))
-                        .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                        .foregroundStyle(Pop.correctFg)
                 }
-                Text("✨ \(session.attemptCount) 回でクリア ✨")
+                Text("\(session.attemptCount) 回でクリア")
                     .font(.caption.weight(.heavy))
-                    .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                    .foregroundStyle(Pop.correctFg)
                 if !session.problem.explanation.isEmpty {
                     Text(session.problem.explanation)
                         .font(.footnote.weight(.medium))
