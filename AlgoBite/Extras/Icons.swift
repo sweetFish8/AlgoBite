@@ -568,6 +568,8 @@ struct DarkBerryIcon: View {
 struct RollCakeStreak: View {
     let streak: Int
     var maxDays: Int = 10
+    /// true のとき初回表示で「最後の1個が上から落ちて乗る」演出を再生する
+    var animateNewBerry: Bool = false
 
     private var visibleBerries: Int { min(max(streak, 0), maxDays) }
 
@@ -601,8 +603,18 @@ struct RollCakeStreak: View {
         // ケーキ本体の伸びは spring で全体に効かせる
         .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
         .onAppear {
-            // 初回表示は遅延無しで即時セット
-            revealedBerries = visibleBerries
+            if animateNewBerry && visibleBerries > 0 {
+                // クリア直後：最後の1個を抜いた状態から始めて、ぽとっと落として乗せる
+                revealedBerries = visibleBerries - 1
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.5)) {
+                        revealedBerries = visibleBerries
+                    }
+                }
+            } else {
+                // 通常表示は遅延無しで即時セット
+                revealedBerries = visibleBerries
+            }
         }
         .onChange(of: streak) { _, _ in
             // ケーキが伸び切る ~0.35s 待ってから、新しい苺をぽとっと落とす

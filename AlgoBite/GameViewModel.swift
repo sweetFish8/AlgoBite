@@ -16,6 +16,8 @@ final class GameViewModel: ObservableObject {
     @Published private(set) var slotResults: [String: Bool] = [:]
     @Published var hintLevel: HintLevel = .none
     @Published var gentleHintText: String?
+    /// 今この瞬間にクリアした合図 (ホームのケーキにイチゴが載るアニメ用)
+    @Published var justClearedToday = false
     /// 直前に不正解だったスロット (赤波線で表示し続ける)
     @Published var lastWrongIDs: Set<String> = []
 
@@ -133,6 +135,7 @@ final class GameViewModel: ObservableObject {
         gentleHintText = nil
         lastWrongIDs = []
         attemptCount = 0
+        justClearedToday = false
         logMessage = ""
     }
 
@@ -242,6 +245,7 @@ final class GameViewModel: ObservableObject {
             defaults.set(answers, forKey: "algobite.todayAnswers.\(today)")
             defaults.set(results, forKey: "algobite.todayResults.\(today)")
             logMessage = "PASS 🎉 今日のパズルクリア！"
+            justClearedToday = true
             Haptics.success()
             stats.recordPuzzleClear(topic: todayProblem.topic)
             badges.evaluate(stats: stats, streak: streak)
@@ -297,6 +301,7 @@ final class GameViewModel: ObservableObject {
         defaults.set(today, forKey: "algobite.lastSolvedDate")
         defaults.set(streak, forKey: "algobite.streak")
         logMessage = "PASS 🎉 今日のひと口クリア！"
+        justClearedToday = true
         Haptics.success()
         // 並べ替えのクリア記録は ReorderQuizViewModel.submit で既に行われている
         badges.evaluate(stats: stats, streak: streak)

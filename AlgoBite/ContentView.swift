@@ -147,6 +147,14 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            // ケーキ演出が再生し終わったらフラグを下ろす (再訪時に再生しない)
+            if vm.justClearedToday {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    vm.justClearedToday = false
+                }
+            }
+        }
     }
 
     private var homeHeader: some View {
@@ -422,7 +430,7 @@ struct ContentView: View {
 
                 // ロールケーキが伸びていって、上に苺が乗っていく演出
                 ScrollView(.horizontal, showsIndicators: false) {
-                    RollCakeStreak(streak: vm.streak)
+                    RollCakeStreak(streak: vm.streak, animateNewBerry: vm.justClearedToday)
                         .padding(.horizontal, 4)
                 }
                 .frame(height: 92)
@@ -489,6 +497,16 @@ struct ContentView: View {
                             completionCard
                             ExplanationView(problem: vm.todayProblem,
                                             segments: vm.segments(for:))
+                            // 解説の下：ホームに戻ってケーキ演出を見せる
+                            PopButton(fill: Color(red: 0.13, green: 0.77, blue: 0.37),
+                                      shadow: Color(red: 0.08, green: 0.55, blue: 0.26),
+                                      action: { withAnimation { path = [] } }) {
+                                HStack(spacing: 8) {
+                                    Text("🍽️")
+                                    Text("ごちそうさまでした！")
+                                        .font(.headline.weight(.black))
+                                }
+                            }
                         } else {
                             answersPanel
                         }
