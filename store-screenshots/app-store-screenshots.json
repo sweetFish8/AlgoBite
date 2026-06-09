@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "appName": "AlgoBite",
+  "themeId": "warm-editorial",
+  "connectedCanvas": false,
+  "locales": [
+    "ja"
+  ],
+  "locale": "ja",
+  "device": "iphone",
+  "orientation": "portrait",
+  "appIcon": "/app-icon.png",
+  "slidesByDevice": {
+    "iphone": [
+      {
+        "id": "algobite-home",
+        "layout": "hero",
+        "label": {
+          "ja": "毎日ひと口"
+        },
+        "headline": {
+          "ja": "アルゴリズムが\n続く習慣に。"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/01-home.png"
+      },
+      {
+        "id": "algobite-problem",
+        "layout": "device-bottom",
+        "label": {
+          "ja": "コードパズル"
+        },
+        "headline": {
+          "ja": "選んで埋めて\n考え方が身につく"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/02-problem.png"
+      },
+      {
+        "id": "algobite-correct",
+        "layout": "device-top",
+        "label": {
+          "ja": "得意分野バッジ"
+        },
+        "headline": {
+          "ja": "続けた成果が\nバッジになる"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/03-problem-correct.png",
+        "inverted": true
+      },
+      {
+        "id": "algobite-achievements",
+        "layout": "hero",
+        "label": {
+          "ja": "成長を実感"
+        },
+        "headline": {
+          "ja": "ストリークも\n得意分野も見える"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/04-achievements.png"
+      },
+      {
+        "id": "algobite-reorder",
+        "layout": "device-bottom",
+        "label": {
+          "ja": "並べ替えクイズ"
+        },
+        "headline": {
+          "ja": "処理の順番を\n手で動かして学ぶ"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/05-reorder-list.png",
+        "inverted": true
+      },
+      {
+        "id": "algobite-review",
+        "layout": "hero",
+        "label": {
+          "ja": "復習モード"
+        },
+        "headline": {
+          "ja": "103問をいつでも\n好きなだけ"
+        },
+        "screenshot": "/screenshots/apple/iphone/ja/06-review.png"
+      }
+    ],
+    "android": [],
+    "ipad": [],
+    "android-7": [],
+    "android-10": [],
+    "feature-graphic": []
+  }
+}
