@@ -2,3 +2,8 @@
 xcuserdata/
 *.xcuserstate
 DerivedData/
+.build/
+store-screenshots/exports/
+store-screenshots/node_modules/
+store-screenshots/.next/
+リリーススケジュール.md
