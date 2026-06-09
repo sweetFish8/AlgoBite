@@ -127,7 +127,7 @@ struct RomanToIntAnim: View {
 // MARK: - KMP Failure Function
 
 struct KMPFailureAnim: View {
-    let pat: String = "ababaca"
+    let pat: String = "AAACAAAA"
     @State private var fail: [Int] = []
     @State private var idx = -1
     @State private var token = 0
@@ -248,8 +248,8 @@ struct LongestPalindromeAnim: View {
 // MARK: - Anagram Check (char count buckets)
 
 struct AnagramCheckAnim: View {
-    let s = "listen"
-    let p = "silent"
+    let s = "anagram"
+    let p = "nagaram"
     @State private var idx = -1
     @State private var counts: [Character: Int] = [:]
     @State private var phase = 0   // 0=adding s, 1=subtracting p, 2=done
@@ -374,7 +374,7 @@ struct LongestSubstringAnim: View {
 // MARK: - Longest Valid Parens (stack of indices)
 
 struct LongestValidParensAnim: View {
-    let s: String = "(()())(("
+    let s: String = ")()())"
     @State private var idx = -1
     @State private var stack: [Int] = [-1]
     @State private var bestLen = 0

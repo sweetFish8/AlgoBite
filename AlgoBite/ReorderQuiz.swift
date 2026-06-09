@@ -122,7 +122,7 @@ final class ReorderQuizViewModel: ObservableObject {
             Haptics.success()
             // ③ 累計統計に反映し、④ バッジを再評価
             let stats = StatsStore.shared
-            stats.recordReorderClear()
+            stats.recordReorderClear(topic: quiz.topic)
             BadgeStore.shared.evaluate(
                 stats: stats,
                 streak: appDefaults.integer(forKey: "algobite.streak")
@@ -204,12 +204,9 @@ struct ReorderQuizView: View {
         PopCard(fill: Pop.surface,
                 border: Color(red: 0.87, green: 0.84, blue: 0.99)) {
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Text("📋").font(.title3)
-                    Text(model.quiz.topic)
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Color(red: 0.31, green: 0.27, blue: 0.90))
-                }
+                Text(model.quiz.topic)
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(Color(red: 0.31, green: 0.27, blue: 0.90))
                 Text(model.quiz.prompt)
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Pop.inkSub)
@@ -383,7 +380,6 @@ struct ReorderQuizView: View {
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
-                    Image(systemName: "party.popper.fill").font(.system(size: 26)).foregroundStyle(Pop.accent)
                     Text("クリア！")
                         .font(.title2.weight(.black))
                         .foregroundStyle(Pop.correctFg)
@@ -398,15 +394,56 @@ struct ReorderQuizView: View {
 
                 // 解説アニメ — quiz topic に応じて自動選択
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "sparkles").font(.subheadline).foregroundStyle(Pop.accent)
-                        Text("動きで見る")
-                            .font(.caption.weight(.black))
-                            .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
-                    }
-                    topicAnimationFallback(topic: model.quiz.topic)
+                    Text("動きで見る")
+                        .font(.caption.weight(.black))
+                        .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
+                    ReorderAnswerAnim(quiz: model.quiz)
                 }
                 .padding(.top, 4)
+            }
+        }
+    }
+}
+
+private struct ReorderAnswerAnim: View {
+    let quiz: ReorderQuiz
+    @State private var revealedCount = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "正しい並び", tint: .green, onReplay: play) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(quiz.answer.indices, id: \.self) { index in
+                        tile(width: max(42, CGFloat(quiz.answer[index].count * 11)),
+                             height: 34,
+                             bg: index < revealedCount ? .green.opacity(0.72) : .gray.opacity(0.18)) {
+                            Text(index < revealedCount ? quiz.answer[index] : "?")
+                                .font(.system(size: 12, weight: .black, design: .monospaced))
+                        }
+                        .scaleEffect(index == revealedCount - 1 ? 1.12 : 1)
+                        .animation(.spring(response: 0.35), value: revealedCount)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            Text(revealedCount == quiz.answer.count
+                 ? quiz.answer.joined(separator: " → ")
+                 : "問題の正解順を左から確認")
+                .font(.system(.caption2, design: .monospaced))
+                .foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+
+    private func play() {
+        token += 1
+        let currentToken = token
+        revealedCount = 0
+        for count in 1...quiz.answer.count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35 + Double(count - 1) * 0.5) {
+                guard currentToken == token else { return }
+                withAnimation { revealedCount = count }
             }
         }
     }

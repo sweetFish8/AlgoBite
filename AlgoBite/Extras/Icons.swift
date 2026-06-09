@@ -560,11 +560,46 @@ struct DarkBerryIcon: View {
     }
 }
 
+/// 落下 + 着地ぷるぷる演出付きの苺
+/// shouldAnimate: true のとき onAppear で上から落ちて来て、着地後にダンプドオシレーション
+struct DroppingBerry: View {
+    var size: CGFloat = 22
+    var shouldAnimate: Bool = true
+
+    @State private var dropY: CGFloat
+    @State private var wiggle: Double = 0
+
+    init(size: CGFloat = 22, shouldAnimate: Bool = true) {
+        self.size = size
+        self.shouldAnimate = shouldAnimate
+        _dropY = State(initialValue: shouldAnimate ? -50 : 0)
+    }
+
+    var body: some View {
+        StrawberryTipUp(size: size)
+            .offset(y: dropY)
+            .rotationEffect(.degrees(wiggle))
+            .onAppear {
+                guard shouldAnimate else { return }
+                // 上から落ちる (underDamped spring でバウンス)
+                withAnimation(.spring(response: 0.38, dampingFraction: 0.48)) {
+                    dropY = 0
+                }
+                // 着地後にぷるぷる (ダンプドオシレーション: 右→左→右→ 収束)
+                let t = 0.28
+                DispatchQueue.main.asyncAfter(deadline: .now() + t)        { withAnimation(.easeOut(duration: 0.10))    { wiggle =  16 } }
+                DispatchQueue.main.asyncAfter(deadline: .now() + t + 0.10) { withAnimation(.easeInOut(duration: 0.09)) { wiggle = -11 } }
+                DispatchQueue.main.asyncAfter(deadline: .now() + t + 0.19) { withAnimation(.easeInOut(duration: 0.09)) { wiggle =   7 } }
+                DispatchQueue.main.asyncAfter(deadline: .now() + t + 0.28) { withAnimation(.spring(response: 0.25, dampingFraction: 0.7)) { wiggle = 0 } }
+            }
+    }
+}
+
 /// ロールケーキ風のストリークビュー — 寝かせたロール (両端丸い) + piped クリーム + ベリー盛り合わせ
 ///
 /// streak が増えた時の演出:
 ///   1. ケーキ本体が左 → 右に伸びる (spring)
-///   2. 伸び終わったタイミングで新しい苺が上から落ちて乗る
+///   2. 伸び終わったタイミングで新しい苺が上から落ちて乗る (DroppingBerry)
 struct RollCakeStreak: View {
     let streak: Int
     var maxDays: Int = 10
@@ -604,24 +639,19 @@ struct RollCakeStreak: View {
         .animation(.spring(response: 0.55, dampingFraction: 0.72), value: streak)
         .onAppear {
             if animateNewBerry && visibleBerries > 0 {
-                // クリア直後：最後の1個を抜いた状態から始めて、ぽとっと落として乗せる
+                // クリア直後：最後の1個を抜いた状態から始めて、DroppingBerry が落ちて乗る
                 revealedBerries = visibleBerries - 1
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.5)) {
-                        revealedBerries = visibleBerries
-                    }
+                    revealedBerries = visibleBerries   // DroppingBerry が自前でアニメする
                 }
             } else {
-                // 通常表示は遅延無しで即時セット
                 revealedBerries = visibleBerries
             }
         }
         .onChange(of: streak) { _, _ in
-            // ケーキが伸び切る ~0.35s 待ってから、新しい苺をぽとっと落とす
+            // ケーキが伸び切る ~0.35s 待ってから新しい苺を追加 (DroppingBerry が自前でアニメ)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) {
-                    revealedBerries = visibleBerries
-                }
+                revealedBerries = visibleBerries
             }
         }
     }
@@ -730,19 +760,15 @@ struct RollCakeStreak: View {
     }
 
     /// 苺だけ (streak の日数ぶん)。ケーキ幅に合わせて等間隔に載せる
-    /// 新規追加分は上からぽとっと落ちてくる
+    /// 最後に追加された苺は DroppingBerry が上から落ちてきて着地後にぷるぷる
     private var berriesLayer: some View {
         let count = revealedBerries
         return ZStack(alignment: .topLeading) {
             ForEach(0..<count, id: \.self) { i in
-                StrawberryTipUp(size: 22)
+                DroppingBerry(size: 22,
+                              shouldAnimate: animateNewBerry && i == count - 1)
                     .position(x: berryX(index: i, slotCount: visibleBerries),
                               y: i.isMultiple(of: 2) ? 11 : 13)
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .top).combined(with: .opacity)
-                                      .combined(with: .scale(scale: 0.55, anchor: .bottom)),
-                        removal: .opacity
-                    ))
                     .id(i)
             }
         }

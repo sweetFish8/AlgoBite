@@ -166,7 +166,7 @@ struct SortingAnim: View {
 // MARK: - Bubble Sort Pass (per-pass swap visualization)
 
 struct BubbleSortPassAnim: View {
-    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var arr = [64, 34, 25, 12, 22, 11, 90]
     @State private var i = 0   // j 位置
     @State private var swapping = false
     @State private var done = false
@@ -193,7 +193,7 @@ struct BubbleSortPassAnim: View {
     }
     private func play() {
         token += 1; let t = token
-        arr = [5, 2, 4, 1, 3]; i = 0; swapping = false; done = false
+        arr = [64, 34, 25, 12, 22, 11, 90]; i = 0; swapping = false; done = false
         var a = arr
         var k = 0
         for j in 0..<(a.count - 1) {
@@ -222,7 +222,7 @@ struct BubbleSortPassAnim: View {
 // MARK: - Selection Sort (find-min and swap)
 
 struct SelectionSortAnim: View {
-    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var arr = [64, 25, 12, 22, 11]
     @State private var startIdx = 0
     @State private var scanIdx = 0
     @State private var minIdx = 0
@@ -251,7 +251,7 @@ struct SelectionSortAnim: View {
     }
     private func play() {
         token += 1; let t = token
-        arr = [5, 2, 4, 1, 3]; startIdx = 0; scanIdx = 0; minIdx = 0; done = false
+        arr = [64, 25, 12, 22, 11]; startIdx = 0; scanIdx = 0; minIdx = 0; done = false
         let a = arr
         var k = 0
         var mIdx = 0
@@ -275,7 +275,7 @@ struct SelectionSortAnim: View {
 // MARK: - Insertion Sort
 
 struct InsertionSortAnim: View {
-    @State private var arr = [5, 2, 4, 1, 3]
+    @State private var arr = [12, 11, 13, 5, 6]
     @State private var sortedEnd = 0   // 0..sortedEnd is sorted
     @State private var cur = 0
     @State private var token = 0
@@ -297,7 +297,7 @@ struct InsertionSortAnim: View {
     }
     private func play() {
         token += 1; let t = token
-        arr = [5, 2, 4, 1, 3]; sortedEnd = 0; cur = 0
+        arr = [12, 11, 13, 5, 6]; sortedEnd = 0; cur = 0
         var a = arr
         var k = 0
         for i in 1..<a.count {
@@ -318,10 +318,10 @@ struct InsertionSortAnim: View {
 // MARK: - Dutch National Flag (3-way partition)
 
 struct DutchFlagAnim: View {
-    @State private var arr: [Int] = [2, 0, 2, 1, 1, 0, 1, 0, 2]
+    @State private var arr: [Int] = [2, 0, 2, 1, 1, 0]
     @State private var lo = 0
     @State private var mid = 0
-    @State private var hi = 8
+    @State private var hi = 5
     @State private var token = 0
 
     var body: some View {
@@ -348,7 +348,7 @@ struct DutchFlagAnim: View {
     }
     private func play() {
         token += 1; let t = token
-        var a = [2, 0, 2, 1, 1, 0, 1, 0, 2]
+        var a = [2, 0, 2, 1, 1, 0]
         arr = a; lo = 0; mid = 0; hi = a.count - 1
         var l = 0, m = 0, h = a.count - 1
         var k = 0
@@ -369,7 +369,7 @@ struct DutchFlagAnim: View {
 // MARK: - Quicksort (Lomuto partition + recursion)
 
 struct QuicksortAnim: View {
-    @State private var arr = [3, 1, 4, 1, 5, 9, 2, 6, 5]
+    @State private var arr = [3, 6, 8, 10, 1, 2]
     @State private var pivotIdx: Int? = nil
     @State private var i = -1
     @State private var j = -1
@@ -395,7 +395,7 @@ struct QuicksortAnim: View {
     }
     private func play() {
         token += 1; let t = token
-        arr = [3, 1, 4, 1, 5, 9, 2, 6, 5]; pivotIdx = nil; i = -1; j = -1
+        arr = [3, 6, 8, 10, 1, 2]; pivotIdx = nil; i = -1; j = -1
         var a = arr
         var k = 0
         // 部分配列 [0..n-1] の partition
@@ -432,7 +432,7 @@ struct QuicksortAnim: View {
 // MARK: - Merge Sort (divide visualization)
 
 struct MergeSortAnim: View {
-    let initial = [4, 2, 7, 1, 3, 6, 5, 8]
+    let initial = [38, 27, 43, 3, 9, 82, 10]
     @State private var rows: [[Int]] = []   // 各段のグループを連結したもの
     @State private var phase = 0
     @State private var token = 0
@@ -488,9 +488,9 @@ struct MergeSortAnim: View {
             guard t == token else { return }
             withAnimation { phase = 1 }
         }
-        let merge2 = [2, 4, 1, 7, 3, 6, 5, 8]
-        let merge4 = [1, 2, 4, 7, 3, 5, 6, 8]
-        let merge8 = [1, 2, 3, 4, 5, 6, 7, 8]
+        let merge2 = [27, 38, 3, 43, 9, 82, 10]
+        let merge4 = [3, 27, 38, 43, 9, 10, 82]
+        let merge8 = [3, 9, 10, 27, 38, 43, 82]
         let mergeSteps = [merge2, merge4, merge8]
         for (idx, lvl) in mergeSteps.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k + idx + 1) * 0.8) {

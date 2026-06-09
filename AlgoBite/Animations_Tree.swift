@@ -7,12 +7,15 @@ struct TreeTraversalAnim: View {
     let order: Order
     /// 7 ノード 3 段の木 (level order の配列表現)。問題ごとに違う数列を渡せる
     let nodes: [Int]
+    let hiddenIndices: Set<Int>
     /// 副題 (問題の文脈で表示)
     let subtitle: String
 
-    init(order: Order, nodes: [Int] = [4, 2, 6, 1, 3, 5, 7], subtitle: String = "") {
+    init(order: Order, nodes: [Int] = [4, 2, 6, 1, 3, 5, 7],
+         hiddenIndices: Set<Int> = [], subtitle: String = "") {
         self.order = order
         self.nodes = nodes
+        self.hiddenIndices = hiddenIndices
         self.subtitle = subtitle
     }
 
@@ -29,18 +32,23 @@ struct TreeTraversalAnim: View {
                         .foregroundStyle(.secondary)
                 }
                 // Render as 3-level pyramid
-                let levels: [[Int]] = [[nodes[0]], [nodes[1], nodes[2]], [nodes[3], nodes[4], nodes[5], nodes[6]]]
+                let levels = [[0], [1, 2], [3, 4, 5, 6]]
                 ForEach(levels.indices, id: \.self) { lvl in
                     HStack(spacing: 12) {
-                        ForEach(levels[lvl], id: \.self) { v in
-                            let isVisited = visited.contains(v)
-                            let isCur = current == v
-                            tile(width: 30, height: 30,
-                                 bg: isCur ? .yellow : (isVisited ? .green.opacity(0.5) : .white.opacity(0.08)),
-                                 fg: isCur ? .black : .white) { Text("\(v)") }
-                                .scaleEffect(isCur ? 1.18 : 1.0)
-                                .animation(.spring(response: 0.3), value: current)
-                                .animation(.spring(response: 0.3), value: visited)
+                        ForEach(levels[lvl], id: \.self) { index in
+                            if hiddenIndices.contains(index) {
+                                Color.clear.frame(width: 30, height: 30)
+                            } else {
+                                let value = nodes[index]
+                                let isVisited = visited.contains(value)
+                                let isCur = current == value
+                                tile(width: 30, height: 30,
+                                     bg: isCur ? .yellow : (isVisited ? .green.opacity(0.5) : .white.opacity(0.08)),
+                                     fg: isCur ? .black : .white) { Text("\(value)") }
+                                    .scaleEffect(isCur ? 1.18 : 1.0)
+                                    .animation(.spring(response: 0.3), value: current)
+                                    .animation(.spring(response: 0.3), value: visited)
+                            }
                         }
                     }
                 }
@@ -66,13 +74,14 @@ struct TreeTraversalAnim: View {
         visited = []; current = nil
         // nodes[0..6] を完全二分木として扱い、走査順を実際に計算する
         // index: 0=root, 1=L, 2=R, 3=LL, 4=LR, 5=RL, 6=RR
-        let seq: [Int]
+        let indices: [Int]
         switch order {
-        case .inorder:   seq = [nodes[3], nodes[1], nodes[4], nodes[0], nodes[5], nodes[2], nodes[6]]
-        case .preorder:  seq = [nodes[0], nodes[1], nodes[3], nodes[4], nodes[2], nodes[5], nodes[6]]
-        case .postorder: seq = [nodes[3], nodes[4], nodes[1], nodes[5], nodes[6], nodes[2], nodes[0]]
-        case .level:     seq = nodes
+        case .inorder:   indices = [3, 1, 4, 0, 5, 2, 6]
+        case .preorder:  indices = [0, 1, 3, 4, 2, 5, 6]
+        case .postorder: indices = [3, 4, 1, 5, 6, 2, 0]
+        case .level:     indices = Array(nodes.indices)
         }
+        let seq = indices.filter { !hiddenIndices.contains($0) }.map { nodes[$0] }
         for (i, v) in seq.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(i) * 0.6) {
                 guard t == token else { return }
@@ -89,7 +98,8 @@ struct TreeTraversalAnim: View {
 // MARK: - Validate BST (inorder ascending check)
 
 struct ValidateBSTAnim: View {
-    let nodes = [5, 3, 7, 1, 4, 6, 8]  // BST
+    // 例: [2,1,3] → True。slot 3..6 は null(0)
+    let nodes = [2, 1, 3, 0, 0, 0, 0]
     @State private var visited: [Int] = []
     @State private var cur: Int? = nil
     @State private var ok = true
@@ -114,8 +124,8 @@ struct ValidateBSTAnim: View {
     private func play() {
         token += 1; let t = token
         visited = []; cur = nil; ok = true
-        // インオーダー (左→根→右) を完全二分木として
-        let seq = [nodes[3], nodes[1], nodes[4], nodes[0], nodes[5], nodes[2], nodes[6]]
+        // 木 [2,1,3] の inorder (左→根→右) = [1,2,3] → 昇順
+        let seq = [1, 2, 3]
         var seen: [Int] = []
         for (i, v) in seq.enumerated() {
             let prevSeen = seen
@@ -148,12 +158,23 @@ struct InvertTreeAnim: View {
     private func play() {
         token += 1; let t = token
         nodes = [4, 2, 7, 1, 3, 6, 9]
-        // 親 index 0 (left=1, right=2), 1 (left=3, right=4), 2 (left=5, right=6) を swap
-        let swaps: [(Int, Int, Int)] = [(0, 1, 2), (1, 3, 4), (2, 5, 6)]
-        for (k, s) in swaps.enumerated() {
+        // 反転: 各親の左右の子を swap。サブツリーごと入れ替わるので
+        // [4,2,7,1,3,6,9] → [4,7,2,9,6,3,1]
+        // (1) root の子を swap: 子サブツリーごと → slot1↔2, slot3↔5, slot4↔6
+        // (2) 各サブツリー内で子を swap: slot3↔4, slot5↔6
+        // hl は強調する親ノードの index
+        let steps: [(hl: Int, swaps: [(Int, Int)])] = [
+            (0, [(1, 2), (3, 5), (4, 6)]),  // root の左右サブツリーを入替
+            (1, [(3, 4)]),                  // 左 (元 7, 今 index1) の子を swap
+            (2, [(5, 6)])                   // 右 (元 2, 今 index2) の子を swap
+        ]
+        for (k, step) in steps.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 1.0) {
                 guard t == token else { return }
-                withAnimation { swapAt = s.0; nodes.swapAt(s.1, s.2) }
+                withAnimation {
+                    swapAt = step.hl
+                    for (a, b) in step.swaps { nodes.swapAt(a, b) }
+                }
             }
         }
     }
@@ -208,7 +229,9 @@ struct SymmetricTreeAnim: View {
 // MARK: - Path Sum (root → leaf with running sum)
 
 struct PathSumAnim: View {
-    let nodes = [5, 4, 8, 11, 2, 13, 1]
+    // 例: [5,4,8,11,null,13,4,7,2], target=22 → True (パス 5→4→11→2)
+    // 3段までしか描けないので上位3段 [5,4,8,11,null,13,4] を表示。葉の 2 はパス表記のみ
+    let nodes = [5, 4, 8, 11, 0, 13, 4]
     let target = 22
     @State private var path: [Int] = []
     @State private var sum = 0
@@ -238,16 +261,15 @@ struct PathSumAnim: View {
     private func play() {
         token += 1; let t = token
         path = []; sum = 0; done = false; found = false
-        // root(5) -> 4 -> 11 -> 2 = 22 ヒット
-        let seqIdx = [0, 1, 3, 4]
-        for (k, i) in seqIdx.enumerated() {
-            let v = nodes[i]
+        // root(5) -> 4 -> 11 -> 2 = 22 ヒット (2 は level4 の葉)
+        let seqVals = [5, 4, 11, 2]
+        for (k, v) in seqVals.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.8) {
                 guard t == token else { return }
                 withAnimation { path.append(v); sum += v }
             }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(seqIdx.count) * 0.8 + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(seqVals.count) * 0.8 + 0.3) {
             guard t == token else { return }
             withAnimation { done = true; found = sum == target }
         }
@@ -257,7 +279,8 @@ struct PathSumAnim: View {
 // MARK: - Max Depth (postorder, returning depth)
 
 struct MaxDepthBTAnim: View {
-    let nodes = [3, 9, 20, 1, 2, 15, 7]
+    // 例: [3,9,20,null,null,15,7] → 3。slot 3,4 は null(0)
+    let nodes = [3, 9, 20, 0, 0, 15, 7]
     @State private var depths: [Int: Int] = [:]   // node value → depth
     @State private var token = 0
 
@@ -285,10 +308,8 @@ struct MaxDepthBTAnim: View {
     private func play() {
         token += 1; let t = token
         depths = [:]
-        // 葉から順に depth を確定
-        let order: [(Int, Int)] = [(nodes[3], 1), (nodes[4], 1), (nodes[1], 2),
-                                    (nodes[5], 1), (nodes[6], 1), (nodes[2], 2),
-                                    (nodes[0], 3)]
+        // 葉から順に depth を確定 (9 は葉=1, 15/7=1, 20=2, root 3=3)
+        let order: [(Int, Int)] = [(9, 1), (15, 1), (7, 1), (20, 2), (3, 3)]
         for (k, (v, d)) in order.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.6) {
                 guard t == token else { return }
@@ -345,7 +366,8 @@ struct LCAofBSTAnim: View {
 // MARK: - Diameter of Binary Tree
 
 struct DiameterBTAnim: View {
-    let nodes = [1, 2, 3, 4, 5, 6, 7]
+    // 例: [1,2,3,4,5] → 直径 3 (4-2-1-3)。slot 5,6 は null(0)
+    let nodes = [1, 2, 3, 4, 5, 0, 0]
     @State private var leftD: Int? = nil
     @State private var rightD: Int? = nil
     @State private var rootHL: Int? = nil
@@ -374,12 +396,12 @@ struct DiameterBTAnim: View {
     private func play() {
         token += 1; let t = token
         leftD = nil; rightD = nil; rootHL = nil; dia = 0
-        // root の左サブツリー深さ=2, 右=2, 通る経路長=4
+        // root(1) の左サブツリー深さ=2 (2→4/5), 右=1 (3), 通る経路長=2+1=3
         let steps = [
             (0.5, { self.rootHL = 1 }),
-            (1.2, { self.leftD = 1 }),
-            (1.8, { self.rightD = 2 }),
-            (2.4, { self.rootHL = nodes[0]; self.dia = 4 })
+            (1.2, { self.leftD = 2 }),
+            (1.8, { self.rightD = 1 }),
+            (2.4, { self.rootHL = nodes[0]; self.dia = 3 })
         ]
         for (delay, action) in steps {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -393,7 +415,8 @@ struct DiameterBTAnim: View {
 // MARK: - Balanced Binary Tree
 
 struct BalancedBTAnim: View {
-    let nodes = [3, 9, 20, 1, 2, 15, 7]
+    // 例: [3,9,20,null,null,15,7] → True。slot 3,4 は null(0)
+    let nodes = [3, 9, 20, 0, 0, 15, 7]
     @State private var depths: [Int: Int] = [:]
     @State private var bad: Int? = nil
     @State private var done = false
@@ -426,10 +449,8 @@ struct BalancedBTAnim: View {
     private func play() {
         token += 1; let t = token
         depths = [:]; bad = nil; done = false
-        // postorder で高さ計算 (葉=1)
-        let post: [(Int, Int)] = [(nodes[3], 1), (nodes[4], 1), (nodes[1], 2),
-                                   (nodes[5], 1), (nodes[6], 1), (nodes[2], 2),
-                                   (nodes[0], 3)]
+        // postorder で高さ計算 (葉=1)。9 は葉=1, 15/7=1, 20=2, root 3=3
+        let post: [(Int, Int)] = [(9, 1), (15, 1), (7, 1), (20, 2), (3, 3)]
         for (k, (v, h)) in post.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 0.6) {
                 guard t == token else { return }
@@ -502,7 +523,8 @@ struct BuildTreePostAnim: View {
 // MARK: - Serialize Binary Tree
 
 struct SerializeBTAnim: View {
-    let nodes = [1, 2, 3, 4, 5, 6, 7]
+    // 例: [1,2,3,null,null,4,5] → '1,2,3,N,N,4,5'
+    let nodes = [1, 2, 3, 0, 0, 4, 5]
     @State private var serialized: [String] = []
     @State private var token = 0
 
@@ -529,7 +551,8 @@ struct SerializeBTAnim: View {
     private func play() {
         token += 1; let t = token
         serialized = []
-        let seq = nodes.map(String.init) + ["#", "#", "#", "#", "#", "#", "#", "#"]
+        // BFS: 1,2,3,N,N,4,5 (例の出力と一致)
+        let seq = ["1", "2", "3", "N", "N", "4", "5"]
         for (k, s) in seq.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(k) * 0.4) {
                 guard t == token else { return }
@@ -542,8 +565,9 @@ struct SerializeBTAnim: View {
 // MARK: - Kth Smallest in BST
 
 struct KthSmallestBSTAnim: View {
-    let nodes = [5, 3, 8, 1, 4, 7, 9]
-    let k = 3
+    // 例: BST=[3,1,4,null,2], k=1 → 1。slot 3,5,6 は null(0)
+    let nodes = [3, 1, 4, 0, 2, 0, 0]
+    let k = 1
     @State private var visited: [Int] = []
     @State private var current: Int? = nil
     @State private var answer: Int? = nil
@@ -575,8 +599,8 @@ struct KthSmallestBSTAnim: View {
     private func play() {
         token += 1; let t = token
         visited = []; current = nil; answer = nil
-        // BST inorder = 昇順
-        let seq = [nodes[3], nodes[1], nodes[4], nodes[0], nodes[5], nodes[2], nodes[6]]
+        // BST [3,1,4,null,2] の inorder = 昇順 [1,2,3,4]
+        let seq = [1, 2, 3, 4]
         for (idx, v) in seq.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(idx) * 0.6) {
                 guard t == token else { return }
@@ -596,7 +620,8 @@ struct KthSmallestBSTAnim: View {
 // MARK: - Inorder Iterative (stack)
 
 struct InorderIterativeAnim: View {
-    let nodes = [4, 2, 6, 1, 3, 5, 7]
+    // 例: BST [4,2,6,1,3] → inorder [1,2,3,4,6]。slot 5,6 は null(0)
+    let nodes = [4, 2, 6, 1, 3, 0, 0]
     @State private var stack: [Int] = []
     @State private var current: Int? = nil
     @State private var visited: [Int] = []
@@ -632,18 +657,16 @@ struct InorderIterativeAnim: View {
         var st: [Int] = []
         var v: [Int] = []
         // シンプルにスタックの push/pop を演出
+        // 木 [4,2,6,1,3] の反復中順 → out: 1,2,3,4,6
         let steps: [(stack: [Int], visit: Int?, cur: Int?)] = [
             ([4], nil, 4), ([4, 2], nil, 2), ([4, 2, 1], nil, 1),
-            ([4, 2], 1, 2),
+            ([4, 2], 1, 1),
             ([4], 2, 2),
             ([4, 3], nil, 3),
             ([4], 3, 3),
             ([], 4, 4),
-            ([6], nil, 6), ([6, 5], nil, 5),
-            ([6], 5, 5),
-            ([], 6, 6),
-            ([7], nil, 7),
-            ([], 7, 7)
+            ([6], nil, 6),
+            ([], 6, 6)
         ]
         for (k, step) in steps.enumerated() {
             let s = step.stack

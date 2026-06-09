@@ -368,8 +368,9 @@ struct JumpGameAnim: View {
 // MARK: - Coin Change (DP min coins)
 
 struct CoinChangeAnim: View {
-    let coins: [Int] = [1, 2, 5]
-    let amount: Int = 7
+    // 問題例 (coins=[1,5,10], amount=11 → 2) に合わせる
+    let coins: [Int] = [1, 5, 10]
+    let amount: Int = 11
     @State private var dp: [Int] = []
     @State private var curI = -1
     @State private var token = 0
@@ -418,8 +419,9 @@ struct CoinChangeAnim: View {
 // MARK: - Edit Distance (DP grid)
 
 struct EditDistanceAnim: View {
-    let a = "kitten"
-    let b = "sitting"
+    // 問題例 (horse → ros → 3) に合わせる
+    let a = "horse"
+    let b = "ros"
     @State private var dp: [[Int]] = []
     @State private var cur: (Int, Int)? = nil
     @State private var token = 0
@@ -1013,7 +1015,8 @@ struct WordBreakAnim: View {
 // MARK: - Count Bits (DP using i & (i-1))
 
 struct CountBitsAnim: View {
-    let n = 8
+    // 問題例 (n=5 → [0,1,1,2,1,2]) に合わせる
+    let n = 5
     @State private var dp: [Int] = []
     @State private var cur = -1
     @State private var token = 0
@@ -1122,8 +1125,9 @@ struct DecodeWaysAnim: View {
 // MARK: - Regex Match (DP grid for s & p)
 
 struct RegexMatchAnim: View {
-    let s = "aab"
-    let p = "c*a*b"
+    // 問題例 (s='aa', p='a*' → True) に合わせる
+    let s = "aa"
+    let p = "a*"
     @State private var dp: [[Bool]] = []
     @State private var cur: (Int, Int)? = nil
     @State private var token = 0

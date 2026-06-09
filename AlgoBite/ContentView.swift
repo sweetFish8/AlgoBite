@@ -46,8 +46,14 @@ struct ContentView: View {
                             }
                         case .review:
                             appBackButton {
-                                ReviewListView(problems: vm.problems) { p in
-                                    path.append(.practice(p))
+                                ReviewListView(
+                                    challenges: vm.problems.map { .puzzle($0) }
+                                              + ReorderQuiz.allList.map { .reorder($0) }
+                                ) { challenge in
+                                    switch challenge {
+                                    case .puzzle(let p):  path.append(.practice(p))
+                                    case .reorder(let q): path.append(.reorder(q))
+                                    }
                                 }
                             }
                         case .practice(let p):
@@ -330,7 +336,7 @@ struct ContentView: View {
                             .foregroundStyle(Pop.inkSub)
                     }
                     Spacer()
-                    popBadge("全 \(vm.problems.count) 問",
+                    popBadge("全 \(vm.problems.count + ReorderQuiz.allList.count) 問",
                              bg: Color(red: 0.87, green: 0.84, blue: 0.99),
                              fg: Color(red: 0.30, green: 0.18, blue: 0.50))
                 }
@@ -430,6 +436,7 @@ struct ContentView: View {
                         .padding(.horizontal, 4)
                 }
                 .frame(height: 92)
+                .scrollClipDisabled()   // 苺の落下アニメが ScrollView 上端を越えてカード内に見える
                 // 10 日を超えたら「+N 日」を金色プレートで表示
                 if vm.streak > 10 {
                     HStack(spacing: 6) {
@@ -722,8 +729,13 @@ struct ContentView: View {
                 }
 
                 HStack(spacing: 10) {
-                    smallBtn("ヒント", systemImage: "lightbulb.fill",
-                             fill: Pop.accent, shadow: Pop.accentShadow) { vm.revealHint() }
+                    smallBtn(vm.hintLabel, systemImage: "lightbulb.fill",
+                             fill: vm.hintLevel == .fillOne
+                                 ? Color(red: 0.61, green: 0.64, blue: 0.71)
+                                 : Pop.accent,
+                             shadow: vm.hintLevel == .fillOne
+                                 ? Color(red: 0.41, green: 0.45, blue: 0.50)
+                                 : Pop.accentShadow) { vm.revealHint() }
                     smallBtn("リセット", systemImage: "arrow.counterclockwise",
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) { vm.resetCurrent() }
@@ -809,13 +821,9 @@ struct ContentView: View {
         PopCard(fill: Pop.surfaceMint,                                           // #DCFCE7
                 border: Color(red: 0.13, green: 0.77, blue: 0.37)) {            // #22C55E
             VStack(spacing: 20) {
-                HStack(spacing: 10) {
-                    Image(systemName: "party.popper.fill").font(.system(size: 36)).foregroundStyle(Pop.accent)
-                    Text("クリア！")
-                        .font(.system(size: 30, weight: .black, design: .rounded))
-                        .foregroundStyle(Pop.correctFg)
-                    Image(systemName: "sparkles").font(.system(size: 32)).foregroundStyle(Pop.accent)
-                }
+                Text("クリア！")
+                    .font(.system(size: 30, weight: .black, design: .rounded))
+                    .foregroundStyle(Pop.correctFg)
 
                 HStack(spacing: 14) {
                     Image(systemName: "flame.fill").font(.system(size: 36)).foregroundStyle(.orange)
@@ -833,13 +841,11 @@ struct ContentView: View {
                     }
                 }
 
-                HStack(spacing: 8) {
-                    ForEach(vm.todayProblem.orderedSlotIDs, id: \.self) { id in
-                        Image(systemName: vm.slotResults[id] == true ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundStyle(vm.slotResults[id] == true ? Pop.correctBorder : Pop.danger)
-                    }
-                }
+                // ヒント使用状況
+                Text(vm.hintLevel == .none ? "ノーヒントクリア！" :
+                     vm.hintLevel == .gentle ? "ヒント 1回使用" : "ヒント 2回使用")
+                    .font(.subheadline.weight(.heavy))
+                    .foregroundStyle(vm.hintLevel == .none ? Pop.correctFg : Pop.inkWarmSub)
                 Text("\(vm.attemptCount) 回でクリア")
                     .font(.caption.weight(.heavy))
                     .foregroundStyle(Pop.correctFg)

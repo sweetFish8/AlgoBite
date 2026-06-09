@@ -16,23 +16,28 @@ struct TopicIllustration: View {
 
     var kind: Kind {
         let t = topic.lowercased()
-        if t.contains("two pointer") || t.contains("two pointers") { return .twoPointers }
-        if t.contains("binary search") { return .binarySearch }
-        if t.contains("sort") || t.contains("sorting")             { return .sort }
-        if t.contains("hash")                                      { return .hashMap }
-        if t.contains("stack")                                     { return .stack }
-        if t.contains("queue")                                     { return .queue }
-        if t.contains("linked list")                               { return .linkedList }
-        if t.contains("tree") || t.contains("bst") || t.contains("trie") { return .tree }
+        if t.contains("two pointer") || t.contains("two pointers") || t.contains("2 ポインタ") { return .twoPointers }
+        if t.contains("binary search") || t.contains("二分探索") { return .binarySearch }
+        if t.contains("sort") || t.contains("sorting") || t.contains("ソート") { return .sort }
+        if t.contains("hash") || t.contains("ハッシュ")          { return .hashMap }
+        if t.contains("stack") || t.contains("スタック")         { return .stack }
+        if t.contains("queue") || t.contains("キュー") || t.contains("デック") { return .queue }
+        if t.contains("linked list") || t.contains("連結リスト") || t.contains("リンクリスト") { return .linkedList }
+        if t.contains("tree") || t.contains("bst") || t.contains("trie") ||
+            t.contains("木") || t.contains("ヒープ") { return .tree }
         // backtrack / bit / sliding は graph(dfs) や dp より先に判定する
         // ("Backtracking / DFS" が .graph に、"Bit Manipulation / DP" が .dp に
         //  誤分類されるのを防ぐ)
-        if t.contains("backtrack")                                 { return .backtracking }
-        if t.contains("bit")                                       { return .bit }
-        if t.contains("sliding")                                   { return .slidingWindow }
-        if t.contains("graph") || t.contains("bfs") || t.contains("dfs") { return .graph }
-        if t.contains("dp") || t.contains("dynamic")               { return .dp }
-        if t.contains("string")                                    { return .string }
+        if t.contains("backtrack") || t.contains("バックトラック") ||
+            t.contains("再帰") || t.contains("ハノイ") || t.contains("順列") { return .backtracking }
+        if t.contains("bit") || t.contains("ビット")               { return .bit }
+        if t.contains("sliding") || t.contains("スライディング")   { return .slidingWindow }
+        if t.contains("graph") || t.contains("bfs") || t.contains("dfs") ||
+            t.contains("グラフ") || t.contains("dag") || t.contains("union find") ||
+            t.contains("ダイクストラ") { return .graph }
+        if t.contains("dp") || t.contains("dynamic") || t.contains("動的") ||
+            t.contains("メモ化") || t.contains("lis") { return .dp }
+        if t.contains("string") || t.contains("文字列") || t.contains("kmp") { return .string }
         return .generic
     }
 
@@ -806,4 +811,3 @@ struct TopicIllustration: View {
         .frame(width: size * 0.80, height: size * 0.80)
     }
 }
-

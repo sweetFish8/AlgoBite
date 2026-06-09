@@ -30,6 +30,12 @@ enum DebugCapture {
     /// -captureMode が指定されてるか
     static var isActive: Bool { CommandLine.arguments.contains("-captureMode") }
 
+    /// デバッグビルドで常に表示する問題 ID。
+    /// プログラミング未経験者でも直感的に分かる超基礎問題を固定しておくことで、
+    /// 開発中に毎回日付依存の問題が来てデバッグしにくくなるのを防ぐ。
+    /// → "Climbing Stairs": n段の階段を1or2段ずつ登る方法の数（スロット2個・Easy）
+    static let pinnedProblemID = "climbing-stairs"
+
     /// AlgoBiteApp.init から呼ぶ。サンプルデータを Defaults に流し込む
     static func applyIfRequested() {
         let args = CommandLine.arguments
@@ -48,6 +54,8 @@ enum DebugCapture {
         appDefaults.set(today, forKey: "algobite.lastSolvedDate")
         appDefaults.set(12,   forKey: "algobite.stats.totalSolved")
         appDefaults.set(3,    forKey: "algobite.stats.reorderClears")
+        // Simulatorに残ったトピック集計で、正解画面に意図しないバッジが出るのを防ぐ。
+        appDefaults.set([String: Int](), forKey: "algobite.stats.topicCounts")
         appDefaults.set(["first_clear", "streak_3", "reorder_first", "total_10"],
                         forKey: "algobite.badges.unlocked")
         appDefaults.set(["2026-05-31", "2026-05-30", "2026-05-29", "2026-05-28",

@@ -39,9 +39,11 @@ struct PuzzleProblem: Identifiable, Hashable {
     let slots: [String: PuzzleSlot]
     let explanation: String
 
+    // explanation は必須（デフォルト値なし）。空にできてしまうと「ポイント」欄が
+    // 問題文の流用になりやすいため、追加時に必ず考え方を書かせる。
     init(id: String, title: String, difficulty: String, topic: String,
          prompt: String, example: String, template: [String],
-         slots: [String: PuzzleSlot], explanation: String = "") {
+         slots: [String: PuzzleSlot], explanation: String) {
         self.id = id
         self.title = title
         self.difficulty = difficulty

@@ -298,7 +298,8 @@ struct TwoSumAnim: View {
 // MARK: - Spiral Matrix
 
 struct SpiralMatrixAnim: View {
-    let rows = 4, cols = 4
+    // 問題例 (3x3 → [1,2,3,6,9,8,7,4,5]) に合わせる
+    let rows = 3, cols = 3
     @State private var visited: [(Int, Int)] = []
     @State private var token = 0
 
@@ -424,7 +425,8 @@ struct ProductExceptSelfAnim: View {
 // MARK: - Pascal's Triangle
 
 struct PascalsTriangleAnim: View {
-    let rows = 6
+    // 問題例 (numRows=5 → [[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]) に合わせる
+    let rows = 5
     @State private var triangle: [[Int]] = []
     @State private var curR = -1
     @State private var token = 0
@@ -813,7 +815,8 @@ struct KthLargestAnim: View {
 // MARK: - Meeting Rooms II (min heap of end times)
 
 struct MeetingRoomsAnim: View {
-    let intervals: [(Int, Int)] = [(0, 30), (5, 10), (15, 20), (25, 35)]
+    // 問題例 (intervals=[[0,30],[5,10],[15,20]] → 2) に合わせる
+    let intervals: [(Int, Int)] = [(0, 30), (5, 10), (15, 20)]
     @State private var i = -1
     @State private var heap: [Int] = []
     @State private var rooms = 0
@@ -868,7 +871,8 @@ struct MeetingRoomsAnim: View {
 // MARK: - Trie Insert (tree growing)
 
 struct TrieInsertAnim: View {
-    let words = ["cat", "car", "card", "cap"]
+    // 問題例 (insert('apple')) に合わせる
+    let words = ["apple"]
     @State private var nodes: [String: Set<String>] = [:]   // path → children chars
     @State private var current = ""
     @State private var inserting: String = ""
@@ -943,8 +947,9 @@ struct TrieInsertAnim: View {
 // MARK: - Trie Search (path walking)
 
 struct TrieSearchAnim: View {
-    let words = ["cat", "car", "card"]
-    let query = "card"
+    // 問題例 (辞書に 'apple'、search('apple')→True) に合わせる
+    let words = ["apple"]
+    let query = "apple"
     @State private var path = ""
     @State private var found = false
     @State private var failed = false

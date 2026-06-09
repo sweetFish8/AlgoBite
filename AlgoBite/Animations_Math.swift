@@ -159,7 +159,8 @@ struct FastPowAnim: View {
 }
 
 struct SieveAnim: View {
-    let n = 30
+    // 問題例 (n=10 → [2,3,5,7]) に合わせる
+    let n = 10
     @State private var marked: Set<Int> = []
     @State private var current: Int? = nil
     @State private var token = 0
@@ -222,7 +223,8 @@ struct FloydAnim: View {
     @State private var fast = 0
     @State private var caption = ""
     @State private var token = 0
-    let arr = [1, 3, 4, 2, 5, 2, 6]
+    // 問題例 (nums=[1,3,4,2,2] → 重複 2) に合わせる
+    let arr = [1, 3, 4, 2, 2]
 
     var body: some View {
         AnimFrame(title: "Floyd's Tortoise & Hare", tint: .green, onReplay: play) {
@@ -365,7 +367,8 @@ struct ReverseBitsAnim: View {
 // MARK: - Power of Two
 
 struct PowerOfTwoAnim: View {
-    let candidates = [1, 2, 4, 6, 8, 16, 17, 32, 100]
+    // 問題例 (n=16 → True / n=6 → False) を含む候補列
+    let candidates = [16, 6, 1, 2, 4, 8, 17, 32, 100]
     @State private var idx = -1
     @State private var results: [(Int, Bool)] = []
     @State private var token = 0

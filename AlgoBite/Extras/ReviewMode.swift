@@ -104,8 +104,8 @@ final class PracticeSession: ObservableObject {
 }
 
 struct ReviewListView: View {
-    let problems: [PuzzleProblem]
-    let onPick: (PuzzleProblem) -> Void
+    let challenges: [DailyChallenge]
+    let onPick: (DailyChallenge) -> Void
 
     var body: some View {
         ZStack {
@@ -114,34 +114,9 @@ struct ReviewListView: View {
                 .ignoresSafeArea()
             ScrollView {
                 LazyVStack(spacing: 10) {
-                    ForEach(problems) { p in
-                        Button { onPick(p) } label: {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text(p.title)
-                                        .font(.subheadline.weight(.black))
-                                        .foregroundStyle(Pop.ink)
-                                    Spacer()
-                                    Text("★ \(p.difficulty)")
-                                        .font(.caption2.weight(.heavy))
-                                        .padding(.horizontal, 8).padding(.vertical, 3)
-                                        .background(diffBg(p.difficulty), in: Capsule())
-                                        .foregroundStyle(diffFg(p.difficulty))
-                                }
-                                Text(p.topic)
-                                    .font(.caption2.weight(.heavy))
-                                    .foregroundStyle(Color(red: 0.31, green: 0.27, blue: 0.90))
-                                Text(p.prompt)
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(Pop.inkSub)
-                                    .lineLimit(2)
-                            }
-                            .padding(14)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(.white, in: RoundedRectangle(cornerRadius: 14))
-                            .overlay(RoundedRectangle(cornerRadius: 14)
-                                .stroke(Color(red: 0.78, green: 0.82, blue: 0.99), lineWidth: 1.2))
-                            .shadow(color: .black.opacity(0.04), radius: 3, y: 1)
+                    ForEach(Array(challenges.enumerated()), id: \.offset) { _, challenge in
+                        Button { onPick(challenge) } label: {
+                            reviewRow(challenge)
                         }
                         .buttonStyle(.plain)
                         .simultaneousGesture(TapGesture().onEnded { Haptics.light() })
@@ -154,6 +129,46 @@ struct ReviewListView: View {
         }
         .navigationTitle("復習モード")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private func reviewRow(_ challenge: DailyChallenge) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(challenge.title)
+                    .font(.subheadline.weight(.black))
+                    .foregroundStyle(Pop.ink)
+                Spacer()
+                // 並べ替えは "並べ替え" タグ、穴埋めは難易度バッジ
+                switch challenge {
+                case .puzzle(let p):
+                    Text("★ \(p.difficulty)")
+                        .font(.caption2.weight(.heavy))
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(diffBg(p.difficulty), in: Capsule())
+                        .foregroundStyle(diffFg(p.difficulty))
+                case .reorder:
+                    Text("並べ替え")
+                        .font(.caption2.weight(.heavy))
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Color(red: 0.96, green: 0.93, blue: 1.00), in: Capsule())
+                        .foregroundStyle(Color(red: 0.31, green: 0.27, blue: 0.90))
+                }
+            }
+            Text(challenge.topic)
+                .font(.caption2.weight(.heavy))
+                .foregroundStyle(Color(red: 0.31, green: 0.27, blue: 0.90))
+            Text(challenge.prompt)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Pop.inkSub)
+                .lineLimit(2)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14)
+            .stroke(Color(red: 0.78, green: 0.82, blue: 0.99), lineWidth: 1.2))
+        .shadow(color: .black.opacity(0.04), radius: 3, y: 1)
     }
 
     private func diffBg(_ d: String) -> Color {

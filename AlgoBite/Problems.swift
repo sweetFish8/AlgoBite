@@ -25,7 +25,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "tgt": PuzzleSlot(id: "tgt", label: "目標の長さ", answer: "k",     choices: ["k", "n", "k - 1"]),
             "nxt": PuzzleSlot(id: "nxt", label: "次の開始",   answer: "i + 1", choices: ["i + 1", "i", "start + 1"])
-        ]
+        ],
+        explanation: "1〜n から k 個を選ぶ。次の候補を i+1 から始めることで「順序違い・重複」を排除し、path の長さが k に達したら確定する。start を増やすのが組み合わせ（順列でない）の肝。"
     ),
 
     // 52. N-Queens
@@ -55,7 +56,8 @@ private let p51_100: [PuzzleProblem] = [
             "diag": PuzzleSlot(id: "diag", label: "対角チェック",  answer: "abs(i - row)", choices: ["abs(i - row)", "i - row", "row - i"]),
             "base": PuzzleSlot(id: "base", label: "基底条件",      answer: "n",            choices: ["n", "0", "n - 1"]),
             "nr":   PuzzleSlot(id: "nr",   label: "次の行",        answer: "row + 1",      choices: ["row + 1", "row", "row - 1"])
-        ]
+        ],
+        explanation: "各行に1つずつクイーンを置く。同じ列、または対角線（列差の絶対値＝行差）に既存のクイーンが無いか検査しながら DFS。row が n に達したら1解。盤面を board[row]=col の1次元配列で持つのがコツ。"
     ),
 
     // 53. Word Search
@@ -80,7 +82,8 @@ private let p51_100: [PuzzleProblem] = [
             "done": PuzzleSlot(id: "done", label: "完了条件",    answer: "len(word)", choices: ["len(word)", "len(word) - 1", "0"]),
             "mk":   PuzzleSlot(id: "mk",   label: "訪問済みマーク", answer: "'#'",    choices: ["'#'", "None", "' '"]),
             "ni":   PuzzleSlot(id: "ni",   label: "次の文字インデックス", answer: "i + 1", choices: ["i + 1", "i", "i - 1"])
-        ]
+        ],
+        explanation: "グリッドを4方向に DFS。訪問中のセルを一時的に '#' に書き換えて同じマスの再利用を防ぎ、i が単語長に達したら成功。戻るときに元の文字へ復元するのがバックトラッキング。"
     ),
 
     // 54. Palindrome Check
@@ -125,7 +128,8 @@ private let p51_100: [PuzzleProblem] = [
             "er":  PuzzleSlot(id: "er",  label: "偶数拡張の右端", answer: "i + 1",    choices: ["i + 1", "i", "i - 1"]),
             "sl":  PuzzleSlot(id: "sl",  label: "スライス",       answer: "l:r+1",    choices: ["l:r+1", "l:r", "l+1:r"]),
             "exp": PuzzleSlot(id: "exp", label: "右への拡張",     answer: "1",        choices: ["1", "2", "-1"])
-        ]
+        ],
+        explanation: "各位置を中心に左右へ広げる中心展開法。奇数長 (i,i) と偶数長 (i,i+1) の2パターンを試し、s[l]==s[r] の間だけ拡張する。O(n²)・追加メモリ O(1)。"
     ),
 
     // 56. Anagram Check
@@ -168,7 +172,8 @@ private let p51_100: [PuzzleProblem] = [
             "dt":  PuzzleSlot(id: "dt",  label: "デフォルト型",  answer: "list",   choices: ["list", "set", "dict"]),
             "srt": PuzzleSlot(id: "srt", label: "ソート方法",    answer: "sorted(s)", choices: ["sorted(s)", "reversed(s)", "list(s)"]),
             "vs":  PuzzleSlot(id: "vs",  label: "値の取得",      answer: "values", choices: ["values", "keys", "items"])
-        ]
+        ],
+        explanation: "アナグラムはソートすると同じ文字列になる。sorted(s) をキーに defaultdict(list) でグループ化する。キーは tuple 化してハッシュ可能にするのがポイント。O(n·k log k)。"
     ),
 
     // 58. Roman to Integer
@@ -191,7 +196,8 @@ private let p51_100: [PuzzleProblem] = [
             "nc":  PuzzleSlot(id: "nc",  label: "次の文字",   answer: "s[i+1]", choices: ["s[i+1]", "s[i]", "s[i-1]"]),
             "add": PuzzleSlot(id: "add", label: "演算子",     answer: "+",      choices: ["+", "-", "*"]),
             "cc":  PuzzleSlot(id: "cc",  label: "現在の文字", answer: "s[i]",   choices: ["s[i]", "s[i+1]", "s[-1]"])
-        ]
+        ],
+        explanation: "左から走査し、現在の文字が次の文字より小さければ減算（IV=4 など）、そうでなければ加算する。1パスで O(n)。"
     ),
 
     // 59. Reverse String
@@ -211,7 +217,8 @@ private let p51_100: [PuzzleProblem] = [
             "rl":  PuzzleSlot(id: "rl",  label: "s[l]の新値", answer: "r",  choices: ["r", "l", "0"]),
             "lr":  PuzzleSlot(id: "lr",  label: "s[r]の新値", answer: "l",  choices: ["l", "r", "-1"]),
             "dec": PuzzleSlot(id: "dec", label: "rの減少量",  answer: "1",  choices: ["1", "2", "l"])
-        ]
+        ],
+        explanation: "両端から内側へ swap する Two Pointers。l<r の間だけ s[l] と s[r] を交換し、追加メモリ無しの in-place 反転。O(n)。"
     ),
 
     // 60. Container With Most Water
@@ -225,7 +232,7 @@ private let p51_100: [PuzzleProblem] = [
             "    best = 0",
             "    while l < r:",
             "        h = min(height[l], height[r])",
-            "        best = max(best, h * {{w}})",
+            "        best = max(best, h * ({{w}}))",
             "        if height[l] < height[r]: l += 1",
             "        else: r -= {{dec}}",
             "    return best"
@@ -233,7 +240,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "w":   PuzzleSlot(id: "w",   label: "幅の計算", answer: "r - l",  choices: ["r - l", "r + l", "l - r"]),
             "dec": PuzzleSlot(id: "dec", label: "rの減少量", answer: "1",     choices: ["1", "2", "r"])
-        ]
+        ],
+        explanation: "水量は低い方の壁で決まるので、低い側のポインタを内側へ動かす。幅 (r-l) × min(高さ) を最大化する Two Pointers。O(n)。"
     ),
 
     // 61. Trapping Rain Water
@@ -260,7 +268,8 @@ private let p51_100: [PuzzleProblem] = [
             "ul": PuzzleSlot(id: "ul", label: "lmaxの更新",  answer: "height[l]",          choices: ["height[l]", "lmax + 1", "water"]),
             "al": PuzzleSlot(id: "al", label: "左側の水量",  answer: "lmax - height[l]",   choices: ["lmax - height[l]", "height[l] - lmax", "lmax"]),
             "ar": PuzzleSlot(id: "ar", label: "右側の水量",  answer: "rmax - height[r]",   choices: ["rmax - height[r]", "height[r] - rmax", "rmax"])
-        ]
+        ],
+        explanation: "低い側の壁から処理する。各位置の水量は「これまでの最大壁 − 現在の高さ」。lmax/rmax を更新しつつ低い側を進めることで1パス・O(1) 空間。"
     ),
 
     // 62. Product Except Self
@@ -281,7 +290,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "pr": PuzzleSlot(id: "pr", label: "前置積のrange", answer: "n",    choices: ["n", "n - 1", "n + 1"]),
             "sm": PuzzleSlot(id: "sm", label: "後置積を掛ける", answer: "suf", choices: ["suf", "out[i]", "nums[i]"])
-        ]
+        ],
+        explanation: "各要素の左側全積（前置）と右側全積（後置）を掛け合わせる。除算を使わず2パスで O(n)、出力配列を作業領域に再利用する。"
     ),
 
     // 63. Find Duplicate (Floyd's)
@@ -305,7 +315,8 @@ private let p51_100: [PuzzleProblem] = [
             "sn":  PuzzleSlot(id: "sn",  label: "slowの次",  answer: "slow", choices: ["slow", "fast", "0"]),
             "fn":  PuzzleSlot(id: "fn",  label: "fastの次",  answer: "fast", choices: ["fast", "slow", "0"]),
             "rst": PuzzleSlot(id: "rst", label: "slowのリセット", answer: "0", choices: ["0", "slow", "fast"])
-        ]
+        ],
+        explanation: "値をポインタとみなすと、重複により閉路ができる。Floyd の循環検出で出会い点を見つけ、片方を先頭へ戻し同速で進めると入口＝重複値。O(1) 空間。"
     ),
 
     // 64. Rotate Array
@@ -323,7 +334,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "ra": PuzzleSlot(id: "ra", label: "全体を逆順",  answer: "reverse", choices: ["reverse", "sort", "clear"]),
             "rs": PuzzleSlot(id: "rs", label: "右半分スライス", answer: "k:",   choices: ["k:", ":k", "k+1:"])
-        ]
+        ],
+        explanation: "全体を反転 → 先頭 k 個を反転 → 残りを反転、の3回反転で右 k 回転を実現する。追加配列が要らない in-place トリック。O(n)。"
     ),
 
     // 65. Merge Intervals
@@ -346,7 +358,8 @@ private let p51_100: [PuzzleProblem] = [
             "sk": PuzzleSlot(id: "sk", label: "ソートキー",   answer: "0",  choices: ["0", "1", "-1"]),
             "le": PuzzleSlot(id: "le", label: "最後の終端",   answer: "1",  choices: ["1", "0", "-1"]),
             "ne": PuzzleSlot(id: "ne", label: "新しい終端",   answer: "e",  choices: ["e", "s", "merged[-1][0]"])
-        ]
+        ],
+        explanation: "開始時刻でソートすると重なる区間は隣り合う。直前の終端と次の開始を比べ、重なれば終端を max で延長、離れていれば新区間として追加。O(n log n)。"
     ),
 
     // 66. Search in Rotated Sorted Array
@@ -373,7 +386,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "ub": PuzzleSlot(id: "ub", label: "左半分の上限", answer: "nums[mid]", choices: ["nums[mid]", "nums[r]", "target"]),
             "lb": PuzzleSlot(id: "lb", label: "右半分の下限", answer: "nums[mid]", choices: ["nums[mid]", "nums[l]", "target"])
-        ]
+        ],
+        explanation: "二分探索の各ステップで、mid を境に必ず片方はソート済み。そのソート済み側に target が入るかで探索範囲を半分に絞る。O(log n)。"
     ),
 
     // 67. Find First and Last Position
@@ -399,7 +413,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "sv": PuzzleSlot(id: "sv", label: "結果を保存",  answer: "mid",     choices: ["mid", "lo", "hi"]),
             "gr": PuzzleSlot(id: "gr", label: "右へ絞り込み", answer: "mid + 1", choices: ["mid + 1", "mid - 1", "mid"])
-        ]
+        ],
+        explanation: "target を見つけても止まらない。左境界探索では右半分を、右境界探索では左半分を続けて絞り込む二分探索を2回実行する。O(log n)。"
     ),
 
     // 68. Count Bits
@@ -411,13 +426,14 @@ private let p51_100: [PuzzleProblem] = [
             "def count_bits(n):",
             "    dp = [0] * (n + 1)",
             "    for i in range(1, n + 1):",
-            "        dp[i] = dp[{{rs}}] + {{lb}}",
+            "        dp[i] = dp[{{rs}}] + ({{lb}})",
             "    return dp"
         ],
         slots: [
             "rs": PuzzleSlot(id: "rs", label: "右シフト参照", answer: "i >> 1", choices: ["i >> 1", "i << 1", "i - 1"]),
             "lb": PuzzleSlot(id: "lb", label: "最下位ビット", answer: "i & 1",  choices: ["i & 1", "i | 1", "i ^ 1"])
-        ]
+        ],
+        explanation: "dp[i] = dp[i>>1] + (i&1)。i を1ビット右シフトした数のビット数に最下位ビットを足すだけ。前の結果を使う DP で O(n)。"
     ),
 
     // 69. Single Number
@@ -435,7 +451,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "init": PuzzleSlot(id: "init", label: "初期値",  answer: "0",  choices: ["0", "1", "nums[0]"]),
             "op":   PuzzleSlot(id: "op",   label: "演算子",  answer: "^",  choices: ["^", "&", "|"])
-        ]
+        ],
+        explanation: "XOR は同じ数同士を打ち消す（a^a=0）。全要素を XOR すると重複は消え、単独の数だけ残る。O(n)・O(1)。"
     ),
 
     // 70. Power of Two
@@ -451,7 +468,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "mask": PuzzleSlot(id: "mask", label: "マスク値",  answer: "n - 1", choices: ["n - 1", "n + 1", "n"]),
             "exp":  PuzzleSlot(id: "exp",  label: "期待値",   answer: "0",     choices: ["0", "1", "n"])
-        ]
+        ],
+        explanation: "2の累乗は2進数で1ビットだけ立つ。n & (n-1) は最下位の1を消すので、結果が0なら2の累乗。O(1)。"
     ),
 
     // 71. Reverse Bits
@@ -471,7 +489,8 @@ private let p51_100: [PuzzleProblem] = [
             "bits": PuzzleSlot(id: "bits", label: "ビット数",    answer: "32", choices: ["32", "16", "64"]),
             "lsb":  PuzzleSlot(id: "lsb",  label: "最下位ビット取得", answer: "1",  choices: ["1", "0", "2"]),
             "shr":  PuzzleSlot(id: "shr",  label: "右シフト演算子",   answer: ">>", choices: [">>", "<<", "//"])
-        ]
+        ],
+        explanation: "32回ループし、n の最下位ビットを取り出して result に左から詰める。result を左シフト、n を右シフトしていく。"
     ),
 
     // 72. GCD (Euclidean)
@@ -488,7 +507,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "cond": PuzzleSlot(id: "cond", label: "ループ条件", answer: "b",     choices: ["b", "a", "a > b"]),
             "rem":  PuzzleSlot(id: "rem",  label: "余りの計算", answer: "a % b", choices: ["a % b", "b % a", "a - b"])
-        ]
+        ],
+        explanation: "ユークリッドの互除法。a を「b で割った余り」に置き換えることを b が0になるまで繰り返すと、残った a が最大公約数。O(log min(a,b))。"
     ),
 
     // 73. Sieve of Eratosthenes
@@ -512,7 +532,8 @@ private let p51_100: [PuzzleProblem] = [
             "one": PuzzleSlot(id: "one", label: "1を除外",     answer: "1",     choices: ["1", "0", "2"]),
             "st":  PuzzleSlot(id: "st",  label: "篩の開始位置", answer: "p * p", choices: ["p * p", "p + 1", "2 * p"]),
             "mk":  PuzzleSlot(id: "mk",  label: "合成数マーク", answer: "False", choices: ["False", "True", "not is_p[i]"])
-        ]
+        ],
+        explanation: "2から順に、素数 p の倍数（p*p から開始）を合成数として消していく。p*p 未満は既に小さい素数で消済み。O(n log log n)。"
     ),
 
     // 74. Fast Exponentiation
@@ -533,7 +554,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "odd": PuzzleSlot(id: "odd", label: "奇数判定",   answer: "exp & 1",      choices: ["exp & 1", "exp % 2 == 0", "exp > 1"]),
             "shr": PuzzleSlot(id: "shr", label: "expの更新",  answer: ">>",           choices: [">>", "<<", "-"])
-        ]
+        ],
+        explanation: "指数を2進展開し、ビットが立つ桁だけ底を結果に掛ける。底を毎回2乗、指数を右シフトすることで O(log n) に。"
     ),
 
     // 75. Bubble Sort
@@ -546,7 +568,7 @@ private let p51_100: [PuzzleProblem] = [
             "    n = len(arr)",
             "    for i in range(n):",
             "        swapped = False",
-            "        for j in range(0, n - {{ie}}):",
+            "        for j in range(0, n - ({{ie}})):",
             "            if arr[j] > arr[{{nj}}]:",
             "                arr[j], arr[j+1] = arr[j+1], arr[j]",
             "                swapped = True",
@@ -557,7 +579,8 @@ private let p51_100: [PuzzleProblem] = [
             "ie":    PuzzleSlot(id: "ie",    label: "内側ループ終端", answer: "i + 1",  choices: ["i + 1", "i", "1"]),
             "nj":    PuzzleSlot(id: "nj",    label: "比較対象",       answer: "j + 1",  choices: ["j + 1", "j", "j - 1"]),
             "early": PuzzleSlot(id: "early", label: "早期終了条件",   answer: "swapped", choices: ["swapped", "arr", "i"])
-        ]
+        ],
+        explanation: "隣接要素を比較・交換して大きい要素を後ろへ「浮かせる」。1周して交換が無ければソート済みとして早期終了。最良 O(n)、最悪 O(n²)。"
     ),
 
     // 76. Insertion Sort
@@ -580,7 +603,8 @@ private let p51_100: [PuzzleProblem] = [
             "sj":  PuzzleSlot(id: "sj",  label: "j の初期値",  answer: "i - 1", choices: ["i - 1", "i", "0"]),
             "cmp": PuzzleSlot(id: "cmp", label: "比較対象",     answer: "key",   choices: ["key", "arr[i]", "arr[j+1]"]),
             "fj":  PuzzleSlot(id: "fj",  label: "シフト元",     answer: "j",     choices: ["j", "j + 1", "j - 1"])
-        ]
+        ],
+        explanation: "各要素を、前のソート済み部分の正しい位置へ挿入する。key より大きい要素を1つずつ後ろへずらして隙間を作る。最良 O(n)、最悪 O(n²)。"
     ),
 
     // 77. Selection Sort
@@ -602,7 +626,8 @@ private let p51_100: [PuzzleProblem] = [
             "inner": PuzzleSlot(id: "inner", label: "内側の開始", answer: "i + 1", choices: ["i + 1", "i", "0"]),
             "ci":    PuzzleSlot(id: "ci",    label: "最小値の比較対象", answer: "min_i", choices: ["min_i", "i", "j"]),
             "si":    PuzzleSlot(id: "si",    label: "スワップ対象",    answer: "min_i", choices: ["min_i", "i", "j"])
-        ]
+        ],
+        explanation: "未ソート部分から最小値を選び、先頭と交換することを繰り返す。比較は多いが交換は n 回のみ。常に O(n²)。"
     ),
 
     // 78. Counting Sort
@@ -623,7 +648,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "key": PuzzleSlot(id: "key", label: "カウントキー", answer: "n",               choices: ["n", "n - 1", "n + 1"]),
             "itr": PuzzleSlot(id: "itr", label: "イテレーション", answer: "enumerate(count)", choices: ["enumerate(count)", "count.items()", "zip(arr, count)"])
-        ]
+        ],
+        explanation: "値そのものを配列の添字としてカウントし、小さい値から順に展開する。比較ソートではなく値域 k に依存し O(n+k)。"
     ),
 
     // 79. Merge Sort
@@ -647,7 +673,8 @@ private let p51_100: [PuzzleProblem] = [
             "mid": PuzzleSlot(id: "mid", label: "中点",        answer: "len(arr) // 2", choices: ["len(arr) // 2", "len(arr) - 1", "len(arr)"]),
             "rs":  PuzzleSlot(id: "rs",  label: "右半分スライス", answer: "mid",         choices: ["mid", "mid + 1", "mid - 1"]),
             "aj":  PuzzleSlot(id: "aj",  label: "jの増加量",    answer: "1",             choices: ["1", "2", "i"])
-        ]
+        ],
+        explanation: "配列を半分に分割して再帰的にソートし、ソート済み2列を先頭から比較しながらマージする。分割統治で安定ソート、O(n log n)。"
     ),
 
     // 80. Dutch National Flag
@@ -673,7 +700,8 @@ private let p51_100: [PuzzleProblem] = [
             "bound": PuzzleSlot(id: "bound", label: "ループ境界",  answer: "hi",   choices: ["hi", "lo", "len(nums)"]),
             "sm":    PuzzleSlot(id: "sm",    label: "スワップ対象", answer: "mid",  choices: ["mid", "lo", "hi"]),
             "inc":   PuzzleSlot(id: "inc",   label: "midの増加量", answer: "1",    choices: ["1", "2", "0"])
-        ]
+        ],
+        explanation: "lo/mid/hi の3ポインタで、0は前へ・2は後ろへ swap し、1はそのまま。mid<=hi の間1パスで3分割する Two Pointers。O(n)・O(1)。"
     ),
 
     // 81. Balanced Binary Tree
@@ -697,7 +725,8 @@ private let p51_100: [PuzzleProblem] = [
             "sentinel": PuzzleSlot(id: "sentinel", label: "不平衡のセンチネル", answer: "-1", choices: ["-1", "0", "1"]),
             "thresh":   PuzzleSlot(id: "thresh",   label: "許容差",            answer: "1",  choices: ["1", "0", "2"]),
             "chk":      PuzzleSlot(id: "chk",      label: "不平衡チェック",    answer: "-1", choices: ["-1", "0", "1"])
-        ]
+        ],
+        explanation: "高さを返す再帰の中で、部分木が不平衡なら -1（センチネル）を返して即伝播させる。左右の高さ差が1を超えたら -1。各ノード1回訪問で O(n)。"
     ),
 
     // 82. Build Tree from Inorder + Postorder
@@ -720,7 +749,8 @@ private let p51_100: [PuzzleProblem] = [
             "ri": PuzzleSlot(id: "ri", label: "ルートのインデックス", answer: "-1",      choices: ["-1", "0", "len(postorder) // 2"]),
             "pl": PuzzleSlot(id: "pl", label: "左の後順終端",        answer: "mid",     choices: ["mid", "mid + 1", "len(inorder)"]),
             "ir": PuzzleSlot(id: "ir", label: "右の中順開始",        answer: "mid + 1", choices: ["mid + 1", "mid", "mid - 1"])
-        ]
+        ],
+        explanation: "後順の末尾が必ずルート。そのルート値で中順を左右に分割し、サイズに応じて後順も分割して左右部分木を再帰構築する。O(n)。"
     ),
 
     // 83. LCA of Binary Tree (General)
@@ -741,7 +771,8 @@ private let p51_100: [PuzzleProblem] = [
             "gl":    PuzzleSlot(id: "gl",    label: "左へ再帰",      answer: "left", choices: ["left", "right", "val"]),
             "both":  PuzzleSlot(id: "both",  label: "両側で見つかった", answer: "root", choices: ["root", "left", "right"]),
             "or_op": PuzzleSlot(id: "or_op", label: "片側のみの場合", answer: "or",   choices: ["or", "and", "if left else"])
-        ]
+        ],
+        explanation: "左右に再帰し、p または q を見つけたらそのノードを返す。左右両方からノードが返ればそこが LCA、片方だけならそれを上へ伝える。O(n)。"
     ),
 
     // 84. Flatten BT to Linked List
@@ -765,7 +796,8 @@ private let p51_100: [PuzzleProblem] = [
             "trav": PuzzleSlot(id: "trav", label: "右端を探す",   answer: "right", choices: ["right", "left", "val"]),
             "att":  PuzzleSlot(id: "att",  label: "右を付け替え", answer: "right", choices: ["right", "left", "val"]),
             "clr":  PuzzleSlot(id: "clr",  label: "左をクリア",   answer: "None",  choices: ["None", "curr.right", "root"])
-        ]
+        ],
+        explanation: "各ノードで左部分木の最右端を見つけ、そこに右部分木を付け替える。左を右に移して左を None にし、前順の連結リストへ in-place 変換。O(n)。"
     ),
 
     // 85. Meeting Rooms II
@@ -790,7 +822,8 @@ private let p51_100: [PuzzleProblem] = [
             "sk":   PuzzleSlot(id: "sk",   label: "開始時刻でソート", answer: "0",   choices: ["0", "1", "-1"]),
             "cmp":  PuzzleSlot(id: "cmp",  label: "空き部屋の確認",  answer: "s",   choices: ["s", "e", "heap[-1]"]),
             "push": PuzzleSlot(id: "push", label: "終了時刻を追加",  answer: "e",   choices: ["e", "s", "e - s"])
-        ]
+        ],
+        explanation: "開始時刻でソートし、最小ヒープに各会議の終了時刻を入れる。次の開始までに終わる部屋があれば再利用、無ければ新室追加。ヒープサイズ＝必要室数。O(n log n)。"
     ),
 
     // 86. Decode Ways
@@ -815,7 +848,8 @@ private let p51_100: [PuzzleProblem] = [
             "z":  PuzzleSlot(id: "z",  label: "先頭0チェック", answer: "'0'", choices: ["'0'", "'1'", "None"]),
             "sl": PuzzleSlot(id: "sl", label: "2桁スライス",   answer: "i-2", choices: ["i-2", "i-1", "0"]),
             "mx": PuzzleSlot(id: "mx", label: "2桁の最大値",   answer: "26",  choices: ["26", "99", "20"])
-        ]
+        ],
+        explanation: "dp[i] は先頭 i 文字のデコード数。直前1桁が有効なら dp[i-1]、直前2桁が 10〜26 なら dp[i-2] を加える。フィボナッチ型 DP。O(n)。"
     ),
 
     // 87. Minimum Path Sum
@@ -839,7 +873,8 @@ private let p51_100: [PuzzleProblem] = [
             "lft": PuzzleSlot(id: "lft", label: "左からの参照", answer: "j-1", choices: ["j-1", "j", "j+1"]),
             "ri":  PuzzleSlot(id: "ri",  label: "返り値の行",   answer: "m-1", choices: ["m-1", "0", "m"]),
             "rj":  PuzzleSlot(id: "rj",  label: "返り値の列",   answer: "n-1", choices: ["n-1", "0", "n"])
-        ]
+        ],
+        explanation: "各セルは「上か左の小さい方 ＋ 自分のコスト」。端の行・列は一方向しか来られない特別扱い。右下に最小コストが累積する。O(mn)。"
     ),
 
     // 88. Regular Expression Matching
@@ -869,7 +904,8 @@ private let p51_100: [PuzzleProblem] = [
             "sb":   PuzzleSlot(id: "sb",   label: "スター基底", answer: "j-2", choices: ["j-2", "j-1", "0"]),
             "pr":   PuzzleSlot(id: "pr",   label: "前行参照",   answer: "i-1", choices: ["i-1", "i", "i+1"]),
             "dg":   PuzzleSlot(id: "dg",   label: "対角参照",   answer: "j-1", choices: ["j-1", "j", "j+1"])
-        ]
+        ],
+        explanation: "dp[i][j] は s の i 文字まで・p の j 文字まで一致するか。'*' は「0回（j-2参照）」か「1回以上（前文字一致かつ dp[i-1][j]）」で場合分けする。O(mn)。"
     ),
 
     // 89. Minimum Window Substring
@@ -897,7 +933,8 @@ private let p51_100: [PuzzleProblem] = [
             "init": PuzzleSlot(id: "init", label: "missing初期値", answer: "len(t)", choices: ["len(t)", "len(s)", "0"]),
             "sh":   PuzzleSlot(id: "sh",   label: "縮小条件",      answer: "0",      choices: ["0", "1", "-1"]),
             "cb":   PuzzleSlot(id: "cb",   label: "最良解の比較",  answer: "best",   choices: ["best", "win", "s"])
-        ]
+        ],
+        explanation: "右端を伸ばして必要文字を満たし、満たしたら左端を縮めて最小化するスライディングウィンドウ。missing カウンタで充足を判定する。O(n)。"
     ),
 
     // 90. Largest Rectangle in Histogram
@@ -922,7 +959,8 @@ private let p51_100: [PuzzleProblem] = [
             "sent": PuzzleSlot(id: "sent", label: "番兵の追加",  answer: "[0]",  choices: ["[0]", "[heights[0]]", "[]"]),
             "wd":   PuzzleSlot(id: "wd",   label: "幅の計算",    answer: "idx",  choices: ["idx", "start", "i"]),
             "ns":   PuzzleSlot(id: "ns",   label: "start更新",   answer: "idx",  choices: ["idx", "i", "start"])
-        ]
+        ],
+        explanation: "単調増加スタックに (開始位置, 高さ) を積み、低い棒が来たら高い棒を pop して面積を確定する。番兵0で最後を flush。各棒1回 push/pop で O(n)。"
     ),
 
     // 91. Longest Valid Parentheses
@@ -949,7 +987,8 @@ private let p51_100: [PuzzleProblem] = [
             "init": PuzzleSlot(id: "init", label: "スタック初期値", answer: "-1",        choices: ["-1", "0", "None"]),
             "rem":  PuzzleSlot(id: "rem",  label: "スタックから削除", answer: "pop",     choices: ["pop", "append", "popleft"]),
             "base": PuzzleSlot(id: "base", label: "長さの基底",     answer: "stack[-1]", choices: ["stack[-1]", "stack[0]", "i"])
-        ]
+        ],
+        explanation: "スタックに未対応の位置を積む。底に -1 を置き、')' で pop した後、残った底との差が現在の有効長。空になったらその位置を新しい底にする。O(n)。"
     ),
 
     // 92. Serialize / Deserialize Binary Tree
@@ -969,6 +1008,7 @@ private let p51_100: [PuzzleProblem] = [
             "            res.append(str(node.val))",
             "            q.append({{lch}}); q.append(node.right)",
             "        else: res.append({{ns}})",
+            "    while res and res[-1] == 'N': res.pop()",
             "    return ','.join(res)",
             "",
             "def deserialize(data):",
@@ -976,7 +1016,7 @@ private let p51_100: [PuzzleProblem] = [
             "    vals = data.split(',')",
             "    root = TreeNode(int(vals[0]))",
             "    q = deque([root]); i = {{si}}",
-            "    while q:",
+            "    while q and i < len(vals):",
             "        node = q.popleft()",
             "        for side in ['left','right']:",
             "            if vals[i]!='N':",
@@ -989,7 +1029,8 @@ private let p51_100: [PuzzleProblem] = [
             "lch": PuzzleSlot(id: "lch", label: "左の子をキューへ", answer: "node.left", choices: ["node.left", "node.right", "root"]),
             "ns":  PuzzleSlot(id: "ns",  label: "Nullの表現",      answer: "'N'",        choices: ["'N'", "'#'", "'null'"]),
             "si":  PuzzleSlot(id: "si",  label: "デシリアライズ開始", answer: "1",        choices: ["1", "0", "2"])
-        ]
+        ],
+        explanation: "BFS でノードを順に出力し、None は 'N' で記録する。デシリアライズも同じ順にキューで子を割り当て直す。木構造を1次元文字列へ可逆変換。O(n)。"
     ),
 
     // 93. Wildcard Matching
@@ -1017,7 +1058,8 @@ private let p51_100: [PuzzleProblem] = [
             "wb": PuzzleSlot(id: "wb", label: "スター基底条件",     answer: "j-1", choices: ["j-1", "j", "j+1"]),
             "sp": PuzzleSlot(id: "sp", label: "スターの遷移",       answer: "j-1", choices: ["j-1", "j", "j+1"]),
             "di": PuzzleSlot(id: "di", label: "対角参照",           answer: "i-1", choices: ["i-1", "i", "i+1"])
-        ]
+        ],
+        explanation: "dp[i][j]。'*' は「空文字（dp[i][j-1]）」か「1文字消費（dp[i-1][j]）」、'?' と一致文字は対角 dp[i-1][j-1]。regex の '*' と違い単独で任意長にマッチ。O(mn)。"
     ),
 
     // 94. KMP Failure Function
@@ -1045,7 +1087,8 @@ private let p51_100: [PuzzleProblem] = [
             "start": PuzzleSlot(id: "start", label: "開始インデックス", answer: "1",        choices: ["1", "0", "2"]),
             "cj":    PuzzleSlot(id: "cj",    label: "比較対象",        answer: "length",   choices: ["length", "i", "i - 1"]),
             "back":  PuzzleSlot(id: "back",  label: "フォールバック",  answer: "length - 1", choices: ["length - 1", "length", "i - 1"])
-        ]
+        ],
+        explanation: "lps[i] は pat[0..i] の「真の接頭辞かつ接尾辞」の最大長。一致で length を伸ばし、不一致なら lps[length-1] へフォールバックして再比較する。O(m)。"
     ),
 
     // 95. Median of Two Sorted Arrays
@@ -1075,7 +1118,8 @@ private let p51_100: [PuzzleProblem] = [
             "jc":  PuzzleSlot(id: "jc",  label: "jの計算",    answer: "(m+n+1)//2 - i", choices: ["(m+n+1)//2 - i", "(m+n)//2 - i", "m+n-i"]),
             "chk": PuzzleSlot(id: "chk", label: "パーティション条件", answer: "Bl<=Ar",  choices: ["Bl<=Ar", "Bl>=Ar", "Bl<Ar"]),
             "odd": PuzzleSlot(id: "odd", label: "奇数長のメジアン",   answer: "max(Al,Bl)", choices: ["max(Al,Bl)", "min(Ar,Br)", "(Al+Bl)/2"])
-        ]
+        ],
+        explanation: "短い方を二分探索し、両配列を「左半分の合計個数が全体の半分」になるよう分割する。左の最大 ≤ 右の最小を満たす分割点でメジアン確定。O(log min(m,n))。"
     ),
 
     // 96. Minimum Spanning Tree (Kruskal's)
@@ -1102,7 +1146,8 @@ private let p51_100: [PuzzleProblem] = [
             "fc": PuzzleSlot(id: "fc", label: "経路圧縮",   answer: "x",  choices: ["x", "parent[x]", "0"]),
             "sk": PuzzleSlot(id: "sk", label: "重みでソート", answer: "2", choices: ["2", "0", "1"]),
             "mg": PuzzleSlot(id: "mg", label: "マージ先",    answer: "pv", choices: ["pv", "pu", "u"])
-        ]
+        ],
+        explanation: "辺を重み昇順にソートし、Union-Find で閉路を作らない辺だけ採用する貪欲法。連結成分が異なる辺のみ加えると最小全域木になる。O(E log E)。"
     ),
 
     // 97. Jump Game II
@@ -1123,7 +1168,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "reach": PuzzleSlot(id: "reach", label: "到達可能な最大", answer: "i + nums[i]", choices: ["i + nums[i]", "nums[i]", "i + far"]),
             "bound": PuzzleSlot(id: "bound", label: "ジャンプ境界",   answer: "cur_end",     choices: ["cur_end", "far", "len(nums) - 1"])
-        ]
+        ],
+        explanation: "現在のジャンプで届く範囲を走査しつつ、次に届く最遠点 far を更新する。範囲の端 i==cur_end に来たらジャンプ回数を増やし境界を far に更新。貪欲な BFS。O(n)。"
     ),
 
     // 98. Pascal's Triangle
@@ -1144,7 +1190,8 @@ private let p51_100: [PuzzleProblem] = [
             "prev_row": PuzzleSlot(id: "prev_row", label: "前の行を取得", answer: "-1",  choices: ["-1", "0", "i"]),
             "nj":       PuzzleSlot(id: "nj",       label: "隣接インデックス", answer: "j+1", choices: ["j+1", "j", "j-1"]),
             "add_row":  PuzzleSlot(id: "add_row",  label: "行を追加",    answer: "row", choices: ["row", "prev", "[row]"])
-        ]
+        ],
+        explanation: "各行は両端が1で、内側は前の行の隣り合う2要素の和。prev[j]+prev[j+1] で生成する。O(numRows²)。"
     ),
 
     // 99. Best Time to Buy and Sell Stock
@@ -1164,7 +1211,8 @@ private let p51_100: [PuzzleProblem] = [
         slots: [
             "um": PuzzleSlot(id: "um", label: "最安値の更新", answer: "p",          choices: ["p", "profit", "min_p"]),
             "up": PuzzleSlot(id: "up", label: "利益の更新",   answer: "p - min_p",  choices: ["p - min_p", "min_p - p", "p + min_p"])
-        ]
+        ],
+        explanation: "これまでの最安値を更新しながら、各日「現在価格 − 最安値」で最大利益を更新する。1パス・1回売買で O(n)。"
     ),
 
     // 100. Spiral Matrix
@@ -1194,7 +1242,8 @@ private let p51_100: [PuzzleProblem] = [
             "t":  PuzzleSlot(id: "t",  label: "上辺の行",  answer: "top",  choices: ["top", "bottom", "left"]),
             "st": PuzzleSlot(id: "st", label: "下辺のstep", answer: "-1",  choices: ["-1", "1", "0"]),
             "cl": PuzzleSlot(id: "cl", label: "左辺の列",  answer: "left", choices: ["left", "right", "top"])
-        ]
+        ],
+        explanation: "top/bottom/left/right の4境界を内側へ詰めながら、上辺→右辺→下辺→左辺の順に取り出す。境界が交差したら終了。O(mn)。"
     )
 ]
 
@@ -1247,7 +1296,8 @@ private let p1_50: [PuzzleProblem] = [
             "diff_expr": PuzzleSlot(id: "diff_expr", label: "差分式",  answer: "target - n", choices: ["n - target", "target - n", "target + n"]),
             "seen_key":  PuzzleSlot(id: "seen_key",  label: "辞書キー", answer: "n",          choices: ["i", "n", "diff"]),
             "seen_val":  PuzzleSlot(id: "seen_val",  label: "辞書値",  answer: "i",          choices: ["i", "n", "target"])
-        ]
+        ],
+        explanation: "各要素について target との差を辞書で探す。差が既出ならペア成立、無ければ自分を辞書へ登録。1パス・ハッシュで O(n)。"
     ),
 
     // 3. Valid Parentheses
@@ -1272,7 +1322,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "empty_check": PuzzleSlot(id: "empty_check", label: "空スタック判定", answer: "not stack",  choices: ["not stack", "stack", "len(stack) > 0"]),
             "final_check": PuzzleSlot(id: "final_check", label: "最終判定",      answer: "not stack",  choices: ["True", "not stack", "len(stack) > 0"])
-        ]
+        ],
+        explanation: "開き括弧はスタックに積み、閉じ括弧では対応する開きが先頭にあるか pop して確認する。最後にスタックが空なら全て対応済み。O(n)。"
     ),
 
     // 4. Fibonacci (Memoization)
@@ -1293,7 +1344,8 @@ private let p1_50: [PuzzleProblem] = [
             "cache_check": PuzzleSlot(id: "cache_check", label: "キャッシュ確認", answer: "n in memo", choices: ["n in memo", "memo[n]", "n > 1"]),
             "rec1":        PuzzleSlot(id: "rec1",        label: "再帰1",         answer: "n - 1",     choices: ["n - 1", "n - 2", "n + 1"]),
             "rec2":        PuzzleSlot(id: "rec2",        label: "再帰2",         answer: "n - 2",     choices: ["n - 2", "n - 1", "n + 2"])
-        ]
+        ],
+        explanation: "計算済みの値を memo に保存し、再帰の重複計算を排除する。fib(n)=fib(n-1)+fib(n-2)。メモ化で指数時間を O(n) に短縮。"
     ),
 
     // 5. Maximum Subarray (Kadane's)
@@ -1312,7 +1364,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "cur_upd": PuzzleSlot(id: "cur_upd", label: "cur更新",     answer: "max(n, cur + n)",    choices: ["max(n, cur + n)", "max(0, cur + n)", "cur + n"]),
             "max_upd": PuzzleSlot(id: "max_upd", label: "max_sum更新", answer: "max(max_sum, cur)",  choices: ["max(max_sum, cur)", "max(max_sum, n)", "max_sum + cur"])
-        ]
+        ],
+        explanation: "Kadane 法。各位置で「自分から始め直す or 直前までの和に足す」の大きい方を cur とし、その最大を記録する。O(n)・O(1)。"
     ),
 
     // 6. Reverse Linked List
@@ -1335,7 +1388,8 @@ private let p1_50: [PuzzleProblem] = [
             "point_to": PuzzleSlot(id: "point_to", label: "next付け替え先", answer: "prev",  choices: ["prev", "nxt", "None"]),
             "adv_prev": PuzzleSlot(id: "adv_prev", label: "prev更新",      answer: "curr",  choices: ["curr", "nxt", "prev"]),
             "ret_val":  PuzzleSlot(id: "ret_val",  label: "返り値",         answer: "prev",  choices: ["prev", "curr", "head"])
-        ]
+        ],
+        explanation: "prev/curr/nxt の3ポインタで、各ノードの next を前向きから後ろ向きへ付け替える。最後の prev が新しい先頭。O(n)・O(1)。"
     ),
 
     // 7. BFS
@@ -1360,7 +1414,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "deq": PuzzleSlot(id: "deq", label: "取り出し(FIFO)", answer: "popleft", choices: ["popleft", "pop", "append"]),
             "enq": PuzzleSlot(id: "enq", label: "追加方向",       answer: "append",  choices: ["append", "appendleft", "popleft"])
-        ]
+        ],
+        explanation: "キュー（FIFO）で近い順に展開する。訪問時に visited へ入れて二重訪問を防ぎ、popleft で取り出し append で追加。O(V+E)。"
     ),
 
     // 8. DFS (Iterative)
@@ -1384,7 +1439,8 @@ private let p1_50: [PuzzleProblem] = [
             "loop_cond": PuzzleSlot(id: "loop_cond", label: "ループ条件",       answer: "stack",  choices: ["stack", "visited", "True"]),
             "pop_m":     PuzzleSlot(id: "pop_m",     label: "取り出し(LIFO)",   answer: "pop",    choices: ["pop", "popleft", "append"]),
             "push":      PuzzleSlot(id: "push",      label: "スタックに積む値", answer: "nb",     choices: ["nb", "node", "start"])
-        ]
+        ],
+        explanation: "スタック（LIFO）で深い方向へ探索する。pop で取り出し、未訪問なら訪問して隣接を push。再帰を明示スタックで置き換えた形。O(V+E)。"
     ),
 
     // 9. Longest Substring Without Repeating
@@ -1408,7 +1464,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "shrink": PuzzleSlot(id: "shrink", label: "縮小条件",   answer: "s[right] in char_set", choices: ["s[right] in char_set", "left > right", "right >= len(s)"]),
             "win":    PuzzleSlot(id: "win",    label: "ウィンドウ幅", answer: "right - left + 1",    choices: ["right - left + 1", "right - left", "right + 1"])
-        ]
+        ],
+        explanation: "右端を伸ばし、重複文字が入ったら左端を縮めて集合から除く。ウィンドウ幅 right-left+1 の最大を記録する。O(n)。"
     ),
 
     // 10. Quicksort
@@ -1430,7 +1487,8 @@ private let p1_50: [PuzzleProblem] = [
             "base":  PuzzleSlot(id: "base",  label: "基底条件",    answer: "1",             choices: ["1", "0", "2"]),
             "pivot": PuzzleSlot(id: "pivot", label: "ピボット位置", answer: "len(arr) // 2", choices: ["len(arr) // 2", "0", "-1"]),
             "l_arg": PuzzleSlot(id: "l_arg", label: "左再帰の引数", answer: "left",          choices: ["left", "mid", "right"])
-        ]
+        ],
+        explanation: "ピボットを基準に 小・等・大 の3つへ分割し、小と大を再帰ソートして連結する。平均 O(n log n)。"
     ),
 
     // 11. Climbing Stairs
@@ -1450,7 +1508,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "dp2":  PuzzleSlot(id: "dp2",  label: "dp[2]の初期値", answer: "2",                 choices: ["2", "1", "3"]),
             "recur": PuzzleSlot(id: "recur", label: "漸化式",       answer: "dp[i-1] + dp[i-2]", choices: ["dp[i-1] + dp[i-2]", "dp[i-1] * dp[i-2]", "dp[i-2] + dp[i-3]"])
-        ]
+        ],
+        explanation: "dp[i]=dp[i-1]+dp[i-2]。i 段目には「1段前から1歩」か「2段前から2歩」で来るので、フィボナッチと同じ漸化式になる。O(n)。"
     ),
 
     // 12. House Robber
@@ -1471,7 +1530,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "dp1":  PuzzleSlot(id: "dp1",  label: "dp[1]の初期値", answer: "nums[0]",           choices: ["nums[0]", "0", "nums[1]"]),
             "prev1": PuzzleSlot(id: "prev1", label: "直前を参照",    answer: "i-1",               choices: ["i-1", "i-2", "i"])
-        ]
+        ],
+        explanation: "dp[i]=max(盗まない=dp[i-1], 盗む=dp[i-2]+今の家)。隣接禁止を「1つ飛ばし」で表現する DP。O(n)。"
     ),
 
     // 13. Coin Change
@@ -1492,7 +1552,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "base": PuzzleSlot(id: "base", label: "基底条件",   answer: "0",     choices: ["0", "1", "amount"]),
             "sub":  PuzzleSlot(id: "sub",  label: "部分問題",   answer: "i - c", choices: ["i - c", "i - 1", "c"])
-        ]
+        ],
+        explanation: "dp[i] は金額 i を作る最小枚数。各コイン c について dp[i-c]+1 と比べて最小を取る。ボトムアップ DP で O(amount×コイン数)。"
     ),
 
     // 14. Longest Common Subsequence
@@ -1515,7 +1576,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "match":    PuzzleSlot(id: "match",    label: "一致時",  answer: "dp[i-1][j-1] + 1",          choices: ["dp[i-1][j-1] + 1", "dp[i][j-1] + 1", "dp[i-1][j-1]"]),
             "mismatch": PuzzleSlot(id: "mismatch", label: "不一致時", answer: "max(dp[i-1][j], dp[i][j-1])", choices: ["max(dp[i-1][j], dp[i][j-1])", "dp[i-1][j-1]", "dp[i-1][j] + dp[i][j-1]"])
-        ]
+        ],
+        explanation: "文字が一致したら対角 dp[i-1][j-1]+1、不一致なら左か上の大きい方を引き継ぐ。2次元 DP で O(mn)。"
     ),
 
     // 15. Longest Increasing Subsequence
@@ -1535,7 +1597,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "inner": PuzzleSlot(id: "inner", label: "内側のrange", answer: "i",  choices: ["i", "len(nums)", "i + 1"]),
             "add":   PuzzleSlot(id: "add",   label: "加算値",      answer: "1",  choices: ["1", "2", "dp[i]"])
-        ]
+        ],
+        explanation: "dp[i] は i で終わる最長増加列の長さ。自分より前で値が小さい j を見て dp[j]+1 の最大を取る。O(n²)。"
     ),
 
     // 16. Jump Game
@@ -1555,7 +1618,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "check": PuzzleSlot(id: "check", label: "到達不可条件", answer: "reach",  choices: ["reach", "n", "len(nums)"]),
             "upd":   PuzzleSlot(id: "upd",   label: "reach更新",   answer: "i + n",  choices: ["i + n", "reach + 1", "n"])
-        ]
+        ],
+        explanation: "到達可能な最遠点 reach を更新し続け、現在位置 i が reach を超えたら到達不能。貪欲法で O(n)。"
     ),
 
     // 17. Word Break
@@ -1577,7 +1641,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "base": PuzzleSlot(id: "base", label: "基底条件", answer: "0",   choices: ["0", "1", "n"]),
             "sl":   PuzzleSlot(id: "sl",   label: "スライス", answer: "j:i", choices: ["j:i", "i:j", "j:n"])
-        ]
+        ],
+        explanation: "dp[i] は先頭 i 文字が辞書語で分割可能か。dp[j] が真かつ s[j:i] が辞書にあれば dp[i] も真。O(n²)。"
     ),
 
     // 18. Edit Distance
@@ -1602,7 +1667,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "row":  PuzzleSlot(id: "row",  label: "行の初期化", answer: "i",   choices: ["i", "j", "0"]),
             "diag": PuzzleSlot(id: "diag", label: "対角参照",   answer: "i-1", choices: ["i-1", "i", "i+1"])
-        ]
+        ],
+        explanation: "dp[i][j] は w1 の i 文字を w2 の j 文字へ変える最小操作数。一致なら対角そのまま、不一致なら 挿入/削除/置換 の min に +1。O(mn)。"
     ),
 
     // 19. 0-1 Knapsack
@@ -1627,7 +1693,8 @@ private let p1_50: [PuzzleProblem] = [
             "prev": PuzzleSlot(id: "prev", label: "前行参照",  answer: "i-1",      choices: ["i-1", "i", "i+1"]),
             "vali": PuzzleSlot(id: "vali", label: "価値の追加", answer: "val[i-1]", choices: ["val[i-1]", "wt[i-1]", "1"]),
             "sw":   PuzzleSlot(id: "sw",   label: "同重さ参照", answer: "w",        choices: ["w", "w-1", "0"])
-        ]
+        ],
+        explanation: "dp[i][w] は i 個目まで・容量 w での最大価値。入れる（価値＋残容量の最適）か入れない（前行）かの max を取る。O(nW)。"
     ),
 
     // 20. Unique Paths
@@ -1648,7 +1715,8 @@ private let p1_50: [PuzzleProblem] = [
             "rf":   PuzzleSlot(id: "rf",   label: "上からの参照", answer: "i-1", choices: ["i-1", "i", "i+1"]),
             "cf":   PuzzleSlot(id: "cf",   label: "左からの参照", answer: "j-1", choices: ["j-1", "j", "j+1"]),
             "ret":  PuzzleSlot(id: "ret",  label: "返り値の行",   answer: "m-1", choices: ["m-1", "0", "m"])
-        ]
+        ],
+        explanation: "各マスへの経路数は「上＋左」の和。端は常に1通り。組み合わせを DP で数える形で O(mn)。"
     ),
 
     // 21. Number of Islands
@@ -1675,7 +1743,8 @@ private let p1_50: [PuzzleProblem] = [
             "tgt": PuzzleSlot(id: "tgt", label: "探索対象",  answer: "'1'", choices: ["'1'", "'0'", "1"]),
             "vis": PuzzleSlot(id: "vis", label: "訪問済みマーク", answer: "'0'", choices: ["'0'", "'#'", "'1'"]),
             "nj":  PuzzleSlot(id: "nj",  label: "隣接j計算",  answer: "j+dj", choices: ["j+dj", "j", "dj"])
-        ]
+        ],
+        explanation: "陸 '1' を見つけたら DFS で繋がった陸を全て '0' に沈め、1島とカウントする。沈めることで再カウントを防ぐ。O(mn)。"
     ),
 
     // 22. Course Schedule
@@ -1703,7 +1772,8 @@ private let p1_50: [PuzzleProblem] = [
             "cyc":  PuzzleSlot(id: "cyc",  label: "サイクル判定値", answer: "1",  choices: ["1", "2", "0"]),
             "rec":  PuzzleSlot(id: "rec",  label: "再帰引数",      answer: "nb", choices: ["nb", "v", "g[v]"]),
             "done": PuzzleSlot(id: "done", label: "完了マーク",    answer: "2",  choices: ["2", "1", "0"])
-        ]
+        ],
+        explanation: "有向グラフの閉路検出。state(0=未訪問/1=訪問中/2=完了) で DFS し、訪問中(1)に再到達したら閉路＝受講不可。O(V+E)。"
     ),
 
     // 23. Topological Sort (Kahn's)
@@ -1732,7 +1802,8 @@ private let p1_50: [PuzzleProblem] = [
             "zero": PuzzleSlot(id: "zero", label: "初期キュー条件",     answer: "0",  choices: ["0", "1", "-1"]),
             "rdy":  PuzzleSlot(id: "rdy",  label: "追加条件",          answer: "0",  choices: ["0", "1", "-1"]),
             "chk":  PuzzleSlot(id: "chk",  label: "完全性チェック",     answer: "n",  choices: ["n", "len(edges)", "0"])
-        ]
+        ],
+        explanation: "Kahn 法。入次数0のノードから取り出し、隣接の入次数を減らして0になれば追加する。全ノードを出せなければ閉路あり。O(V+E)。"
     ),
 
     // 24. Union Find
@@ -1760,7 +1831,8 @@ private let p1_50: [PuzzleProblem] = [
             "init":     PuzzleSlot(id: "init",     label: "初期化",   answer: "n",               choices: ["n", "n + 1", "0"]),
             "compress": PuzzleSlot(id: "compress", label: "経路圧縮", answer: "self.parent[x]",  choices: ["self.parent[x]", "x", "0"]),
             "child":    PuzzleSlot(id: "child",    label: "子ノード", answer: "py",              choices: ["py", "px", "y"])
-        ]
+        ],
+        explanation: "find で経路圧縮（親を根へ付け替え）、union でランクの低い木を高い木へ繋ぐ。ほぼ O(1) で集合の併合・所属判定ができる。"
     ),
 
     // 25. Dijkstra's
@@ -1788,7 +1860,8 @@ private let p1_50: [PuzzleProblem] = [
             "init_d": PuzzleSlot(id: "init_d", label: "始点の距離",    answer: "0",        choices: ["0", "1", "float('inf')"]),
             "pop":    PuzzleSlot(id: "pop",    label: "最小取り出し",   answer: "heappop",  choices: ["heappop", "heappush", "heapify"]),
             "nb":     PuzzleSlot(id: "nb",     label: "隣接ノード参照", answer: "v",        choices: ["v", "u", "src"])
-        ]
+        ],
+        explanation: "最小ヒープで「現在いちばん近い未確定ノード」を取り出し、隣接を緩和する。負辺が無ければ取り出した瞬間に距離が確定。O(E log V)。"
     ),
 
     // 26. Merge Two Sorted Lists
@@ -1814,7 +1887,8 @@ private let p1_50: [PuzzleProblem] = [
             "adv_l1": PuzzleSlot(id: "adv_l1", label: "l1を進める",   answer: "l1.next",   choices: ["l1.next", "l2.next", "None"]),
             "adv_c":  PuzzleSlot(id: "adv_c",  label: "currを進める", answer: "next",      choices: ["next", "val", "prev"]),
             "tail":   PuzzleSlot(id: "tail",   label: "残りの接続",   answer: "l1 or l2",  choices: ["l1 or l2", "None", "l1 and l2"])
-        ]
+        ],
+        explanation: "ダミーノードを起点に、2リストの先頭の小さい方を繋いでいく。片方が尽きたら残りをそのまま接続する。O(m+n)。"
     ),
 
     // 27. Detect Cycle (Floyd's)
@@ -1836,7 +1910,8 @@ private let p1_50: [PuzzleProblem] = [
             "cond":  PuzzleSlot(id: "cond",  label: "ループ条件",   answer: "fast and fast.next",  choices: ["fast and fast.next", "fast", "slow != fast"]),
             "step":  PuzzleSlot(id: "step",  label: "fastのステップ", answer: "next.next",           choices: ["next.next", "next", "prev"]),
             "found": PuzzleSlot(id: "found", label: "サイクル検出",  answer: "True",                choices: ["True", "False", "slow"])
-        ]
+        ],
+        explanation: "亀（1歩）とウサギ（2歩）を進めると、閉路があれば必ず出会う。fast が末尾に達したら閉路なし。O(n)・O(1)。"
     ),
 
     // 28. Add Two Numbers (LL)
@@ -1862,7 +1937,8 @@ private let p1_50: [PuzzleProblem] = [
             "cc":  PuzzleSlot(id: "cc",  label: "繰り上がり条件", answer: "carry",      choices: ["carry", "l1 and l2", "False"]),
             "nc":  PuzzleSlot(id: "nc",  label: "次の繰り上がり", answer: "total // 10", choices: ["total // 10", "total % 10", "total - 10"]),
             "dig": PuzzleSlot(id: "dig", label: "桁の値",         answer: "total % 10", choices: ["total % 10", "total // 10", "total"])
-        ]
+        ],
+        explanation: "逆順なので下位桁から加算でき、carry を上の桁へ繰り上げる。桁または carry が残る限りループ。O(max(m,n))。"
     ),
 
     // 29. Intersection of Two Linked Lists
@@ -1881,7 +1957,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "sa": PuzzleSlot(id: "sa", label: "Aのスイッチ先", answer: "hB", choices: ["hB", "hA", "None"]),
             "sb": PuzzleSlot(id: "sb", label: "Bのスイッチ先", answer: "hA", choices: ["hA", "hB", "None"])
-        ]
+        ],
+        explanation: "2ポインタを末尾で相手の先頭へ繋ぎ替えると、長さの差が相殺され同時に交点へ到達する。交点が無ければ共に None で停止。O(m+n)。"
     ),
 
     // 30. Middle of Linked List
@@ -1900,7 +1977,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "chk": PuzzleSlot(id: "chk", label: "fastの確認",   answer: "next",  choices: ["next", "val", "prev"]),
             "stp": PuzzleSlot(id: "stp", label: "fastのステップ", answer: "next",  choices: ["next", "next.next", "val"])
-        ]
+        ],
+        explanation: "亀1歩・ウサギ2歩で進めると、ウサギが末尾に着くとき亀が中央を指す。偶数長では後半側の中央。O(n)。"
     ),
 
     // 31. Inorder Traversal (Iterative)
@@ -1924,7 +2002,8 @@ private let p1_50: [PuzzleProblem] = [
             "extra": PuzzleSlot(id: "extra", label: "ループ継続条件", answer: "stack", choices: ["stack", "res", "curr"]),
             "left":  PuzzleSlot(id: "left",  label: "左へ進む",      answer: "left",  choices: ["left", "right", "val"]),
             "right": PuzzleSlot(id: "right", label: "右へ進む",      answer: "right", choices: ["right", "left", "next"])
-        ]
+        ],
+        explanation: "左に潜れるだけスタックへ積み、pop して値を取り、右へ移る。再帰の中順走査をスタックで再現する。O(n)。"
     ),
 
     // 32. Level Order Traversal
@@ -1951,7 +2030,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "sz":  PuzzleSlot(id: "sz",  label: "レベルのサイズ",  answer: "len(q)",   choices: ["len(q)", "q.maxlen", "1"]),
             "deq": PuzzleSlot(id: "deq", label: "取り出し(FIFO)",  answer: "popleft",  choices: ["popleft", "pop", "append"])
-        ]
+        ],
+        explanation: "BFS で、各ループ開始時のキュー長を「その階層のノード数」として一段ずつ取り出す。階層ごとに配列化する。O(n)。"
     ),
 
     // 33. Maximum Depth of Binary Tree
@@ -1969,7 +2049,8 @@ private let p1_50: [PuzzleProblem] = [
             "base": PuzzleSlot(id: "base", label: "基底条件",  answer: "0",     choices: ["0", "1", "-1"]),
             "lft":  PuzzleSlot(id: "lft",  label: "左の再帰",  answer: "left",  choices: ["left", "right", "val"]),
             "rgt":  PuzzleSlot(id: "rgt",  label: "右の再帰",  answer: "right", choices: ["right", "left", "next"])
-        ]
+        ],
+        explanation: "空なら0、そうでなければ左右の深さの max に自分の1を足す。再帰による素直な高さ計算。O(n)。"
     ),
 
     // 34. Validate BST
@@ -1988,7 +2069,8 @@ private let p1_50: [PuzzleProblem] = [
             "base": PuzzleSlot(id: "base", label: "基底条件",  answer: "True",     choices: ["True", "False", "None"]),
             "lhi":  PuzzleSlot(id: "lhi",  label: "左の上限",  answer: "root.val", choices: ["root.val", "hi", "lo"]),
             "rlo":  PuzzleSlot(id: "rlo",  label: "右の下限",  answer: "root.val", choices: ["root.val", "lo", "hi"])
-        ]
+        ],
+        explanation: "各ノードに許容範囲 (lo,hi) を渡し、左へは上限を val に、右へは下限を val に狭めて再帰する。範囲外なら不正。O(n)。"
     ),
 
     // 35. LCA of BST
@@ -2011,7 +2093,8 @@ private let p1_50: [PuzzleProblem] = [
             "gl":  PuzzleSlot(id: "gl",  label: "左へ移動",  answer: "left",  choices: ["left", "right", "val"]),
             "gr":  PuzzleSlot(id: "gr",  label: "右へ移動",  answer: "right", choices: ["right", "left", "next"]),
             "ret": PuzzleSlot(id: "ret", label: "LCA を返す", answer: "root",  choices: ["root", "p", "q"])
-        ]
+        ],
+        explanation: "BST の順序性を使う。両ノードが root より小さければ左、大きければ右、分岐したらそこが LCA。O(h)。"
     ),
 
     // 36. Kth Smallest in BST
@@ -2035,7 +2118,8 @@ private let p1_50: [PuzzleProblem] = [
             "lft":  PuzzleSlot(id: "lft",  label: "左へ進む",  answer: "left",  choices: ["left", "right", "val"]),
             "inc":  PuzzleSlot(id: "inc",  label: "カウント増加", answer: "1",   choices: ["1", "k", "cnt"]),
             "attr": PuzzleSlot(id: "attr", label: "返す属性",   answer: "val",  choices: ["val", "left", "right"])
-        ]
+        ],
+        explanation: "中順走査は昇順に値を出す。k 個目に取り出した値が答え。スタックで反復中順を行う。O(h+k)。"
     ),
 
     // 37. Invert Binary Tree
@@ -2054,7 +2138,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "base": PuzzleSlot(id: "base", label: "基底条件",  answer: "None",                  choices: ["None", "root", "False"]),
             "swap": PuzzleSlot(id: "swap", label: "左右の入れ替え", answer: "root.right, root.left", choices: ["root.right, root.left", "root.left, root.right", "None, None"])
-        ]
+        ],
+        explanation: "各ノードで左右の子を入れ替え、再帰的に下まで反転する。O(n)。"
     ),
 
     // 38. Symmetric Tree
@@ -2076,7 +2161,8 @@ private let p1_50: [PuzzleProblem] = [
             "ne": PuzzleSlot(id: "ne", label: "片方がNone", answer: "False",   choices: ["False", "True", "None"]),
             "ir": PuzzleSlot(id: "ir", label: "右の内側",   answer: "r.right", choices: ["r.right", "r.left", "l.right"]),
             "sl": PuzzleSlot(id: "sl", label: "開始ノード", answer: "left",    choices: ["left", "right", "val"])
-        ]
+        ],
+        explanation: "左部分木と右部分木を「鏡」として比較する。l.left と r.right、l.right と r.left を再帰照合。O(n)。"
     ),
 
     // 39. Path Sum
@@ -2096,7 +2182,8 @@ private let p1_50: [PuzzleProblem] = [
             "base": PuzzleSlot(id: "base", label: "基底条件",     answer: "False",    choices: ["False", "True", "target == 0"]),
             "leaf": PuzzleSlot(id: "leaf", label: "リーフの判定", answer: "target",   choices: ["target", "0", "root.val"]),
             "sub":  PuzzleSlot(id: "sub",  label: "残りの合計",   answer: "root.val", choices: ["root.val", "target", "1"])
-        ]
+        ],
+        explanation: "残り target から各ノード値を引きながら下り、リーフで残りが0（＝val が残りと一致）なら成功。左右いずれか真でよい。O(n)。"
     ),
 
     // 40. Diameter of Binary Tree
@@ -2118,7 +2205,8 @@ private let p1_50: [PuzzleProblem] = [
             "base": PuzzleSlot(id: "base", label: "基底条件",  answer: "0",     choices: ["0", "-1", "1"]),
             "diam": PuzzleSlot(id: "diam", label: "直径の更新", answer: "l + r", choices: ["l + r", "l + r + 1", "max(l, r)"]),
             "mr":   PuzzleSlot(id: "mr",   label: "高さの計算", answer: "r",     choices: ["r", "l", "l + r"])
-        ]
+        ],
+        explanation: "各ノードで「左の高さ＋右の高さ」が、そのノードを通る最長経路。高さを返す再帰の副作用として直径を更新する。O(n)。"
     ),
 
     // 41. Next Greater Element
@@ -2141,7 +2229,8 @@ private let p1_50: [PuzzleProblem] = [
             "top":    PuzzleSlot(id: "top",    label: "スタック先頭", answer: "stack[-1]", choices: ["stack[-1]", "stack[0]", "stack.pop()"]),
             "assign": PuzzleSlot(id: "assign", label: "結果に代入",   answer: "n",         choices: ["n", "i", "nums[i-1]"]),
             "push":   PuzzleSlot(id: "push",   label: "スタックに積む", answer: "i",        choices: ["i", "n", "res[i]"])
-        ]
+        ],
+        explanation: "単調減少スタックにインデックスを積み、より大きい数が来たら小さい要素を pop して答えを埋める。各要素1回処理で O(n)。"
     ),
 
     // 42. Min Stack
@@ -2166,7 +2255,8 @@ private let p1_50: [PuzzleProblem] = [
             "mv":  PuzzleSlot(id: "mv",  label: "最小値の更新",  answer: "min(val, self.mins[-1])",  choices: ["min(val, self.mins[-1])", "min(val, self.stack[-1])", "self.mins[-1]"]),
             "mp":  PuzzleSlot(id: "mp",  label: "minスタック削除", answer: "pop",                     choices: ["pop", "append", "clear"]),
             "idx": PuzzleSlot(id: "idx", label: "最小値の取得",   answer: "-1",                      choices: ["-1", "0", "1"])
-        ]
+        ],
+        explanation: "値スタックと並行して「その時点の最小値」スタックを持つ。push 時に現最小と比べた値を積むので、get_min は先頭参照で O(1)。"
     ),
 
     // 43. LRU Cache
@@ -2192,7 +2282,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "mv":    PuzzleSlot(id: "mv",    label: "最近使用に移動", answer: "move_to_end", choices: ["move_to_end", "popitem", "update"]),
             "evict": PuzzleSlot(id: "evict", label: "最古を削除",     answer: "popitem",     choices: ["popitem", "pop", "move_to_end"])
-        ]
+        ],
+        explanation: "OrderedDict で順序を保持する。アクセス時に move_to_end で最新化し、容量超過時に popitem(last=False) で最古を捨てる。O(1)。"
     ),
 
     // 44. Kth Largest Element
@@ -2215,7 +2306,8 @@ private let p1_50: [PuzzleProblem] = [
             "push":  PuzzleSlot(id: "push",  label: "ヒープに追加",   answer: "heappush",  choices: ["heappush", "heappop", "heapify"]),
             "pop_s": PuzzleSlot(id: "pop_s", label: "最小値を削除",   answer: "heappop",   choices: ["heappop", "heappush", "heapreplace"]),
             "top":   PuzzleSlot(id: "top",   label: "k番目の取得",    answer: "0",         choices: ["0", "-1", "k - 1"])
-        ]
+        ],
+        explanation: "サイズ k の最小ヒープを維持する。k を超えたら最小を捨てると、ヒープの根が k 番目に大きい値になる。O(n log k)。"
     ),
 
     // 45. Top K Frequent Elements
@@ -2233,13 +2325,14 @@ private let p1_50: [PuzzleProblem] = [
             "    for num, cnt in freq.items():",
             "        heapq.heappush(heap, ({{hk}}, num))",
             "        if len(heap) > k: heapq.heappop(heap)",
-            "    return [x[{{ext}}] for x in heap]"
+            "    return [x[{{ext}}] for x in sorted(heap, reverse=True)]"
         ],
         slots: [
             "inp": PuzzleSlot(id: "inp", label: "カウント対象", answer: "nums",  choices: ["nums", "freq", "k"]),
             "hk":  PuzzleSlot(id: "hk",  label: "ヒープキー",   answer: "cnt",   choices: ["cnt", "-cnt", "num"]),
             "ext": PuzzleSlot(id: "ext", label: "要素の取り出し", answer: "1",    choices: ["1", "0", "-1"])
-        ]
+        ],
+        explanation: "出現回数を数え、(回数, 要素) を最小ヒープに入れて k 個だけ残す。回数の少ないものから捨てる。O(n log k)。"
     ),
 
     // 46. Trie Insert
@@ -2264,7 +2357,8 @@ private let p1_50: [PuzzleProblem] = [
             "nn":  PuzzleSlot(id: "nn",  label: "新しいノード", answer: "TrieNode()", choices: ["TrieNode()", "Trie()", "{}"]),
             "key": PuzzleSlot(id: "key", label: "辞書のキー",   answer: "ch",         choices: ["ch", "word", "node"]),
             "end": PuzzleSlot(id: "end", label: "終端フラグ",   answer: "is_end",     choices: ["is_end", "end", "children"])
-        ]
+        ],
+        explanation: "文字ごとに子ノードを辿り、無ければ作る。単語末尾のノードに is_end フラグを立てる。O(語長)。"
     ),
 
     // 47. Trie Search
@@ -2284,7 +2378,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "nf":    PuzzleSlot(id: "nf",    label: "見つからない", answer: "False",      choices: ["False", "True", "None"]),
             "found": PuzzleSlot(id: "found", label: "終端チェック", answer: "node.is_end", choices: ["node.is_end", "True", "node.children == {}"])
-        ]
+        ],
+        explanation: "文字を辿り、途中で子が無ければ False。最後まで辿れて末尾ノードが is_end なら完全一致。接頭辞だけでは False。O(語長)。"
     ),
 
     // 48. Sliding Window Maximum
@@ -2311,7 +2406,8 @@ private let p1_50: [PuzzleProblem] = [
             "back":  PuzzleSlot(id: "back",  label: "後端インデックス", answer: "dq[-1]",  choices: ["dq[-1]", "dq[0]", "i"]),
             "front": PuzzleSlot(id: "front", label: "前端インデックス", answer: "0",       choices: ["0", "-1", "1"]),
             "start": PuzzleSlot(id: "start", label: "出力開始位置",    answer: "k - 1",   choices: ["k - 1", "k", "0"])
-        ]
+        ],
+        explanation: "単調減少 deque にインデックスを保持する。新値より小さい後端を捨て、範囲外の前端を popleft。先頭が常に窓の最大値。O(n)。"
     ),
 
     // 49. Permutations
@@ -2333,7 +2429,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "app":  PuzzleSlot(id: "app",  label: "結果に追加",   answer: "path[:]",    choices: ["path[:]", "path", "[path]"]),
             "rest": PuzzleSlot(id: "rest", label: "残りの要素",   answer: "rem[i+1:]",  choices: ["rem[i+1:]", "rem[i:]", "rem[:i]"])
-        ]
+        ],
+        explanation: "残り要素から1つ選んで path に加え、その要素を除いた残りで再帰する。残りが空になったら1順列が確定。O(n·n!)。"
     ),
 
     // 50. Subsets
@@ -2353,7 +2450,8 @@ private let p1_50: [PuzzleProblem] = [
         slots: [
             "app": PuzzleSlot(id: "app", label: "結果に追加", answer: "path[:]",  choices: ["path[:]", "path", "[path]"]),
             "rng": PuzzleSlot(id: "rng", label: "ループ開始", answer: "start",   choices: ["start", "0", "start + 1"])
-        ]
+        ],
+        explanation: "各ノードで現在の path を結果に加え、start 以降の要素を選んで再帰する。start を進めることで重複しない部分集合を網羅。O(n·2ⁿ)。"
     ),
     PuzzleProblem(
         id: "queue-two-stacks", title: "Implement Queue using Stacks", difficulty: "Easy", topic: "Queue / Design",

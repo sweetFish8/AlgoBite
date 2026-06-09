@@ -89,21 +89,15 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     switch problem.id {
     // Binary search variants — それぞれ違う配列と target で動かす
     case "binary-search":
-        BinarySearchAnim(nums: [1, 3, 5, 7, 9, 11, 13],
-                         target: 11,
-                         caption: "ソート済の中から 11 を探す")
+        BinarySearchAnim(nums: [-1, 0, 3, 5, 9, 12],
+                         target: 9,
+                         caption: "例題の配列から 9 を探す")
     case "search-rotated":
-        BinarySearchAnim(nums: [6, 7, 8, 1, 2, 3, 4, 5],
-                         target: 3,
-                         caption: "回転済の配列から 3 を探す (片側がソート済)")
+        RotatedBinarySearchAnim()
     case "first-last-pos":
-        BinarySearchAnim(nums: [1, 2, 2, 2, 3, 4, 5],
-                         target: 2,
-                         caption: "最初/最後の 2 を求める (lower / upper bound)")
+        SearchRangeAnim()
     case "median-two-arrays":
-        BinarySearchAnim(nums: [1, 3, 5, 8, 10, 14, 17],
-                         target: 8,
-                         caption: "2つの配列をマージした中央値の位置を二分探索")
+        MedianTwoArraysAnim()
     // Two pointers / strings
     case "palindrome-check": TwoPointerAnim(word: "racecar")
     case "reverse-string": TwoPointerAnim(word: "hello")
@@ -144,7 +138,8 @@ func topicAnimation(for problem: PuzzleProblem) -> some View {
     case "dfs-iterative": DFSIterativeAnim()
     case "num-islands":   NumIslandsAnim()
     case "level-order":
-        TreeTraversalAnim(order: .level, nodes: [3,9,20,1,2,15,7],
+        TreeTraversalAnim(order: .level, nodes: [3,9,20,0,0,15,7],
+                          hiddenIndices: [3, 4],
                           subtitle: "BFS で同じ深さをまとめて出力")
     case "topo-sort":       TopologicalSortAnim()
     case "course-schedule": TopologicalSortAnim()
@@ -251,6 +246,12 @@ func topicAnimationFallback(topic: String) -> some View {
         SortingAnim(kind: .selection)
     } else if t.contains("counting") || t.contains("counting sort") {
         SortingAnim(kind: .counting)
+    } else if t.contains("ヒープソート") || t.contains("heap sort") || t.contains("heapsort") {
+        // ヒープソートは SortingAnim に専用 kind がないため HeapAnim で代用。
+        // "ヒープ" を含む文字列は後段の heap 条件でも拾えるが、
+        // "ヒープソート" が "ソート" の汎用 bubble fallback に先に引っかかるのを防ぐため
+        // ここで明示的に分岐させる。
+        HeapAnim(kind: .kthLargest)
     } else if t.contains("sort") || t.contains("ソート") {
         SortingAnim(kind: .bubble)
     } else if t.contains("hash") || t.contains("ハッシュ") {
@@ -275,6 +276,8 @@ func topicAnimationFallback(topic: String) -> some View {
         SlidingWindowAnim(s: "abcabc", initialWidth: 1)
     } else if t.contains("dijkstra") || t.contains("ダイクストラ") {
         GridSearchAnim(kind: .bfs)
+    } else if t.contains("dag") || t.contains("topological") || t.contains("トポロジカル") {
+        TopologicalSortAnim()
     } else if t.contains("graph") || t.contains("bfs") || t.contains("dfs") || t.contains("グラフ") {
         GridSearchAnim(kind: .bfs)
     } else if t.contains("dp") || t.contains("dynamic") || t.contains("メモ化") || t.contains("lis") {

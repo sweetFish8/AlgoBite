@@ -57,6 +57,14 @@ final class GameViewModel: ObservableObject {
 
     /// 今日の一問 (穴埋め or 並べ替え)
     var todayChallenge: DailyChallenge {
+        #if DEBUG
+        // デバッグビルドでは常に固定の超基礎問題を出す。
+        // ホームプレビューカード・問題画面・autoplay すべてが同じ問題を参照するよう
+        // todayProblem の上流である todayChallenge ごと差し替える。
+        if let p = problems.first(where: { $0.id == DebugCapture.pinnedProblemID }) {
+            return .puzzle(p)
+        }
+        #endif
         let day = Calendar.current.ordinality(of: .day, in: .era, for: Date()) ?? 0
         let pool = dailyChallenges
         return pool[day % pool.count]
@@ -251,7 +259,7 @@ final class GameViewModel: ObservableObject {
             logMessage = "PASS 🎉 今日のパズルクリア！"
             justClearedToday = true
             Haptics.success()
-            stats.recordPuzzleClear(topic: todayProblem.topic)
+            stats.recordPuzzleClear(topic: todayProblem.topic, difficulty: todayProblem.difficulty)
             badges.evaluate(stats: stats, streak: streak)
         } else {
             let labels = wrong.compactMap { todayProblem.slots[$0]?.label }.joined(separator: " / ")

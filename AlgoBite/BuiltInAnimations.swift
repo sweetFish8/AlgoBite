@@ -131,6 +131,192 @@ struct BinarySearchAnim: View {
     }
 }
 
+// MARK: - Rotated Binary Search Animation
+
+struct RotatedBinarySearchAnim: View {
+    private let nums = [4, 5, 6, 7, 0, 1, 2]
+    private let target = 0
+    @State private var step = 0
+    @State private var found = false
+    @State private var token = 0
+
+    private var steps: [(l: Int, r: Int, mid: Int)] {
+        var result: [(Int, Int, Int)] = []
+        var l = 0
+        var r = nums.count - 1
+        while l <= r {
+            let mid = (l + r) / 2
+            result.append((l, r, mid))
+            if nums[mid] == target { break }
+            if nums[l] <= nums[mid] {
+                if nums[l] <= target && target < nums[mid] {
+                    r = mid - 1
+                } else {
+                    l = mid + 1
+                }
+            } else if nums[mid] < target && target <= nums[r] {
+                l = mid + 1
+            } else {
+                r = mid - 1
+            }
+        }
+        return result
+    }
+
+    var body: some View {
+        AnimFrame(title: "Rotated Binary Search", tint: .teal, onReplay: play) {
+            let current = steps[min(step, steps.count - 1)]
+            HStack(spacing: 5) {
+                ForEach(nums.indices, id: \.self) { index in
+                    let isMid = index == current.mid
+                    let isFound = found && isMid
+                    tile(width: 30, height: 30,
+                         bg: isFound ? .green :
+                             isMid ? .yellow :
+                             (current.l...current.r).contains(index) ? .teal.opacity(0.35) : .gray.opacity(0.15),
+                         fg: isMid && !isFound ? .black : .white) {
+                        Text("\(nums[index])")
+                    }
+                    .scaleEffect(isMid ? 1.15 : 1)
+                    .animation(.spring(response: 0.35), value: step)
+                }
+            }
+            Text(found
+                 ? "index 4 で target=0 を発見"
+                 : "片側のソート済み範囲を判定して探索側を絞る")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+
+    private func play() {
+        token += 1
+        let currentToken = token
+        step = 0
+        found = false
+        for index in steps.indices {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(index) * 0.8) {
+                guard currentToken == token else { return }
+                withAnimation { step = index }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4 + Double(steps.count) * 0.8) {
+            guard currentToken == token else { return }
+            withAnimation { found = true }
+        }
+    }
+}
+
+// MARK: - First and Last Position Animation
+
+struct SearchRangeAnim: View {
+    private let nums = [5, 7, 7, 8, 8, 10]
+    private let target = 8
+    private let visits = [2, 4, 3, 2, 4, 5]
+    @State private var visitCount = 0
+    @State private var result: [Int] = []
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "First / Last Position", tint: .purple, onReplay: play) {
+            HStack(spacing: 5) {
+                ForEach(nums.indices, id: \.self) { index in
+                    let isCurrent = visitCount > 0 && visits[visitCount - 1] == index
+                    let isAnswer = result.contains(index)
+                    tile(width: 30, height: 30,
+                         bg: isAnswer ? .green.opacity(0.75) :
+                             isCurrent ? .yellow : .purple.opacity(0.3),
+                         fg: isCurrent && !isAnswer ? .black : .white) {
+                        Text("\(nums[index])")
+                    }
+                    .scaleEffect(isCurrent ? 1.15 : 1)
+                    .animation(.spring(response: 0.35), value: visitCount)
+                }
+            }
+            Text(result.count == 2
+                 ? "target=8 の範囲は [\(result[0]), \(result[1])]"
+                 : visitCount <= 3 ? "lower bound を二分探索" : "upper bound を二分探索")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .onAppear { play() }
+    }
+
+    private func play() {
+        token += 1
+        let currentToken = token
+        visitCount = 0
+        result = []
+        for count in 1...visits.count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35 + Double(count - 1) * 0.55) {
+                guard currentToken == token else { return }
+                withAnimation {
+                    visitCount = count
+                    if count == 3 { result = [3] }
+                    if count == visits.count { result = [3, 4] }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Median of Two Sorted Arrays Animation
+
+struct MedianTwoArraysAnim: View {
+    private let a = [1, 3]
+    private let b = [2]
+    @State private var stage = 0
+    @State private var token = 0
+
+    var body: some View {
+        AnimFrame(title: "Median Partition", tint: .indigo, onReplay: play) {
+            VStack(alignment: .leading, spacing: 5) {
+                arrayRow(label: "A", values: a)
+                arrayRow(label: "B", values: b)
+                Text(caption)
+                    .font(.system(.caption2, design: .monospaced))
+                    .foregroundStyle(stage == 2 ? .green : .secondary)
+            }
+        }
+        .onAppear { play() }
+    }
+
+    private var caption: String {
+        switch stage {
+        case 0: return "入力 A=[1,3], B=[2]。短い B を内部の A に交換"
+        case 1: return "交換後 A=[2], B=[1,3]: i=0, j=2 は Bl=3 > Ar=2"
+        default: return "i=1, j=1 で分割成功 → median = 2.0"
+        }
+    }
+
+    private func arrayRow(label: String, values: [Int]) -> some View {
+        HStack(spacing: 5) {
+            Text(label + ":")
+                .font(.caption2.weight(.black))
+                .foregroundStyle(.indigo)
+            ForEach(values.indices, id: \.self) { index in
+                tile(width: 30, height: 28,
+                     bg: stage == 2 && values[index] == 2 ? .green.opacity(0.75) : .indigo.opacity(0.35)) {
+                    Text("\(values[index])")
+                }
+            }
+        }
+    }
+
+    private func play() {
+        token += 1
+        let currentToken = token
+        stage = 0
+        for nextStage in 1...2 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6 + Double(nextStage - 1) * 0.9) {
+                guard currentToken == token else { return }
+                withAnimation { stage = nextStage }
+            }
+        }
+    }
+}
+
 // MARK: - Two Pointer (Palindrome) Animation
 
 struct TwoPointerAnim: View {
@@ -342,4 +528,3 @@ struct AnagramAnim: View {
 }
 
 // MARK: - Reorder Quiz (LCS判定の並べ替え練習)
-

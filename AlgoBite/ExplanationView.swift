@@ -16,12 +16,9 @@ struct ExplanationView: View {
                 border: Pop.borderDefault) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    HStack(spacing: 6) {
-                        Image(systemName: "sparkles").font(.title3).foregroundStyle(Pop.accent)
-                        Text("解説アニメーション")
-                            .font(.subheadline.weight(.black))
-                            .foregroundStyle(Pop.inkWarmSub)
-                    }
+                    Text("解説アニメーション")
+                        .font(.subheadline.weight(.black))
+                        .foregroundStyle(Pop.inkWarmSub)
                     Spacer()
                     Button { play() } label: {
                         HStack(spacing: 4) {
@@ -60,12 +57,9 @@ struct ExplanationView: View {
                 topicAnimation
 
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "lightbulb.fill").font(.title3).foregroundStyle(Pop.accent)
-                        Text("ポイント")
-                            .font(.subheadline.weight(.black))
-                            .foregroundStyle(Pop.inkWarm)
-                    }
+                    Text("ポイント")
+                        .font(.subheadline.weight(.black))
+                        .foregroundStyle(Pop.inkWarm)
                     Text(problem.explanation.isEmpty ? problem.prompt : problem.explanation)
                         .font(.footnote.weight(.medium))
                         .foregroundStyle(Color(red: 0.47, green: 0.22, blue: 0.06))   // #78350F

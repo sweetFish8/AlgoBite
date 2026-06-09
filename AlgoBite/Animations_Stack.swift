@@ -93,8 +93,8 @@ struct StackAnim: View {
 // MARK: - Min Stack (sync min track)
 
 struct MinStackAnim: View {
-    let ops: [(String, Int?)] = [("push", 3), ("push", 5), ("push", 2), ("push", 1),
-                                  ("pop", nil), ("getMin", nil), ("pop", nil), ("getMin", nil)]
+    let ops: [(String, Int?)] = [("push", -2), ("push", 0), ("push", -3),
+                                  ("getMin", nil), ("pop", nil), ("getMin", nil)]
     @State private var stack: [Int] = []
     @State private var mins: [Int] = []
     @State private var op = ""
@@ -155,7 +155,7 @@ struct MinStackAnim: View {
 // MARK: - Valid Parentheses (stack match)
 
 struct ValidParensAnim: View {
-    let s: String = "({[]})"
+    let s: String = "()[]{}"
     @State private var idx = -1
     @State private var stack: [Character] = []
     @State private var matched: Bool = false
@@ -219,7 +219,7 @@ struct ValidParensAnim: View {
 // MARK: - Next Greater Element (monotonic stack)
 
 struct NextGreaterAnim: View {
-    let nums: [Int] = [2, 1, 3, 2, 5, 4, 6]
+    let nums: [Int] = [4, 1, 2, 3]
     @State private var i = -1
     @State private var stack: [Int] = []  // 値を持つ
     @State private var result: [Int] = []

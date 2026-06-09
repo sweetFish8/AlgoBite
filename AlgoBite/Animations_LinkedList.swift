@@ -124,10 +124,10 @@ struct LinkedListAnim: View {
 // MARK: - LRU Cache (linked list + recency)
 
 struct LRUCacheAnim: View {
-    let capacity = 3
+    let capacity = 2
     let ops: [(String, Int, Int?)] = [
-        ("put", 1, 10), ("put", 2, 20), ("put", 3, 30),
-        ("get", 1, nil), ("put", 4, 40), ("get", 2, nil)
+        ("put", 1, 1), ("put", 2, 2), ("get", 1, nil),
+        ("put", 3, 3), ("get", 2, nil)
     ]
     @State private var cache: [(key: Int, val: Int)] = []
     @State private var step = -1
@@ -227,8 +227,7 @@ struct TwoStacksQueueAnim: View {
     private func play() {
         token += 1; let t = token
         inStack = []; outStack = []; op = ""
-        let actions: [(String, Int?)] = [("push", 1), ("push", 2), ("push", 3),
-                                          ("pop", nil), ("push", 4), ("pop", nil)]
+        let actions: [(String, Int?)] = [("push", 1), ("push", 2), ("pop", nil)]
         for (k, (a, v)) in actions.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 1.1) {
                 guard t == token else { return }
@@ -251,8 +250,8 @@ struct TwoStacksQueueAnim: View {
 // MARK: - Circular Queue
 
 struct CircularQueueAnim: View {
-    let cap = 5
-    @State private var buf: [Int?] = Array(repeating: nil, count: 5)
+    let cap = 3
+    @State private var buf: [Int?] = Array(repeating: nil, count: 3)
     @State private var head = 0
     @State private var size = 0
     @State private var op = ""
@@ -300,8 +299,7 @@ struct CircularQueueAnim: View {
         token += 1; let t = token
         buf = Array(repeating: nil, count: cap); head = 0; size = 0; op = ""
         let actions: [(String, Int?)] = [
-            ("enQ", 1), ("enQ", 2), ("enQ", 3), ("deQ", nil),
-            ("enQ", 4), ("enQ", 5), ("enQ", 6)
+            ("enQ", 1), ("enQ", 2), ("enQ", 3), ("deQ", nil), ("enQ", 4)
         ]
         for (k, (a, v)) in actions.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(k) * 1.0) {
@@ -374,8 +372,8 @@ struct ReverseLinkedListAnim: View {
 // MARK: - Merge Two Sorted Lists
 
 struct MergeTwoListsAnim: View {
-    let a = [1, 3, 5, 7]
-    let b = [2, 4, 6, 8, 10]
+    let a = [1, 2, 4]
+    let b = [1, 3, 4]
     @State private var i = 0
     @State private var j = 0
     @State private var merged: [Int] = []
@@ -437,9 +435,9 @@ struct MergeTwoListsAnim: View {
 // MARK: - Detect Cycle (Floyd's tortoise & hare)
 
 struct DetectCycleFloydAnim: View {
-    // 0→1→2→3→4→5→2 (loop back to 2)
-    let nodes = [0, 1, 2, 3, 4, 5]
-    let cycleStart = 2
+    // 1→2→3→4→(2) value 2 のノードに戻る循環
+    let nodes = [1, 2, 3, 4]
+    let cycleStart = 1   // index 1 = value 2 のノード
     @State private var slow = 0
     @State private var fast = 0
     @State private var found = false
@@ -457,7 +455,7 @@ struct DetectCycleFloydAnim: View {
                     ZStack {
                         Circle().fill(Color.red.opacity(0.35))
                             .frame(width: 32, height: 32)
-                        Text("\(i)").font(.system(size: 11, weight: .black))
+                        Text("\(nodes[i])").font(.system(size: 11, weight: .black))
                             .foregroundStyle(.white)
                         if slow == i && fast == i && found {
                             Text("🎯").font(.title3).offset(y: -28)
@@ -566,7 +564,7 @@ struct AddTwoNumbersAnim: View {
 // MARK: - Middle of Linked List (slow / fast)
 
 struct MiddleOfLLAnim: View {
-    let vals = [1, 2, 3, 4, 5, 6, 7]
+    let vals = [1, 2, 3, 4, 5]
     @State private var slow = 0
     @State private var fast = 0
     @State private var done = false

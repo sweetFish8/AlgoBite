@@ -9,12 +9,14 @@ final class StatsStore: ObservableObject {
     @Published private(set) var solvedDates: Set<String>
     @Published private(set) var topicCounts: [String: Int]
     @Published private(set) var reorderClears: Int
+    @Published private(set) var hardClears: Int
     @Published private(set) var lastDate: String?
 
-    private let kTotal = "algobite.stats.totalSolved"
-    private let kDates = "algobite.stats.solvedDates"
-    private let kTopics = "algobite.stats.topicCounts"
+    private let kTotal   = "algobite.stats.totalSolved"
+    private let kDates   = "algobite.stats.solvedDates"
+    private let kTopics  = "algobite.stats.topicCounts"
     private let kReorder = "algobite.stats.reorderClears"
+    private let kHard    = "algobite.stats.hardClears"
 
     static let shared = StatsStore()
 
@@ -24,6 +26,7 @@ final class StatsStore: ObservableObject {
         solvedDates   = Set((d.array(forKey: kDates) as? [String]) ?? [])
         topicCounts   = (d.dictionary(forKey: kTopics) as? [String: Int]) ?? [:]
         reorderClears = d.integer(forKey: kReorder)
+        hardClears    = d.integer(forKey: kHard)
     }
 
     private func todayString() -> String {
@@ -37,21 +40,31 @@ final class StatsStore: ObservableObject {
         return f.string(from: d)
     }
 
-    func recordPuzzleClear(topic: String) {
+    func recordPuzzleClear(topic: String, difficulty: String) {
         totalSolved += 1
         solvedDates.insert(todayString())
+        let mainTopic = topic.components(separatedBy: " / ").first ?? topic
+        topicCounts[mainTopic, default: 0] += 1
+        if difficulty == "Hard" { hardClears += 1 }
+        lastDate = todayString()
+        persist()
+    }
+
+    /// クリアしたトピックの種類数
+    var distinctTopics: Int { topicCounts.keys.count }
+
+    func recordReorderClear(topic: String) {
+        reorderClears += 1
+        solvedDates.insert(todayString())
+        // 並べ替えもトピック別カウントに反映（得意分野バッジ対象）
         let mainTopic = topic.components(separatedBy: " / ").first ?? topic
         topicCounts[mainTopic, default: 0] += 1
         lastDate = todayString()
         persist()
     }
 
-    func recordReorderClear() {
-        reorderClears += 1
-        solvedDates.insert(todayString())
-        lastDate = todayString()
-        persist()
-    }
+    /// 穴埋め + 並べ替えの合計クリア数
+    var totalClears: Int { totalSolved + reorderClears }
 
     /// 過去N日の active 状態（古い方から）
     func activity(days: Int) -> [Bool] {
@@ -70,6 +83,7 @@ final class StatsStore: ObservableObject {
         d.set(Array(solvedDates), forKey: kDates)
         d.set(topicCounts, forKey: kTopics)
         d.set(reorderClears, forKey: kReorder)
+        d.set(hardClears,    forKey: kHard)
     }
 }
 
