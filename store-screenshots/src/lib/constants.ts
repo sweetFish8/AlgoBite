@@ -15,10 +15,8 @@ export type ExportSize = { label: string; w: number; h: number };
 
 export const EXPORT_SIZES: Record<Device, ExportSize[]> = {
   iphone: [
-    { label: '6.9"', w: 1320, h: 2868 },
-    { label: '6.5"', w: 1284, h: 2778 },
-    { label: '6.3"', w: 1206, h: 2622 },
-    { label: '6.1"', w: 1125, h: 2436 },
+    { label: '6.5"', w: 1242, h: 2688 },
+    { label: '5.5"', w: 1242, h: 2208 },
   ],
   ipad: [
     { label: '13" iPad',       w: 2064, h: 2752 },

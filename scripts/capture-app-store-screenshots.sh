@@ -9,7 +9,7 @@ SIMULATOR_DEVICE_TYPE="${SIMULATOR_DEVICE_TYPE:-com.apple.CoreSimulator.SimDevic
 WAIT_SECONDS="${WAIT_SECONDS:-3}"
 BOOT_TIMEOUT_SECONDS="${BOOT_TIMEOUT_SECONDS:-180}"
 DERIVED_DATA="$ROOT_DIR/.build/app-store-screenshots/DerivedData"
-OUTPUT_DIR="$ROOT_DIR/store-screenshots/public/screenshots/apple/iphone/ja"
+OUTPUT_DIR="${OUTPUT_DIR:-$ROOT_DIR/store-screenshots/public/screenshots/apple/iphone/ja}"
 
 run_with_timeout() {
   local seconds="$1"
