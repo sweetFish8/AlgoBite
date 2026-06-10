@@ -50,6 +50,7 @@ struct SettingsView: View {
     @StateObject private var s = SettingsStore.shared
     @State private var confirmingReset = false
     @State private var resetDone = false
+    @State private var soundOn = SoundFX.isEnabled
 
     var body: some View {
         ZStack {
@@ -96,6 +97,32 @@ struct SettingsView: View {
                         }
                     }
 
+                    // サウンド設定
+                    PopCard(fill: Pop.surface,
+                            border: Color(red: 0.99, green: 0.79, blue: 0.45)) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack(spacing: 8) {
+                                Text("🔊").font(.title3)
+                                Text("サウンド").font(.subheadline.weight(.black))
+                                    .foregroundStyle(Pop.ink)
+                            }
+                            Toggle(isOn: $soundOn) {
+                                Text("効果音")
+                                    .font(.subheadline.weight(.heavy))
+                                    .foregroundStyle(Pop.ink)
+                            }
+                            .tint(Pop.primary)
+                            .accessibilityHint("タップ音や正解音を鳴らします")
+                            .onChange(of: soundOn) { _, v in
+                                SoundFX.isEnabled = v
+                                if v { SoundFX.tap() }   // ONにしたら確認音
+                            }
+                            Text("消音スイッチがオンのときは鳴りません")
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(Pop.inkSub)
+                        }
+                    }
+
                     // 進捗リセット
                     PopCard(fill: Pop.surface,
                             border: Pop.danger.opacity(0.45)) {
@@ -130,7 +157,7 @@ struct SettingsView: View {
                                 .foregroundStyle(Pop.inkSub)
                             Divider()
                             // プライバシーポリシー（App Store 審査要件 5.1.1）
-                            Link(destination: URL(string: "https://lifeistech.co.jp/privacy")!) {
+                            Link(destination: URL(string: "https://sweetfish8.github.io/AlgoBite/privacy.html")!) {
                                 HStack(spacing: 4) {
                                     Text("プライバシーポリシー")
                                         .font(.caption.weight(.semibold))

@@ -99,6 +99,7 @@ struct PopButton<Label: View>: View {
 
     var body: some View {
         Button {
+            SoundFX.tap()
             shineTrigger += 1
             action()
         } label: {

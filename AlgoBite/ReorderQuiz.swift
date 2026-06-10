@@ -91,6 +91,7 @@ final class ReorderQuizViewModel: ObservableObject {
         guard !isCompleted, !isGrading else { return }
         picks.append(value)
         Haptics.selection()
+        SoundFX.tap()
     }
 
     func removeAt(_ index: Int) {
@@ -120,6 +121,7 @@ final class ReorderQuizViewModel: ObservableObject {
             isCompleted = true
             resultMood = .success
             Haptics.success()
+            SoundFX.correct()
             // ③ 累計統計に反映し、④ バッジを再評価
             let stats = StatsStore.shared
             stats.recordReorderClear(topic: quiz.topic)
@@ -132,6 +134,7 @@ final class ReorderQuizViewModel: ObservableObject {
 
         resultMood = .fail
         Haptics.error()
+        SoundFX.wrong()
         for (idx, ok) in mask.enumerated() where !ok {
             shakeTrigger[idx, default: 0] += 1
         }

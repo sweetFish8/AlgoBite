@@ -162,6 +162,7 @@ final class GameViewModel: ObservableObject {
         slotStates = [:]
         clearLastWrong(id)
         Haptics.light()
+        SoundFX.select()
     }
 
     func fillChoice(_ choice: String) {
@@ -170,6 +171,7 @@ final class GameViewModel: ObservableObject {
         slotStates = [:]
         activeSlotID = nextEmptySlot(after: id)
         Haptics.selection()
+        SoundFX.tap()
     }
 
     func resetCurrent() {
@@ -191,6 +193,7 @@ final class GameViewModel: ObservableObject {
             hintLevel = .gentle
             logMessage = "💭 ヒント1/2: ふんわりヒント"
             Haptics.light()
+            SoundFX.hint()
         case .gentle:
             // 1 スロット埋める
             let ids = todayProblem.orderedSlotIDs
@@ -203,6 +206,7 @@ final class GameViewModel: ObservableObject {
             }
             hintLevel = .fillOne
             Haptics.medium()
+            SoundFX.hint()
         case .fillOne:
             logMessage = "もうヒントはないよ"
             Haptics.warning()
@@ -265,12 +269,14 @@ final class GameViewModel: ObservableObject {
             logMessage = "PASS 🎉 今日のパズルクリア！"
             justClearedToday = true
             Haptics.success()
+            SoundFX.correct()
             stats.recordPuzzleClear(topic: todayProblem.topic, difficulty: todayProblem.difficulty)
             badges.evaluate(stats: stats, streak: streak)
         } else {
             let labels = wrong.compactMap { todayProblem.slots[$0]?.label }.joined(separator: " / ")
             logMessage = "FAIL: \(labels) を見直してください"
             Haptics.error()
+            SoundFX.wrong()
 
             // 不正解スロットを震わせる → 少し待ってから idle に戻して再挑戦できるようにする
             for id in wrong {
@@ -321,6 +327,7 @@ final class GameViewModel: ObservableObject {
         logMessage = "PASS 🎉 今日のひと口クリア！"
         justClearedToday = true
         Haptics.success()
+        SoundFX.correct()
         // 並べ替えのクリア記録は ReorderQuizViewModel.submit で既に行われている
         badges.evaluate(stats: stats, streak: streak)
     }
