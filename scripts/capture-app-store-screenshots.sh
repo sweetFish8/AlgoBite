@@ -151,7 +151,7 @@ capture() {
 
 capture "01-home.png" -captureMode
 capture "02-problem.png" -captureMode -nav problem -selectSlot first
-capture "03-problem-correct.png" -captureMode -nav problem -autoplay correct
+WAIT_SECONDS=8 capture "03-problem-correct.png" -captureMode -nav problem -autoplay correct
 capture "04-achievements.png" -captureMode -nav achievements
 capture "05-reorder-list.png" -captureMode -nav reorderList
 capture "06-review.png" -captureMode -nav review
