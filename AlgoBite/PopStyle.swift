@@ -78,23 +78,28 @@ struct PopButton<Label: View>: View {
     let fill: Color
     let shadow: Color
     let radius: CGFloat
+    let externalShine: Int
     let label: () -> Label
     @State private var pressed = false
+    @State private var shineTrigger = 0
 
     init(fill: Color = Pop.accent,
          shadow: Color = Pop.accentShadow,
          radius: CGFloat = 16,
+         externalShine: Int = 0,
          action: @escaping () -> Void,
          @ViewBuilder label: @escaping () -> Label) {
         self.action = action
         self.fill = fill
         self.shadow = shadow
         self.radius = radius
+        self.externalShine = externalShine
         self.label = label
     }
 
     var body: some View {
         Button {
+            shineTrigger += 1
             action()
         } label: {
             label()
@@ -110,7 +115,42 @@ struct PopButton<Label: View>: View {
                 .offset(y: pressed ? 1 : 4)
         )
         .offset(y: pressed ? 3 : 0)
+        .overlay(RadialShine(trigger: shineTrigger + externalShine).allowsHitTesting(false))
         ._onButtonGesture(pressing: { pressed = $0 }, perform: {})
+    }
+}
+
+/// ボタンタップ時に中心から放射状にキラッと光る演出
+struct RadialShine: View {
+    var trigger: Int
+    @State private var animate = false
+    private let rayCount = 12
+
+    var body: some View {
+        ZStack {
+            // 中心のリング
+            Circle()
+                .stroke(.white, lineWidth: 3)
+                .frame(width: 36, height: 36)
+                .scaleEffect(animate ? 2.0 : 0.3)
+            // 放射状の光線
+            ForEach(0..<rayCount, id: \.self) { i in
+                Capsule()
+                    .fill(.white)
+                    .frame(width: 3, height: 12)
+                    .offset(y: animate ? -30 : -8)
+                    .rotationEffect(.degrees(Double(i) / Double(rayCount) * 360))
+            }
+            .scaleEffect(animate ? 1.1 : 0.4)
+        }
+        .opacity(animate ? 0 : 0.95)
+        .blendMode(.plusLighter)
+        .onChange(of: trigger) { _, _ in
+            animate = false
+            DispatchQueue.main.async {
+                withAnimation(.easeOut(duration: 0.5)) { animate = true }
+            }
+        }
     }
 }
 

@@ -458,9 +458,14 @@ struct ContentView: View {
 
                 HStack(spacing: 6) {
                     Spacer()
-                    if vm.streak > 0 {
+                    if vm.isCompletedToday {
                         CupcakeIcon(size: 18)
                         Text("また明日もおやつ食べようね")
+                            .font(.caption.weight(.heavy))
+                            .foregroundStyle(Pop.inkWarm)
+                    } else if vm.streak > 0 {
+                        DonutIcon(size: 18)
+                        Text("今日のひと口、まだだよ！")
                             .font(.caption.weight(.heavy))
                             .foregroundStyle(Pop.inkWarm)
                     } else {
@@ -503,33 +508,46 @@ struct ContentView: View {
                     .padding(.horizontal, 18)
                     .frame(maxWidth: 560)
                     .frame(maxWidth: .infinity)
-                ScrollView {
-                    VStack(spacing: 14) {
-                        problemCard
-                        codeBlock
-                        if vm.isCompletedToday {
-                            completionCard
-                            ExplanationView(problem: vm.todayProblem,
-                                            segments: vm.segments(for:))
-                            // 解説の下：ホームに戻ってケーキ演出を見せる
-                            PopButton(fill: Color(red: 0.13, green: 0.77, blue: 0.37),
-                                      shadow: Color(red: 0.08, green: 0.55, blue: 0.26),
-                                      action: { withAnimation { path = [] } }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "fork.knife")
-                                    Text("ごちそうさまでした！")
-                                        .font(.headline.weight(.black))
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 14) {
+                            problemCard
+                            codeBlock
+                            if vm.isCompletedToday {
+                                completionCard
+                                ExplanationView(problem: vm.todayProblem,
+                                                segments: vm.segments(for:))
+                                    .id("explanation")
+                                // 解説の下：ホームに戻ってケーキ演出を見せる
+                                PopButton(fill: Color(red: 0.13, green: 0.77, blue: 0.37),
+                                          shadow: Color(red: 0.08, green: 0.55, blue: 0.26),
+                                          action: { withAnimation { path = [] } }) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "fork.knife")
+                                        Text("ごちそうさまでした！")
+                                            .font(.headline.weight(.black))
+                                    }
                                 }
+                            } else {
+                                answersPanel
                             }
-                        } else {
-                            answersPanel
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.top, 10)
+                        .padding(.bottom, 28)
+                        .frame(maxWidth: 560)
+                        .frame(maxWidth: .infinity)
+                    }
+                    #if DEBUG
+                    .onChange(of: vm.captureScrollPulse) { _, _ in
+                        withAnimation(.easeInOut(duration: 1.3)) {
+                            proxy.scrollTo("explanation", anchor: .top)
                         }
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.top, 10)
-                    .padding(.bottom, 28)
-                    .frame(maxWidth: 560)
-                    .frame(maxWidth: .infinity)
+                    .onChange(of: vm.captureHomePulse) { _, _ in
+                        withAnimation { path = [] }
+                    }
+                    #endif
                 }
             }
         }
@@ -748,6 +766,7 @@ struct ContentView: View {
                 }
 
                 PopButton(fill: Pop.accent, shadow: Pop.accentShadow,
+                          externalShine: vm.checkPulse,
                           action: { vm.runCheck() }) {
                     HStack(spacing: 8) {
                         Image(systemName: "play.fill")

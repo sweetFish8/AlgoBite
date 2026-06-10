@@ -12,6 +12,12 @@ final class GameViewModel: ObservableObject {
     @Published var logMessage: String = ""
     @Published private(set) var streak: Int = 0
     @Published private(set) var isCompletedToday: Bool = false
+    /// 撮影/プレビューで「こたえる」ボタンのキラッ演出を外部から発火させる用
+    @Published var checkPulse: Int = 0
+    /// 撮影/プレビューで解説までスクロールさせる用
+    @Published var captureScrollPulse: Int = 0
+    /// 撮影/プレビューでホームに戻す用
+    @Published var captureHomePulse: Int = 0
     @Published private(set) var attemptCount: Int = 0
     @Published private(set) var slotResults: [String: Bool] = [:]
     @Published var hintLevel: HintLevel = .none

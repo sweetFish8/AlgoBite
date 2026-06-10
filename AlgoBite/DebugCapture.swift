@@ -111,14 +111,54 @@ enum DebugCapture {
         guard let i = args.firstIndex(of: "-autoplay"),
               i + 1 < args.count else { return }
         let mode = args[i + 1]
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             let p = vm.todayProblem
             switch mode {
             case "correct":
-                for id in p.orderedSlotIDs {
-                    if let a = p.slots[id]?.answer { vm.answers[id] = a }
+                // 撮影/プレビュー用に「1マスずつ順に埋まっていく」様子を見せる
+                let ids = p.orderedSlotIDs
+                let step = 0.75
+                for (idx, id) in ids.enumerated() {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + step * Double(idx)) {
+                        vm.selectSlot(id)
+                        if let a = p.slots[id]?.answer { vm.answers[id] = a }
+                    }
                 }
-                vm.runCheck()
+                DispatchQueue.main.asyncAfter(deadline: .now() + step * Double(ids.count) + 0.5) {
+                    vm.runCheck()
+                }
+            case "demo":
+                // プレビュー用フルストーリー：①ふんわりヒント ②ヒントで1マス ③残りを順に ④採点
+                let ids = p.orderedSlotIDs
+                let step = 0.75
+                vm.revealHint()                       // ① gentle テキスト表示
+                var t = 2.4
+                DispatchQueue.main.asyncAfter(deadline: .now() + t) {
+                    vm.revealHint()                   // ② ヒントで最初の空きスロットを埋める
+                }
+                t += 1.2
+                for id in ids {                       // ③ 残りを1マスずつ
+                    DispatchQueue.main.asyncAfter(deadline: .now() + t) {
+                        if vm.answers[id] != p.slots[id]?.answer {
+                            vm.selectSlot(id)
+                            if let a = p.slots[id]?.answer { vm.answers[id] = a }
+                        }
+                    }
+                    t += step
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + t + 0.4) {
+                    vm.checkPulse += 1                 // ④「こたえる」のキラッ演出
+                }
+                let checkAt = t + 0.8
+                DispatchQueue.main.asyncAfter(deadline: .now() + checkAt) {
+                    vm.runCheck()                     // ⑤ 採点 → クリア演出
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + checkAt + 2.2) {
+                    vm.captureScrollPulse += 1        // ⑥ 解説アニメまでスクロール
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + checkAt + 6.4) {
+                    vm.captureHomePulse += 1          // ⑦ ホームに戻る（ストリーク+ケーキ演出）
+                }
             case "wrong":
                 for id in p.orderedSlotIDs {
                     if let choices = p.slots[id]?.choices,
