@@ -82,7 +82,76 @@
       }
     ],
     "android": [],
-    "ipad": [],
+    "ipad": [
+      {
+        "id": "algobite-home-ipad",
+        "layout": "hero",
+        "label": {
+          "ja": "毎日ひと口"
+        },
+        "headline": {
+          "ja": "アルゴリズムが\n続く習慣に。"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/01-home.png"
+      },
+      {
+        "id": "algobite-problem-ipad",
+        "layout": "device-bottom",
+        "label": {
+          "ja": "コードパズル"
+        },
+        "headline": {
+          "ja": "選んで埋めて\n考え方が身につく"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/02-problem.png"
+      },
+      {
+        "id": "algobite-correct-ipad",
+        "layout": "device-top",
+        "label": {
+          "ja": "クリア"
+        },
+        "headline": {
+          "ja": "解けたら\nしくみが見える"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/03-problem-correct.png",
+        "inverted": true
+      },
+      {
+        "id": "algobite-achievements-ipad",
+        "layout": "hero",
+        "label": {
+          "ja": "バッジ"
+        },
+        "headline": {
+          "ja": "続けた成果が\nバッジになる"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/04-achievements.png"
+      },
+      {
+        "id": "algobite-reorder-ipad",
+        "layout": "device-bottom",
+        "label": {
+          "ja": "並べ替えクイズ"
+        },
+        "headline": {
+          "ja": "処理の順番を\n手で動かして学ぶ"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/05-reorder-list.png",
+        "inverted": true
+      },
+      {
+        "id": "algobite-review-ipad",
+        "layout": "hero",
+        "label": {
+          "ja": "復習モード"
+        },
+        "headline": {
+          "ja": "134問をいつでも\n好きなだけ"
+        },
+        "screenshot": "/screenshots/apple/ipad/ja/06-review.png"
+      }
+    ],
     "android-7": [],
     "android-10": [],
     "feature-graphic": []
