@@ -38,10 +38,10 @@
         "id": "algobite-correct",
         "layout": "device-top",
         "label": {
-          "ja": "得意分野バッジ"
+          "ja": "クリア"
         },
         "headline": {
-          "ja": "続けた成果が\nバッジになる"
+          "ja": "解けたら\nしくみが見える"
         },
         "screenshot": "/screenshots/apple/iphone/ja/03-problem-correct.png",
         "inverted": true
@@ -50,10 +50,10 @@
         "id": "algobite-achievements",
         "layout": "hero",
         "label": {
-          "ja": "成長を実感"
+          "ja": "バッジ"
         },
         "headline": {
-          "ja": "ストリークも\n得意分野も見える"
+          "ja": "続けた成果が\nバッジになる"
         },
         "screenshot": "/screenshots/apple/iphone/ja/04-achievements.png"
       },
@@ -76,7 +76,7 @@
           "ja": "復習モード"
         },
         "headline": {
-          "ja": "103問をいつでも\n好きなだけ"
+          "ja": "134問をいつでも\n好きなだけ"
         },
         "screenshot": "/screenshots/apple/iphone/ja/06-review.png"
       }

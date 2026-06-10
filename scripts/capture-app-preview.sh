@@ -144,11 +144,15 @@ if command -v ffmpeg >/dev/null 2>&1; then
   : > "$TMP/list.txt"
   printf "file '%s'\n" "$TMP/01-home-pad.mp4"  >> "$TMP/list.txt"
   printf "file '%s'\n" "$TMP/02-solve-pad.mp4" >> "$TMP/list.txt"
-  # App Store のアプリプレビューは 886x1920 を要求するため、最終出力でその寸法へスケール
+  # App Store のアプリプレビューは 886x1920 を要求 + 音声トラック必須（無音でも必要）。
+  # 音声が無いと「オーディオがサポートされていないか破損しています」で弾かれる。
   ffmpeg -y -f concat -safe 0 -i "$TMP/list.txt" \
-    -vf "scale=886:1920,format=yuv420p" \
+    -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
+    -filter:v "scale=886:1920,format=yuv420p" \
+    -map 0:v:0 -map 1:a:0 \
     -c:v libx264 -pix_fmt yuv420p -profile:v high -level 4.0 -r 30 \
-    -movflags +faststart -an "$FINAL"
+    -c:a aac -b:a 128k -shortest \
+    -movflags +faststart "$FINAL"
   echo ""
   echo "✅ App preview ready: $FINAL"
   ffprobe -v error -select_streams v:0 \
