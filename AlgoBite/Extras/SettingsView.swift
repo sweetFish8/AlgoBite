@@ -166,6 +166,16 @@ struct SettingsView: View {
                                 }
                                 .foregroundStyle(Pop.accent)
                             }
+                            // お問い合わせ（サポート）
+                            Link(destination: URL(string: "https://forms.gle/tWAjuwjZ9wx3NL1k7")!) {
+                                HStack(spacing: 4) {
+                                    Text("お問い合わせ")
+                                        .font(.caption.weight(.semibold))
+                                    Image(systemName: "arrow.up.right")
+                                        .font(.caption2)
+                                }
+                                .foregroundStyle(Pop.accent)
+                            }
                         }
                     }
                 }
