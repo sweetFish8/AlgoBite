@@ -388,3 +388,43 @@ extension ReorderQuiz {
     }
 }
 
+
+// MARK: - 並べ替えクイズの計算量データ
+//
+// 各クイズが扱うアルゴリズム/データ構造の計算量。AlgoComplexity は Problems.swift で定義。
+extension ReorderQuiz {
+    /// クイズ id → 計算量。ReorderQuizView の完了カードから参照する。
+    static let complexity: [String: AlgoComplexity] = [
+        "bubble-sort-pass-1":      .init(time: "O(n²)",       space: "O(1)",    note: "隣接交換を全体に繰り返す。1パスは O(n)。"),
+        "bubble-sort-2-passes":    .init(time: "O(n²)",       space: "O(1)",    note: "1パスごとに最大要素が右端へ確定する。"),
+        "merge-sort-merge":        .init(time: "O(n+m)",      space: "O(n+m)",  note: "2つのソート済み列の先頭比較で統合（マージ操作）。"),
+        "merge-sort-merge-step":   .init(time: "O(n+m)",      space: "O(n+m)",  note: "最終マージ。全体のマージソートは O(n log n)。"),
+        "selection-sort-pass-1":   .init(time: "O(n²)",       space: "O(1)",    note: "未ソート部の最小値を選んで先頭へ。"),
+        "insertion-sort-step-1":   .init(time: "O(n²)",       space: "O(1)",    note: "整列済み部分へ1要素ずつ挿入。"),
+        "quicksort-partition":     .init(time: "O(n)",        space: "O(1)",    note: "基準値で1走査して2分割（partition）。全体は O(n log n)。"),
+        "counting-sort-count":     .init(time: "O(n+k)",      space: "O(k)",    note: "値の出現回数を数える（k=値の範囲）。"),
+        "heap-sort-extract":       .init(time: "O(n log n)",  space: "O(1)",    note: "取り出す度に sift-down で再構成。"),
+        "min-heap-insert":         .init(time: "O(log n)",    space: "O(1)",    note: "末尾に追加し親と比較して上へ（sift-up）。"),
+        "binary-search-visits":    .init(time: "O(log n)",    space: "O(1)",    note: "探索範囲を毎回半分に絞る。"),
+        "bfs-traversal":           .init(time: "O(V+E)",      space: "O(V)",    note: "キューで近い頂点から訪問。"),
+        "bfs-distances":           .init(time: "O(V+E)",      space: "O(V)",    note: "重みなしグラフの最短距離はBFSで層ごとに。"),
+        "dfs-traversal":           .init(time: "O(V+E)",      space: "O(V)",    note: "行けるところまで進んで戻る。"),
+        "dijkstra-finalize-order": .init(time: "O((V+E)log V)",space: "O(V)",   note: "最小ヒープで最短の頂点から確定。"),
+        "topological-sort":        .init(time: "O(V+E)",      space: "O(V+E)",  note: "入次数0から順に確定（Kahn法）。"),
+        "union-find-merge":        .init(time: "O(α(n))",     space: "O(n)",    note: "経路圧縮+ランクでほぼ定数（α≈逆アッカーマン）。"),
+        "stack-push-pop":          .init(time: "O(1)",        space: "O(n)",    note: "後入れ先出し。push/popは各 O(1)。"),
+        "queue-enqueue-dequeue":   .init(time: "O(1)",        space: "O(n)",    note: "先入れ先出し。enqueue/dequeueは各 O(1)。"),
+        "deque-both-ends":         .init(time: "O(1)",        space: "O(n)",    note: "両端の追加・削除がいずれも O(1)。"),
+        "tree-preorder":           .init(time: "O(n)",        space: "O(h)",    note: "根→左→右。再帰の深さは木の高さ h。"),
+        "tree-inorder":            .init(time: "O(n)",        space: "O(h)",    note: "左→根→右。BSTなら昇順に並ぶ。"),
+        "tree-postorder":          .init(time: "O(n)",        space: "O(h)",    note: "左→右→根。部分木を片付けてから根。"),
+        "tree-level-order":        .init(time: "O(n)",        space: "O(n)",    note: "キューで階層ごとにBFS。"),
+        "hanoi-2-disks":           .init(time: "O(2ⁿ)",       space: "O(n)",    note: "円盤n枚で移動回数は 2ⁿ-1。再帰の深さは n。"),
+        "fib-memo-order":          .init(time: "O(n)",        space: "O(n)",    note: "メモ化で各 fib(i) を1回だけ計算。"),
+        "factorial-return-order":  .init(time: "O(n)",        space: "O(n)",    note: "n回の再帰呼び出し。コールスタックは深さ n。"),
+        "lis-dp-values":           .init(time: "O(n²)",       space: "O(n)",    note: "各位置までの最長増加長を順に求める。"),
+        "string-reverse":          .init(time: "O(n)",        space: "O(1)",    note: "両端を入れ替えながら中央へ。"),
+        "permutations-lex":        .init(time: "O(n·n!)",     space: "O(n)",    note: "順列は n! 通り。辞書順に生成。"),
+        "kmp-failure":             .init(time: "O(n)",        space: "O(n)",    note: "接頭辞=接尾辞の最長一致表（失敗関数）。"),
+    ]
+}

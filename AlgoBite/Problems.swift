@@ -2545,3 +2545,151 @@ private let p1_50: [PuzzleProblem] = [
         explanation: "配列上で head と size を管理し、index は cap で剰余を取って循環させる。連続メモリのキューを overhead なく実装できる。"
     )
 ]
+
+// MARK: - 計算量データ（時間計算量 / 空間計算量）
+//
+// n は入力サイズ。space は原則「出力を除いた追加メモリ」を表す。
+// h は木の高さ、V/E はグラフの頂点数/辺数、L は文字列・単語長を表す。
+struct AlgoComplexity: Hashable {
+    let time: String
+    let space: String
+    let note: String
+}
+
+extension PuzzleData {
+    /// 問題 id → 計算量。ExplanationView から参照する。
+    static let complexity: [String: AlgoComplexity] = [
+        // Backtracking / 探索系
+        "combinations":      .init(time: "O(k·C(n,k))", space: "O(k)",    note: "全組み合わせを列挙。再帰の深さは最大 k。"),
+        "n-queens":          .init(time: "O(n!)",       space: "O(n)",    note: "行ごとに配置を試す。枝刈りで実際はもっと速い。"),
+        "word-search":       .init(time: "O(m·n·4^L)",  space: "O(L)",    note: "各マスから4方向に L 文字ぶん DFS。"),
+        "permutations":      .init(time: "O(n·n!)",     space: "O(n)",    note: "順列は n! 通り、各々の構築に O(n)。"),
+        "subsets":           .init(time: "O(n·2ⁿ)",     space: "O(n)",    note: "部分集合は 2ⁿ 通り。各々のコピーに O(n)。"),
+
+        // Two Pointers / 文字列
+        "palindrome-check":  .init(time: "O(n)",        space: "O(n)",    note: "両端から走査する考え方自体は O(1)。このコードは英数字を抜き出した文字列を作るので O(n)。"),
+        "longest-palindrome":.init(time: "O(n²)",       space: "O(1)",    note: "各中心から左右に広げる（中心展開）。"),
+        "anagram-check":     .init(time: "O(n)",        space: "O(1)",    note: "文字数を数えるだけ。文字種は定数。"),
+        "group-anagrams":    .init(time: "O(n·k log k)",space: "O(n·k)",  note: "各単語をソートしてキー化（k=単語長）。"),
+        "roman-to-int":      .init(time: "O(n)",        space: "O(1)",    note: "左から1文字ずつ加減算。"),
+        "reverse-string":    .init(time: "O(n)",        space: "O(1)",    note: "両端を入れ替えながら中央へ。"),
+        "container-water":   .init(time: "O(n)",        space: "O(1)",    note: "両端ポインタを内側へ寄せる。"),
+        "trapping-rain":     .init(time: "O(n)",        space: "O(1)",    note: "左右の最大高さを保持しながら1走査。"),
+
+        // 配列
+        "product-except-self":.init(time: "O(n)",       space: "O(1)",    note: "左右の累積積で割り算なしに求める（出力除く）。"),
+        "find-duplicate":    .init(time: "O(n)",        space: "O(1)",    note: "値を次の添字とみなしFloydの循環検出。"),
+        "rotate-array":      .init(time: "O(n)",        space: "O(n)",    note: "反転3回で回転。反転という考え方自体は O(1)。このコードはスライス複製があるので O(n)。"),
+        "merge-intervals":   .init(time: "O(n log n)",  space: "O(n)",    note: "開始でソートしてから順に統合。"),
+        "pascals-triangle":  .init(time: "O(n²)",       space: "O(n²)",   note: "各行は上の行の隣接和。"),
+        "buy-sell-stock":    .init(time: "O(n)",        space: "O(1)",    note: "最安値を更新しつつ最大利益を記録。"),
+        "spiral-matrix":     .init(time: "O(m·n)",      space: "O(1)",    note: "境界を縮めながら一筆書き（出力除く）。"),
+        "max-subarray":      .init(time: "O(n)",        space: "O(1)",    note: "Kadane法。負になったら部分和をリセット。"),
+
+        // 二分探索
+        "search-rotated":    .init(time: "O(log n)",    space: "O(1)",    note: "どちら半分がソート済みか判定して絞る。"),
+        "first-last-pos":    .init(time: "O(log n)",    space: "O(1)",    note: "左寄せ・右寄せの二分探索を2回。"),
+        "median-two-arrays": .init(time: "O(log(min(m,n)))", space: "O(1)", note: "短い方を二分探索で分割点を探す。"),
+        "binary-search":     .init(time: "O(log n)",    space: "O(1)",    note: "探索範囲を毎回半分に絞る。"),
+
+        // ビット演算
+        "count-bits":        .init(time: "O(n)",        space: "O(n)",    note: "dp[i]=dp[i>>1]+(i&1)。"),
+        "single-number":     .init(time: "O(n)",        space: "O(1)",    note: "全部XOR。同じ数は打ち消し合う。"),
+        "power-of-two":      .init(time: "O(1)",        space: "O(1)",    note: "n&(n-1)==0 で立つビットが1個か判定。"),
+        "reverse-bits":      .init(time: "O(1)",        space: "O(1)",    note: "32ビット固定なので定数時間。"),
+
+        // 数学
+        "gcd":               .init(time: "O(log min(a,b))", space: "O(1)", note: "ユークリッドの互除法。"),
+        "sieve":             .init(time: "O(n log log n)",  space: "O(n)", note: "エラトステネスの篩。倍数を消していく。"),
+        "fast-pow":          .init(time: "O(log n)",    space: "O(1)",    note: "指数を半分にしながら累乗（繰り返し二乗法）。"),
+
+        // ソート
+        "bubble-sort":       .init(time: "O(n²)",       space: "O(1)",    note: "隣接交換を繰り返す。安定ソート。"),
+        "insertion-sort":    .init(time: "O(n²)",       space: "O(1)",    note: "整列済み部分へ挿入。ほぼ整列済みなら速い。"),
+        "selection-sort":    .init(time: "O(n²)",       space: "O(1)",    note: "最小値を選んで先頭へ。交換回数は少ない。"),
+        "counting-sort":     .init(time: "O(n+k)",      space: "O(k)",    note: "値の出現数を数える（k=値の範囲）。"),
+        "merge-sort":        .init(time: "O(n log n)",  space: "O(n)",    note: "分割して統合。安定で最悪も n log n。"),
+        "quicksort":         .init(time: "O(n log n)",  space: "O(n)",    note: "平均 n log n、最悪 O(n²)。配列内で交換する考え方なら空間は O(log n)。このコードは左右の新リストを作るので O(n)。"),
+        "dutch-flag":        .init(time: "O(n)",        space: "O(1)",    note: "3ポインタで0/1/2を1走査で仕分け。"),
+
+        // 木
+        "balanced-bt":       .init(time: "O(n)",        space: "O(h)",    note: "高さを返しつつ差が2以上で打ち切り。"),
+        "build-tree-post":   .init(time: "O(n²)",       space: "O(n)",    note: "各ノードを1回ずつ作る考え方自体は O(n)。このコードはindex探索＋スライスがあるので最悪 O(n²)。"),
+        "lca-bt":            .init(time: "O(n)",        space: "O(h)",    note: "左右に分かれたら現ノードが共通祖先。"),
+        "flatten-bt":        .init(time: "O(n)",        space: "O(1)",    note: "右部分木を左の末尾に繋ぎ替える（反復・追加領域なし）。"),
+        "inorder-iter":      .init(time: "O(n)",        space: "O(h)",    note: "スタックで左へ潜る反復版の中順巡回。"),
+        "level-order":       .init(time: "O(n)",        space: "O(n)",    note: "キューで階層ごとにBFS。"),
+        "max-depth-bt":      .init(time: "O(n)",        space: "O(h)",    note: "左右の深さの max+1 を返す。"),
+        "validate-bst":      .init(time: "O(n)",        space: "O(h)",    note: "各ノードに上下限を渡して検査。"),
+        "lca-bst":           .init(time: "O(h)",        space: "O(1)",    note: "BSTの大小で進む方向を決める。"),
+        "kth-smallest-bst":  .init(time: "O(h+k)",      space: "O(h)",    note: "中順巡回で小さい順に k 個目。"),
+        "invert-bt":         .init(time: "O(n)",        space: "O(h)",    note: "左右の子を再帰的に入れ替える。"),
+        "symmetric-tree":    .init(time: "O(n)",        space: "O(h)",    note: "鏡写しの2ノードを同時に比較。"),
+        "path-sum":          .init(time: "O(n)",        space: "O(h)",    note: "残り和を引きながら葉まで降りる。"),
+        "diameter-bt":       .init(time: "O(n)",        space: "O(h)",    note: "各ノードで左右の深さの和を最大化。"),
+        "serialize-bt":      .init(time: "O(n)",        space: "O(n)",    note: "BFS/前順で文字列化し、同手順で復元。"),
+
+        // DP
+        "decode-ways":       .init(time: "O(n)",        space: "O(n)",    note: "直前2つしか参照しないので考え方自体は O(1)。このコードはdp配列を使うので O(n)。"),
+        "min-path-sum":      .init(time: "O(m·n)",      space: "O(1)",    note: "グリッドを直接書き換え、上・左の小さい方+自分。"),
+        "regex-matching":    .init(time: "O(m·n)",      space: "O(m·n)",  note: "'*'と'.'をdpで照合。"),
+        "wildcard-matching": .init(time: "O(m·n)",      space: "O(m·n)",  note: "'*'は0文字以上に対応。"),
+        "fibonacci-memo":    .init(time: "O(n)",        space: "O(n)",    note: "メモ化で重複計算を排除。"),
+        "climbing-stairs":   .init(time: "O(n)",        space: "O(n)",    note: "直前2つの和だけで決まるので考え方自体は O(1)。このコードはdp配列を使うので O(n)。フィボナッチと同型。"),
+        "house-robber":      .init(time: "O(n)",        space: "O(n)",    note: "直前2つしか使わないので考え方自体は O(1)。このコードはdp配列を使うので O(n)。"),
+        "coin-change":       .init(time: "O(n·amount)", space: "O(amount)", note: "金額ごとに最小枚数を更新。"),
+        "lcs":               .init(time: "O(m·n)",      space: "O(m·n)",  note: "一致なら左上+1、違えば上・左の max。"),
+        "lis":               .init(time: "O(n²)",       space: "O(n)",    note: "各位置までの最長増加長（二分探索でn log nも）。"),
+        "word-break":        .init(time: "O(n²)",       space: "O(n)",    note: "位置iまで分割可能かをdpで判定。"),
+        "edit-distance":     .init(time: "O(m·n)",      space: "O(m·n)",  note: "挿入・削除・置換の最小回数。"),
+        "knapsack":          .init(time: "O(n·W)",      space: "O(n·W)",  note: "各容量の値しか参照しないので考え方自体は O(W)。このコードは2次元dpなので O(n·W)（W=容量）。"),
+        "unique-paths":      .init(time: "O(m·n)",      space: "O(m·n)",  note: "1行ずつ更新する考え方なら O(n)。このコードは2次元dpなので O(m·n)。経路数は上+左。"),
+
+        // 貪欲 / スライディングウィンドウ / 文字列
+        "jump-game":         .init(time: "O(n)",        space: "O(1)",    note: "到達可能な最遠点を更新していく貪欲法。"),
+        "jump-game-ii":      .init(time: "O(n)",        space: "O(1)",    note: "現在の到達範囲を使い切る毎にジャンプ数+1。"),
+        "longest-substring": .init(time: "O(n)",        space: "O(k)",    note: "重複文字の位置を記録し窓を縮める（k=文字種）。"),
+        "min-window-substring":.init(time: "O(n)",      space: "O(k)",    note: "必要文字を満たす最小窓を右伸ばし左縮め。"),
+        "kmp-lps":           .init(time: "O(n)",        space: "O(n)",    note: "接頭辞=接尾辞の最長一致表（失敗関数）。"),
+
+        // グラフ
+        "bfs":               .init(time: "O(V+E)",      space: "O(V)",    note: "キューで近い頂点から探索。"),
+        "dfs-iterative":     .init(time: "O(V+E)",      space: "O(V)",    note: "スタックで深く潜る反復版。"),
+        "num-islands":       .init(time: "O(m·n)",      space: "O(m·n)",  note: "陸を見つけたら連結成分を塗りつぶす。"),
+        "course-schedule":   .init(time: "O(V+E)",      space: "O(V+E)",  note: "閉路があれば履修不可能（トポロジカル）。"),
+        "topo-sort":         .init(time: "O(V+E)",      space: "O(V+E)",  note: "入次数0から順に確定（Kahn法）。"),
+        "union-find":        .init(time: "O(α(n))",     space: "O(n)",    note: "経路圧縮+ランクでほぼ定数（α≈逆アッカーマン）。"),
+        "dijkstra":          .init(time: "O((V+E)log V)",space: "O(V)",   note: "最小ヒープで最短の頂点から確定。"),
+        "kruskal":           .init(time: "O(E log E)",  space: "O(V)",    note: "辺を軽い順に、閉路を作らず採用。"),
+        "queue-bfs-shortest":.init(time: "O(V+E)",      space: "O(V)",    note: "重みなしグラフの最短はBFSで。"),
+
+        // 連結リスト
+        "reverse-linked-list":.init(time: "O(n)",       space: "O(1)",    note: "ポインタの向きを順に反転。"),
+        "merge-two-lists":   .init(time: "O(n+m)",      space: "O(1)",    note: "小さい方を繋いでいくマージ。"),
+        "detect-cycle":      .init(time: "O(n)",        space: "O(1)",    note: "低速/高速ポインタが出会えば循環あり。"),
+        "add-two-numbers":   .init(time: "O(max(m,n))", space: "O(max(m,n))", note: "桁ごとに繰り上がりを処理。"),
+        "intersection-ll":   .init(time: "O(n+m)",      space: "O(1)",    note: "末尾を揃えて同時に進める。"),
+        "middle-ll":         .init(time: "O(n)",        space: "O(1)",    note: "高速ポインタが末尾で低速が中央。"),
+
+        // スタック / 単調スタック
+        "valid-parentheses": .init(time: "O(n)",        space: "O(n)",    note: "開き括弧を積み、閉じで対応を確認。"),
+        "largest-rectangle": .init(time: "O(n)",        space: "O(n)",    note: "単調増加スタックで左右の境界を求める。"),
+        "longest-valid-parens":.init(time: "O(n)",      space: "O(n)",    note: "添字をスタック管理、または左右2走査。"),
+        "next-greater":      .init(time: "O(n)",        space: "O(n)",    note: "単調減少スタックで右の最初の大きい値。"),
+        "min-stack":         .init(time: "O(1)",        space: "O(n)",    note: "最小値を別スタックで同期管理（各操作O(1)）。"),
+
+        // ヒープ / Hash / 設計
+        "two-sum":           .init(time: "O(n)",        space: "O(n)",    note: "見た値をハッシュに記録し補数を探す。"),
+        "lru-cache":         .init(time: "O(1)",        space: "O(容量)", note: "ハッシュ+双方向リストで各操作O(1)。"),
+        "kth-largest":       .init(time: "O(n log k)",  space: "O(k)",    note: "サイズkの最小ヒープを維持。"),
+        "top-k-freq":        .init(time: "O(n log k)",  space: "O(n)",    note: "頻度を数えてヒープでk個取り出す。"),
+        "sliding-window-max":.init(time: "O(n)",        space: "O(k)",    note: "単調デキューで窓内の最大を先頭に保つ。"),
+        "meeting-rooms":     .init(time: "O(n log n)",  space: "O(n)",    note: "終了時刻の最小ヒープで部屋を再利用。"),
+
+        // Trie / Queue
+        "trie-insert":       .init(time: "O(L)",        space: "O(L)",    note: "1文字ずつノードを辿って作る（L=単語長）。"),
+        "trie-search":       .init(time: "O(L)",        space: "O(1)",    note: "1文字ずつ子を辿るだけ。"),
+        "queue-two-stacks":  .init(time: "O(1)",        space: "O(n)",    note: "2スタックで入出力。各操作は償却O(1)。"),
+        "queue-circular":    .init(time: "O(1)",        space: "O(k)",    note: "配列+head/sizeで剰余により循環（各操作O(1)）。"),
+    ]
+}

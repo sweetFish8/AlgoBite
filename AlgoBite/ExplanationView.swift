@@ -70,9 +70,70 @@ struct ExplanationView: View {
                             in: RoundedRectangle(cornerRadius: 14))
                 .overlay(RoundedRectangle(cornerRadius: 14)
                     .stroke(Color(red: 0.96, green: 0.62, blue: 0.04), lineWidth: 1.2))
+
+                if let cx = PuzzleData.complexity[problem.id] {
+                    complexityCard(cx)
+                }
             }
         }
         .onAppear { play() }
+    }
+
+    // MARK: - 計算量カード
+
+    @ViewBuilder
+    private func complexityCard(_ cx: AlgoComplexity) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Image(systemName: "gauge.with.dots.needle.67percent")
+                    .font(.subheadline.weight(.bold))
+                Text("計算量")
+                    .font(.subheadline.weight(.black))
+            }
+            .foregroundStyle(Color(red: 0.20, green: 0.21, blue: 0.52))               // indigo ink
+
+            HStack(spacing: 10) {
+                complexityPill(icon: "clock.fill",         title: "時間", value: cx.time)
+                complexityPill(icon: "internaldrive.fill", title: "空間", value: cx.space)
+            }
+
+            if !cx.note.isEmpty {
+                Text(cx.note)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color(red: 0.30, green: 0.31, blue: 0.55))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(red: 0.93, green: 0.94, blue: 1.00),                        // #EDF0FF
+                    in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14)
+            .stroke(Color(red: 0.55, green: 0.58, blue: 0.95), lineWidth: 1.2))
+    }
+
+    private func complexityPill(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color(red: 0.42, green: 0.40, blue: 0.90))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.caption2.weight(.heavy))
+                    .foregroundStyle(Color(red: 0.45, green: 0.47, blue: 0.62))
+                Text(value)
+                    .font(.system(.subheadline, design: .monospaced).weight(.black))
+                    .foregroundStyle(Color(red: 0.20, green: 0.21, blue: 0.52))
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12).padding(.vertical, 9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white, in: RoundedRectangle(cornerRadius: 11))
+        .overlay(RoundedRectangle(cornerRadius: 11)
+            .stroke(Color(red: 0.78, green: 0.80, blue: 0.98), lineWidth: 1))
     }
 
     @ViewBuilder
