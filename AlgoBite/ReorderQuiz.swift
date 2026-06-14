@@ -395,6 +395,10 @@ struct ReorderQuizView: View {
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Color(red: 0.08, green: 0.32, blue: 0.18))
 
+                if let cx = ReorderQuiz.complexity[model.quiz.id] {
+                    reorderComplexityCard(cx)
+                }
+
                 // 解説アニメ — quiz topic に応じて自動選択
                 VStack(alignment: .leading, spacing: 6) {
                     Text("動きで見る")
@@ -405,6 +409,61 @@ struct ReorderQuizView: View {
                 .padding(.top, 4)
             }
         }
+    }
+
+    // MARK: - 計算量カード（完了時）
+
+    private func reorderComplexityCard(_ cx: AlgoComplexity) -> some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 6) {
+                Image(systemName: "gauge.with.dots.needle.67percent")
+                    .font(.caption.weight(.bold))
+                Text("計算量")
+                    .font(.caption.weight(.black))
+            }
+            .foregroundStyle(Color(red: 0.20, green: 0.21, blue: 0.52))
+
+            HStack(spacing: 8) {
+                reorderComplexityPill(icon: "clock.fill",         title: "時間", value: cx.time)
+                reorderComplexityPill(icon: "internaldrive.fill", title: "空間", value: cx.space)
+            }
+            if !cx.note.isEmpty {
+                Text(cx.note)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(Color(red: 0.30, green: 0.31, blue: 0.55))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(red: 0.93, green: 0.94, blue: 1.00),
+                    in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12)
+            .stroke(Color(red: 0.55, green: 0.58, blue: 0.95), lineWidth: 1.1))
+    }
+
+    private func reorderComplexityPill(icon: String, title: String, value: String) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: icon)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(Color(red: 0.42, green: 0.40, blue: 0.90))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 9, weight: .heavy))
+                    .foregroundStyle(Color(red: 0.45, green: 0.47, blue: 0.62))
+                Text(value)
+                    .font(.system(.footnote, design: .monospaced).weight(.black))
+                    .foregroundStyle(Color(red: 0.20, green: 0.21, blue: 0.52))
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10).padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10)
+            .stroke(Color(red: 0.78, green: 0.80, blue: 0.98), lineWidth: 1))
     }
 }
 
