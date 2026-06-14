@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- AdMob アプリ ID。INFOPLIST_KEY_ では Xcode に認識されず生成 Info.plist に
+	     入らないため、ここで明示的に指定する。GENERATE_INFOPLIST_FILE=YES のまま
+	     INFOPLIST_FILE にこのファイルを指定すると、自動生成キーとマージされる。
+	     ⚠️ 現在は Google のテスト ID。出荷前に自分の AdMob アプリ ID へ差し替えること。 -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+</dict>
+</plist>
