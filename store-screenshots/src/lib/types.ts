@@ -73,7 +73,8 @@ export type ThemeId =
   | "dark-bold"
   | "warm-editorial"
   | "ocean-fresh"
-  | "bloom-roast";
+  | "bloom-roast"
+  | "candy-pop";
 
 export type Theme = {
   id: string;
@@ -84,6 +85,13 @@ export type Theme = {
   fgAlt: string;       // text on bgAlt
   accent: string;
   muted: string;
+  // --- Optional "pop" decorations (used by colorful themes) ---
+  // When set, the slide background paints scattered multi-colored blobs from
+  // this palette instead of two monochrome accent blobs.
+  blobs?: string[];
+  // Optional richer background gradient (CSS) for normal / inverted slides.
+  bgGradient?: string;
+  bgGradientAlt?: string;
 };
 
 export type ProjectState = {

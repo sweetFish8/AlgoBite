@@ -277,9 +277,11 @@ function Caption({
 
 function backgroundFor(theme: Theme, inverted?: boolean) {
   if (inverted) {
-    return `linear-gradient(160deg, ${theme.bgAlt} 0%, ${shade(theme.bgAlt, -8)} 100%)`;
+    return theme.bgGradientAlt
+      ?? `linear-gradient(160deg, ${theme.bgAlt} 0%, ${shade(theme.bgAlt, -8)} 100%)`;
   }
-  return `linear-gradient(160deg, ${theme.bg} 0%, ${shade(theme.bg, -6)} 100%)`;
+  return theme.bgGradient
+    ?? `linear-gradient(160deg, ${theme.bg} 0%, ${shade(theme.bg, -6)} 100%)`;
 }
 
 function shade(hex: string, percent: number) {
@@ -731,9 +733,50 @@ function SlideBackground({
         color: inverted ? theme.fgAlt : theme.fg,
       }}
     >
-      <Blob cW={cW} color={theme.accent} x={-15} y={-10} size={55} opacity={inverted ? 0.25 : 0.32} />
-      <Blob cW={cW} color={theme.accent} x={70} y={75} size={45} opacity={inverted ? 0.18 : 0.25} />
+      {theme.blobs && theme.blobs.length > 0 ? (
+        <PopBlobs cW={cW} colors={theme.blobs} inverted={inverted} />
+      ) : (
+        <>
+          <Blob cW={cW} color={theme.accent} x={-15} y={-10} size={55} opacity={inverted ? 0.25 : 0.32} />
+          <Blob cW={cW} color={theme.accent} x={70} y={75} size={45} opacity={inverted ? 0.18 : 0.25} />
+        </>
+      )}
     </div>
+  );
+}
+
+// カラフルな複数ブロブ＋クッキー風コンフェッティ。位置は固定（再現性のため乱数なし）。
+function PopBlobs({ cW, colors, inverted }: { cW: number; colors: string[]; inverted?: boolean }) {
+  const c = (i: number) => colors[i % colors.length];
+  // 大きめのソフトブロブ（背景の彩り）
+  const blobs = [
+    { x: -18, y: -12, size: 52, ci: 0 },
+    { x: 64, y: -8, size: 40, ci: 1 },
+    { x: 74, y: 70, size: 46, ci: 2 },
+    { x: -16, y: 72, size: 42, ci: 3 },
+    { x: 30, y: 38, size: 30, ci: 4 },
+  ];
+  // 小さなくっきりドット（コンフェッティ／キャンディ感）
+  const dots = [
+    { x: 16, y: 14, r: 1.7, ci: 5 }, { x: 84, y: 30, r: 1.3, ci: 0 },
+    { x: 22, y: 58, r: 1.2, ci: 1 }, { x: 78, y: 56, r: 1.6, ci: 3 },
+    { x: 50, y: 12, r: 1.1, ci: 2 }, { x: 40, y: 82, r: 1.4, ci: 4 },
+    { x: 90, y: 84, r: 1.2, ci: 5 }, { x: 8, y: 40, r: 1.0, ci: 2 },
+  ];
+  return (
+    <>
+      {blobs.map((b, i) => (
+        <Blob key={`b${i}`} cW={cW} color={c(b.ci)} x={b.x} y={b.y} size={b.size}
+              opacity={inverted ? 0.32 : 0.42} />
+      ))}
+      {dots.map((d, i) => (
+        <div key={`d${i}`} style={{
+          position: "absolute", left: `${d.x}%`, top: `${d.y}%`,
+          width: `${d.r}%`, aspectRatio: "1 / 1", background: c(d.ci),
+          borderRadius: "50%", opacity: inverted ? 0.8 : 0.9, pointerEvents: "none",
+        }} />
+      ))}
+    </>
   );
 }
 

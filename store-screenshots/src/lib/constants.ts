@@ -131,6 +131,20 @@ export const THEMES: Record<string, Theme> = {
     accent: "#B8794A",
     muted: "#65736B",
   },
+  // ポップでカラフルなテーマ（AlgoBite ブランド配色：Duolingo風グリーン＋ビタミンカラー）
+  "candy-pop": {
+    id: "candy-pop",
+    name: "Candy Pop",
+    bg: "#FFF7E6",          // 明るいクリーム
+    bgAlt: "#2B1769",       // ディープパープル（反転スライド用）
+    fg: "#2B1B0A",          // 濃いブラウン文字
+    fgAlt: "#FFF7E6",
+    accent: "#FF7A1A",      // ビビッドオレンジ
+    muted: "#8A6D4F",
+    blobs: ["#FF7A1A", "#58CC02", "#FF4D6D", "#7C4DFF", "#21C7E8", "#FFD23F"],
+    bgGradient: "linear-gradient(150deg, #FFF7E6 0%, #FFE9C7 45%, #FFE0F0 100%)",
+    bgGradientAlt: "linear-gradient(150deg, #3A1E8C 0%, #2B1769 55%, #5A1E8C 100%)",
+  },
 };
 
 export function themeById(themeId: string | undefined): Theme {
