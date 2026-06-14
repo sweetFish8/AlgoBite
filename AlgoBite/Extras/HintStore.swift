@@ -28,11 +28,11 @@ final class HintStore: ObservableObject {
 // Google Mobile Ads SDK (v11+ / SwiftPM: github.com/googleads/swift-package-manager-google-mobile-ads)
 // を追加すると本番動作する。未追加でもビルドが通るよう canImport でガードしている。
 //
-// ⚠️ 本番リリース前に必須:
-//   1) Info.plist の GADApplicationIdentifier を自分のAdMob App IDに差し替え
-//   2) 下の adUnitID を自分のリワード広告ユニットIDに差し替え（現在はGoogle公式テストID）
-//   3) App Store Connect のプライバシー開示・プライバシーポリシーを更新
-//   4) SKAdNetworkIdentifiers を Info.plist に追加（計測用・推奨）
+// 本番設定:
+//   1) Info.plist の GADApplicationIdentifier = 本番 AdMob アプリID（設定済み）
+//   2) 下の adUnitID = 本番リワード広告ユニットID（設定済み）
+//   3) App Store Connect のプライバシー開示・プライバシーポリシー（更新済み）
+//   4) SKAdNetworkIdentifiers を Info.plist に追加（計測用・推奨／未対応）
 
 #if canImport(GoogleMobileAds)
 import GoogleMobileAds
@@ -43,8 +43,8 @@ import AppTrackingTransparency
 final class RewardedAdManager: NSObject, ObservableObject {
     static let shared = RewardedAdManager()
 
-    /// Google公式テスト用リワード広告ユニットID（本番では自分のIDに差し替え）
-    private let adUnitID = "ca-app-pub-3940256099942544/1712485313"
+    /// 本番リワード広告ユニットID
+    private let adUnitID = "ca-app-pub-5057819549270171/3907192660"
     private var rewardedAd: RewardedAd?
     private var isLoading = false
 

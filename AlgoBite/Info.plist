@@ -4,10 +4,9 @@
 <dict>
 	<!-- AdMob アプリ ID。INFOPLIST_KEY_ では Xcode に認識されず生成 Info.plist に
 	     入らないため、ここで明示的に指定する。GENERATE_INFOPLIST_FILE=YES のまま
-	     INFOPLIST_FILE にこのファイルを指定すると、自動生成キーとマージされる。
-	     ⚠️ 現在は Google のテスト ID。出荷前に自分の AdMob アプリ ID へ差し替えること。 -->
+	     INFOPLIST_FILE にこのファイルを指定すると、自動生成キーとマージされる。 -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-5057819549270171~3453559229</string>
 	<!-- 暗号化は HTTPS/TLS など OS 標準のみ＝輸出規制の非対象。
 	     これによりビルドアップロード時の輸出コンプライアンス申告ダイアログをスキップする。 -->
 	<key>ITSAppUsesNonExemptEncryption</key>
