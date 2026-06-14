@@ -8,5 +8,9 @@
 	     ⚠️ 現在は Google のテスト ID。出荷前に自分の AdMob アプリ ID へ差し替えること。 -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<!-- 暗号化は HTTPS/TLS など OS 標準のみ＝輸出規制の非対象。
+	     これによりビルドアップロード時の輸出コンプライアンス申告ダイアログをスキップする。 -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
