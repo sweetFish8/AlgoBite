@@ -747,13 +747,23 @@ struct ContentView: View {
                 }
 
                 HStack(spacing: 10) {
-                    smallBtn(vm.hintLabel, systemImage: "lightbulb.fill",
-                             fill: vm.hintLevel == .fillOne
-                                 ? Color(red: 0.61, green: 0.64, blue: 0.71)
-                                 : Pop.accent,
-                             shadow: vm.hintLevel == .fillOne
-                                 ? Color(red: 0.41, green: 0.45, blue: 0.50)
-                                 : Pop.accentShadow) { vm.revealHint() }
+                    if vm.canWatchAdForHint {
+                        // 通常ヒントを使い切ったら「広告を見てもう1スロット埋める」（リワード広告）
+                        smallBtn("広告でヒント", systemImage: "play.rectangle.fill",
+                                 fill: Pop.primary, shadow: Pop.primaryShadow) {
+                            RewardedAdManager.shared.showRewarded {
+                                vm.grantExtraHintFromAd()
+                            }
+                        }
+                    } else {
+                        smallBtn(vm.hintLabel, systemImage: "lightbulb.fill",
+                                 fill: vm.hintLevel == .fillOne
+                                     ? Color(red: 0.61, green: 0.64, blue: 0.71)
+                                     : Pop.accent,
+                                 shadow: vm.hintLevel == .fillOne
+                                     ? Color(red: 0.41, green: 0.45, blue: 0.50)
+                                     : Pop.accentShadow) { vm.revealHint() }
+                    }
                     smallBtn("リセット", systemImage: "arrow.counterclockwise",
                              fill: Color(red: 0.61, green: 0.64, blue: 0.71),
                              shadow: Color(red: 0.41, green: 0.45, blue: 0.50)) { vm.resetCurrent() }
