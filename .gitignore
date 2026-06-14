@@ -7,3 +7,14 @@ store-screenshots/exports/
 store-screenshots/node_modules/
 store-screenshots/.next/
 リリーススケジュール.md
+
+# Xcode user-specific state
+*.xcuserstate
+xcuserdata/
+
+# スクショ生成パイプラインのフォント原本（大容量・ローカルで再取得/サブセット）
+store-screenshots/public/fonts/
+
+# 個人用の生成画像（コミット対象外）
+/Firefly_*.jpg
+/Gemini_Generated_Image_*.png
