@@ -184,40 +184,57 @@ final class GameViewModel: ObservableObject {
         Haptics.light()
     }
 
-    /// 段階的ヒント: none → gentle (テキスト表示) → fillOne (1スロット埋める)
+    /// 段階的ヒント（ハイブリッド課金）:
+    ///   1段目（ふんわりテキスト）は無料。
+    ///   2段目以降（スロットを埋める強ヒント）はリワード広告の視聴が必要 → grantExtraHintFromAd()。
+    /// ここでは無料の1段目だけを担当する。
     func revealHint() {
         guard !isCompletedToday else { return }
         switch hintLevel {
         case .none:
             gentleHintText = HintStore.gentleText(for: todayProblem)
             hintLevel = .gentle
-            logMessage = "💭 ヒント1/2: ふんわりヒント"
+            logMessage = "💭 ふんわりヒント（強ヒントは広告で）"
             Haptics.light()
             SoundFX.hint()
-        case .gentle:
-            // 1 スロット埋める
-            let ids = todayProblem.orderedSlotIDs
-            if let id = ids.first(where: { answers[$0] != todayProblem.slots[$0]?.answer }),
-               let answer = todayProblem.slots[id]?.answer {
-                answers[id] = answer
-                slotStates = [:]
-                activeSlotID = nextEmptySlot(after: id)
-                logMessage = "ヒント2/2: \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
-            }
-            hintLevel = .fillOne
-            Haptics.medium()
-            SoundFX.hint()
-        case .fillOne:
-            logMessage = "もうヒントはないよ"
-            Haptics.warning()
+        case .gentle, .fillOne:
+            // 強ヒントは広告経由のみ。ここには通常来ない（UIが広告ボタンを出す）。
+            break
         }
     }
 
     var hintLabel: String {
         switch hintLevel {
-        case .none:    return "ヒント (1/2)"
-        case .gentle:  return "もう少し (2/2)"
+        case .none:    return "ヒント"
+        case .gentle:  return "ヒント表示中"
         case .fillOne: return "ヒント済"
+        }
+    }
+
+    /// まだ正解で埋まっていないスロットが残っているか
+    var hasEmptySlot: Bool {
+        todayProblem.orderedSlotIDs.contains { answers[$0] != todayProblem.slots[$0]?.answer }
+    }
+
+    /// ふんわりヒントを見た後（=gentle以降）かつ空きスロットが残っていれば、
+    /// 広告を見て「スロットを埋める強ヒント」を解放できる。
+    var canWatchAdForHint: Bool {
+        !isCompletedToday && hintLevel >= .gentle && hasEmptySlot
+    }
+
+    /// リワード広告の視聴完了で、空きスロットを1つ埋める（強ヒント）
+    func grantExtraHintFromAd() {
+        guard !isCompletedToday else { return }
+        let ids = todayProblem.orderedSlotIDs
+        if let id = ids.first(where: { answers[$0] != todayProblem.slots[$0]?.answer }),
+           let answer = todayProblem.slots[id]?.answer {
+            answers[id] = answer
+            slotStates = [:]
+            activeSlotID = nextEmptySlot(after: id)
+            hintLevel = .fillOne
+            logMessage = "🎬 広告ありがとう！ \(todayProblem.slots[id]?.label ?? id) を埋めたよ"
+            Haptics.medium()
+            SoundFX.hint()
         }
     }
 

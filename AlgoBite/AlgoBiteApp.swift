@@ -17,6 +17,9 @@ struct AlgoBiteApp: App {
                     #endif
                     // ⑧ 初回起動時にだけ通知許可を聞き、許可済みなら毎日 20:00 にリマインド
                     AppNotifications.requestAuthorizationIfNeeded()
+                    // 広告（AdMob）初期化＋ヒント用リワードの先読み、ATT許可リクエスト
+                    RewardedAdManager.shared.start()
+                    RewardedAdManager.shared.requestTrackingIfNeeded()
                 }
         }
     }
