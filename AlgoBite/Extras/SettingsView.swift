@@ -152,12 +152,12 @@ struct SettingsView: View {
                                     .font(.subheadline.weight(.black))
                                     .foregroundStyle(Pop.ink)
                             }
-                            Text("Version 1.1.0\n毎日ひと口、アルゴリズム。\nMade with 🍪 by ayu")
+                            Text("Version 1.2.0\n毎日ひと口、アルゴリズム。\nMade with 🍪 by ayu")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Pop.inkSub)
                             Divider()
                             // プライバシーポリシー（App Store 審査要件 5.1.1）
-                            Link(destination: URL(string: "https://sweetfish8.github.io/AlgoBite/privacy.html")!) {
+                            Link(destination: URL(string: "https://algobite.pages.dev/privacy")!) {
                                 HStack(spacing: 4) {
                                     Text("プライバシーポリシー")
                                         .font(.caption.weight(.semibold))

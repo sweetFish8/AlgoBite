@@ -374,7 +374,7 @@ struct ContentView: View {
                         .font(.system(size: 10, weight: .heavy))
                 }
                 .foregroundStyle(Pop.inkSub)
-                Text("AlgoBite v1.0  ·  毎日ひと口、アルゴリズム")
+                Text("AlgoBite v1.2.0  ·  毎日ひと口、アルゴリズム")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(Pop.inkSub.opacity(0.7))
             }
