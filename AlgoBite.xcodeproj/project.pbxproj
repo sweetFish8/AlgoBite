@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		04CCF24D63B2FFC648BB4F66 /* BadgesCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D639D7B499CB7D51B893CA /* BadgesCard.swift */; };
 		0993A114BC936F920091B2FF /* ReorderQuizList.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDF40FA4C5DCB4BD9BFB3E4 /* ReorderQuizList.swift */; };
+		15F08FB12FDE3D62002F921A /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 15F08FB02FDE3D62002F921A /* GoogleMobileAds */; };
 		206196F498DE26BDDB3DA2A7 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC74332E2B850A99D186FB7D /* Badges.swift */; };
 		2F7C7AEB2D14D401B955E104 /* AppDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E42D06D8C54F22926CDB9A2 /* AppDefaults.swift */; };
 		340F3E538B1FEC43BD21BD3D /* TopicIllustration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2CD3228FD7CA5DCCE1653C /* TopicIllustration.swift */; };
@@ -129,6 +130,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15F08FB12FDE3D62002F921A /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,13 +287,17 @@
 			};
 			buildConfigurationList = A10000610000000000000001 /* Build configuration list for PBXProject "AlgoBite" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ja,
 			);
 			mainGroup = A10000300000000000000001;
+			packageReferences = (
+				15F08FAF2FDE3D62002F921A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = A10000320000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -506,12 +512,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_LANGUAGE = ja;
 				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = ja;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
+				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに関連性の高い広告を表示するために使用します。";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -538,12 +548,16 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBite/AlgoBite.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_LANGUAGE = ja;
 				DEVELOPMENT_TEAM = 2K446D59RQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = ja;
 				INFOPLIST_KEY_CFBundleDisplayName = AlgoBite;
+				INFOPLIST_KEY_GADApplicationIdentifier = "ca-app-pub-3940256099942544~1458002511";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに関連性の高い広告を表示するために使用します。";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -569,7 +583,8 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_LANGUAGE = ja;
 				DEVELOPMENT_TEAM = R2PSG3H2PA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
@@ -598,7 +613,8 @@
 				CODE_SIGN_ENTITLEMENTS = AlgoBiteWidget/AlgoBiteWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_LANGUAGE = ja;
 				DEVELOPMENT_TEAM = 2K446D59RQ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = AlgoBiteWidget/Info.plist;
@@ -653,6 +669,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		15F08FAF2FDE3D62002F921A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		15F08FB02FDE3D62002F921A /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15F08FAF2FDE3D62002F921A /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000700000000000000001 /* Project object */;
 }
