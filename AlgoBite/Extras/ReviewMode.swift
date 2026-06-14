@@ -123,8 +123,7 @@ struct ReviewListView: View {
                     }
                 }
                 .padding(16)
-                .frame(maxWidth: 560)
-                .frame(maxWidth: .infinity)
+                .contentColumn()
             }
         }
         .navigationTitle("復習モード")
@@ -207,8 +206,7 @@ struct PracticeView: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 12)
                 .padding(.bottom, 28)
-                .frame(maxWidth: 560)
-                .frame(maxWidth: .infinity)
+                .contentColumn()
             }
         }
         .navigationTitle("復習: " + session.problem.title)

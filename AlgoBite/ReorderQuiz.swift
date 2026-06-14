@@ -176,6 +176,7 @@ struct ReorderQuizView: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 14)
                 .padding(.bottom, 28)
+                .contentColumn()
             }
         }
         .navigationTitle(model.quiz.title)

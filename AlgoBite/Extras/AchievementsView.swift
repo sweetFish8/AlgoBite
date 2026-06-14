@@ -33,8 +33,7 @@ struct AchievementsView: View {
                     BadgesCard(badges: badges)
                 }
                 .padding(16)
-                .frame(maxWidth: 560)
-                .frame(maxWidth: .infinity)
+                .contentColumn()
             }
         }
         .navigationTitle("実績")

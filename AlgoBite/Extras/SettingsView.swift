@@ -180,6 +180,7 @@ struct SettingsView: View {
                     }
                 }
                 .padding(16)
+                .contentColumn()
             }
         }
         .navigationTitle("設定")

@@ -136,8 +136,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 homeHeader
                     .padding(.horizontal, 18)
-                    .frame(maxWidth: 560)
-                    .frame(maxWidth: .infinity)
+                    .contentColumn()
                 ScrollView {
                     VStack(spacing: 18) {
                         streakSection      // 最上段 — 連続記録を一番目立たせる
@@ -148,8 +147,7 @@ struct ContentView: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 6)
                     .padding(.bottom, 28)
-                    .frame(maxWidth: 560)
-                    .frame(maxWidth: .infinity)
+                    .contentColumn()
                 }
             }
         }
@@ -506,8 +504,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 headerBar
                     .padding(.horizontal, 18)
-                    .frame(maxWidth: 560)
-                    .frame(maxWidth: .infinity)
+                    .contentColumn()
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 14) {
@@ -535,8 +532,7 @@ struct ContentView: View {
                         .padding(.horizontal, 18)
                         .padding(.top, 10)
                         .padding(.bottom, 28)
-                        .frame(maxWidth: 560)
-                        .frame(maxWidth: .infinity)
+                        .contentColumn()
                     }
                     #if DEBUG
                     .onChange(of: vm.captureScrollPulse) { _, _ in
